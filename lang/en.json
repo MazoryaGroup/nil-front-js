@@ -1,0 +1,79 @@
+{
+  "nav": {
+    "home": "HOME",
+    "about": "ABOUT",
+    "blogs": "BLOGS",
+    "contact": "CONTACT",
+    "search_placeholder": "Search here..."
+  },
+  "hero": {
+    "tagline": "Your Beauty, Our Passion",
+    "title": "Beauty Bliss",
+    "description": "Nurture your skin with the ultimate beauty indulgence.",
+    "shop_now": "Allocating time"
+  },
+  "sections": {
+    "explore": "EXPLORE",
+    "categories": "Our Categories",
+    "news": "NEWS",
+    "latest_articles": "Latest Articles",
+    "our_story": "OUR STORY",
+    "about_us": "About us",
+    "our_purpose": "OUR PURPOSE",
+    "vision_mission": "Our Vision & Mission",
+    "experts": "EXPERTS",
+    "meet_team": "Meet Our Team",
+    "faqs": "FAQ's",
+    "testimonials": "TESTIMONIALS",
+    "clients_review": "Clients Review",
+    "related": "RELATED",
+    "similar_posts": "Similar Posts"
+  },
+  "categories": {
+    "skin_care": "Skin care",
+    "hair_care": "Hair care",
+    "makeup": "Makeup",
+    "fragrances": "Fragrances",
+    "beauty_tools": "Beauty Tools"
+  },
+  "buttons": {
+    "shop_now": "Shop Now",
+    "read_more": "Read More",
+    "subscribe": "SUBSCRIBE",
+    "submit_now": "SUBMIT NOW",
+    "about_glomin": "ABOUT GLOMIN",
+    "sign_up": "Sign Up",
+    "log_in": "Log In",
+    "place_order": "Place Order"
+  },
+  "cta": {
+    "title": "Transform your skincare routine with glomin. shop now for exclusive offers!",
+    "free_shipping": "*Get Free Shipping"
+  },
+  "footer": {
+    "pages": "pages",
+    "resource": "Resource",
+    "utility": "Utility",
+    "home": "HOME",
+    "about": "About us",
+    "blogs": "Blogs",
+    "faq": "FAQ",
+    "contact": "Contact us",
+    "login": "Login",
+    "newsletter_text": "STAY CONNECTED WITH US FOR EXCLUSIVE UPDATES!",
+    "email_placeholder": "Email address",
+    "rights": "All rights reserved"
+  },
+  "forms": {
+    "email": "Email address",
+    "first_name": "First name",
+    "last_name": "Last name",
+    "phone": "Phone number",
+    "message": "Write your message here",
+    "password": "Password",
+    "submit": "SUBMIT"
+  },
+  "common": {
+    ".loading" : "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum."
+  }
+}

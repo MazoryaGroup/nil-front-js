@@ -1,0 +1,686 @@
+/* ============================================
+   Nil Beauty - Custom CSS
+   شبیه‌سازی تم Webflow Glomin
+   ============================================ */
+
+/* ============================================
+   ۱. Reset و متغیرها
+   ============================================ */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+:root {
+  /* رنگ‌ها */
+  --color-black: #1a1a1a;
+  --color-white: #ffffff;
+  --color-dark: #0e0e0e;
+  --color-cream: #f5f1eb;
+  --color-light-green: #e8f0e8;
+  --color-green: #c8d8c0;
+  --color-brown: #8b6f47;
+  --color-pink: #f4d5d5;
+  --color-gray: #666666;
+  --color-light-gray: #f5f5f5;
+  --color-border: #e5e5e5;
+
+  /* فونت‌ها */
+  --font-primary: 'Figtree', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+
+  /* سایزها */
+  --container-max: 1280px;
+  --container-padding: 20px;
+  --radius: 8px;
+  --radius-large: 20px;
+
+  /* انیمیشن */
+  --transition: 0.3s ease;
+}
+
+html {
+  scroll-behavior: smooth;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  font-family: var(--font-primary);
+  font-size: 16px;
+  line-height: 1.5;
+  color: var(--color-black);
+  background: var(--color-white);
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+img {
+  max-width: 100%;
+  height: auto;
+  display: block;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+  transition: var(--transition);
+}
+
+button {
+  font-family: inherit;
+  cursor: pointer;
+  border: none;
+  background: none;
+}
+
+ul, ol {
+  list-style: none;
+}
+
+/* ============================================
+   ۲. Utility Classes
+   ============================================ */
+.container,
+.w-container {
+  width: 100%;
+  max-width: var(--container-max);
+  margin: 0 auto;
+  padding: 0 var(--container-padding);
+}
+
+.w-layout-blockcontainer {
+  display: block;
+}
+
+.cover-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.color-white { color: var(--color-white); }
+.color-black { color: var(--color-black); }
+
+.body-small { font-size: 14px; color: var(--color-gray); }
+.body-large { font-size: 18px; font-weight: 500; }
+.body-x-small { font-size: 12px; text-transform: uppercase; letter-spacing: 1px; }
+
+.line-height-150 { line-height: 1.5; }
+.capitalize { text-transform: capitalize; }
+.mx-medium { max-width: 500px; }
+
+.d-flex { display: flex; }
+.d-none { display: none; }
+
+/* ============================================
+   ۳. دکمه‌ها
+   ============================================ */
+.primary-button,
+.secondary-button,
+.hero-btn,
+.cta-btn,
+.login-button,
+.password-submit {
+  display: inline-block;
+  padding: 14px 32px;
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  border-radius: 100px;
+  cursor: pointer;
+  transition: var(--transition);
+  border: 2px solid transparent;
+  text-align: center;
+}
+
+.primary-button {
+  background: var(--color-black);
+  color: var(--color-white);
+}
+
+.primary-button:hover {
+  background: transparent;
+  color: var(--color-black);
+  border-color: var(--color-black);
+}
+
+.primary-button.large {
+  padding: 18px 42px;
+  font-size: 15px;
+}
+
+.secondary-button {
+  background: transparent;
+  color: var(--color-black);
+  border-color: var(--color-black);
+}
+
+.secondary-button:hover {
+  background: var(--color-black);
+  color: var(--color-white);
+}
+
+.secondary-button.invert {
+  color: var(--color-white);
+  border-color: var(--color-white);
+}
+
+.secondary-button.invert:hover {
+  background: var(--color-white);
+  color: var(--color-black);
+}
+
+/* ============================================
+   ۴. صفحات (Page Wrap)
+   ============================================ */
+.page-wrap {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.section {
+  padding: 80px 0;
+}
+
+.section.to-top {
+  padding-top: 0;
+}
+
+/* ============================================
+   ۵. عنوان‌ها (Section Titles)
+   ============================================ */
+.section-title-wrap {
+  margin-bottom: 50px;
+}
+
+.title-wrap {
+  text-align: center;
+  max-width: 700px;
+  margin: 0 auto;
+}
+
+.subtitle {
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: var(--color-gray);
+  margin-bottom: 12px;
+}
+
+.title-wrap h1,
+.title-wrap h2 {
+  font-size: clamp(28px, 4vw, 48px);
+  font-weight: 500;
+  line-height: 1.2;
+  color: var(--color-black);
+}
+
+
+/* ============================================
+   ۷. Loading / Error States
+   ============================================ */
+.loading-placeholder,
+.page-loading {
+  padding: 40px;
+  text-align: center;
+  color: var(--color-gray);
+  font-size: 16px;
+}
+
+.form-message {
+  margin-top: 16px;
+  padding: 12px 16px;
+  border-radius: var(--radius);
+  font-size: 14px;
+  min-height: 20px;
+}
+
+/* ============================================
+   ۲۵. BLOG LIST PAGE
+   ============================================ */
+.blog-outer {
+  display: flex;
+  flex-direction: column;
+  gap: 60px;
+}
+
+/* ---------- Feature Blog (کارت بزرگ) ---------- */
+.blog-wrap {
+  display: grid;
+  grid-template-columns: 1.2fr 1fr;
+  gap: 0;
+  border-radius: var(--radius-large);
+  overflow: hidden;
+  background: var(--color-cream);
+  transition: var(--transition);
+}
+
+.blog-wrap:hover {
+  transform: translateY(-5px);
+}
+
+.feature-img {
+  height: 500px;
+  overflow: hidden;
+}
+
+.feature-img img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.8s ease;
+}
+
+.blog-wrap:hover .feature-img img {
+  transform: scale(1.05);
+}
+
+.feature-content {
+  padding: 60px 50px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 40px;
+}
+
+.feature-content .blog-content {
+  padding: 0;
+}
+
+.feature-content .blog-title {
+  font-size: clamp(24px, 2.5vw, 34px);
+  font-weight: 500;
+  line-height: 1.3;
+  margin: 16px 0;
+  color: var(--color-black);
+}
+
+.feature-content p {
+  font-size: 15px;
+  line-height: 1.7;
+  color: var(--color-gray);
+  margin-top: 12px;
+}
+
+.feature-content .secondary-button {
+  align-self: flex-start;
+}
+
+/* ---------- Blog List (کارت‌های کوچک) ---------- */
+.blog-list {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 30px;
+}
+
+/* ---------- Blog Card (مشترک) ---------- */
+.blog-card {
+  display: block;
+  border-radius: var(--radius-large);
+  overflow: hidden;
+  background: var(--color-white);
+  border: 1px solid var(--color-border);
+  transition: var(--transition);
+  height: 100%;
+}
+
+.blog-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.08);
+  border-color: transparent;
+}
+
+.blog-thumb {
+  height: 240px;
+  overflow: hidden;
+}
+
+.blog-thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.6s ease;
+}
+
+.blog-card:hover .blog-thumb img {
+  transform: scale(1.08);
+}
+
+.blog-content {
+  padding: 24px;
+}
+
+.blog-data {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 14px;
+}
+
+.blog-data.small {
+  justify-content: center;
+}
+
+.blog-category {
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: var(--color-gray);
+  padding: 4px 10px;
+  background: var(--color-light-gray);
+  border-radius: 100px;
+}
+
+.blog-title {
+  font-size: 18px;
+  font-weight: 500;
+  line-height: 1.4;
+  color: var(--color-black);
+  transition: var(--transition);
+}
+
+.blog-card:hover .blog-title {
+  color: var(--color-brown);
+}
+
+/* ---------- Pagination ---------- */
+.pagination {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 60px;
+}
+
+.pagination a,
+.pagination .w-pagination-next,
+.pagination .w-pagination-previous {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 40px;
+  height: 40px;
+  padding: 0 12px;
+  border-radius: 50%;
+  background: var(--color-white);
+  border: 1px solid var(--color-border);
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--color-black);
+  transition: var(--transition);
+  cursor: pointer;
+}
+
+.pagination a:hover,
+.pagination a.w--current {
+  background: var(--color-black);
+  color: var(--color-white);
+  border-color: var(--color-black);
+}
+
+/* ============================================
+   ۲۶. Responsive - Blog
+   ============================================ */
+@media (max-width: 991px) {
+  .blog-wrap {
+    grid-template-columns: 1fr;
+  }
+
+  .feature-img {
+    height: 350px;
+  }
+
+  .feature-content {
+    padding: 40px 30px;
+    gap: 30px;
+  }
+
+  .blog-list {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+@media (max-width: 767px) {
+  .blog-outer {
+    gap: 40px;
+  }
+
+  .feature-img {
+    height: 250px;
+  }
+
+  .feature-content {
+    padding: 30px 20px;
+  }
+
+  .blog-list {
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
+
+  .blog-thumb {
+    height: 200px;
+  }
+
+  .blog-content {
+    padding: 20px;
+  }
+
+  .blog-title {
+    font-size: 16px;
+  }
+}
+/* ============================================
+   ۲۹. CONTACT PAGE - تکمیلی
+   ============================================ */
+
+/* فرم */
+.contact-form {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+}
+
+.contact-form .text-field {
+  width: 100%;
+}
+
+.contact-form .textarea {
+  grid-column: 1 / -1;
+}
+
+.div-block {
+  grid-column: 1 / -1;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  flex-wrap: wrap;
+  margin-top: 10px;
+}
+
+/* چک‌باکس */
+.w-checkbox {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  font-size: 14px;
+  color: var(--color-gray);
+  cursor: pointer;
+  max-width: 400px;
+}
+
+.w-checkbox-input {
+  width: 18px;
+  height: 18px;
+  margin-top: 2px;
+  flex-shrink: 0;
+  accent-color: var(--color-black);
+  cursor: pointer;
+}
+
+.w-form-label {
+  line-height: 1.5;
+}
+
+.contact-link {
+  color: var(--color-black);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  font-weight: 500;
+}
+
+.contact-link:hover {
+  color: var(--color-brown);
+}
+
+/* ستون اطلاعات تماس */
+.contat-content {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.contat-content > p {
+  font-size: 15px;
+  line-height: 1.7;
+  color: var(--color-gray);
+}
+
+.contact-inner {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.contact-img {
+  border-radius: var(--radius-large);
+  overflow: hidden;
+  height: 250px;
+}
+
+.contact-img img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.contact-info {
+  display: flex;
+  flex-direction: column;
+  gap: 30px;
+}
+
+.contact-outer {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.contact-block {
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+}
+
+.contact-icon {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: var(--color-light-gray);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.contact-icon img {
+  width: 20px;
+  height: 20px;
+}
+
+.contact-block h6 {
+  font-size: 15px;
+  font-weight: 600;
+  margin-bottom: 4px;
+  color: var(--color-black);
+}
+
+.contact-block .body-small {
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+/* Follow Us */
+.follow-us {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding-top: 20px;
+  border-top: 1px solid var(--color-border);
+}
+
+.follow-us .color-black {
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.contact-social {
+  display: flex;
+  gap: 12px;
+}
+
+.social-contact {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: var(--color-light-gray);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: var(--transition);
+}
+
+.social-contact:hover {
+  background: var(--color-black);
+}
+
+.social-contact img {
+  width: 18px;
+  height: 18px;
+}
+
+.social-contact:hover img {
+  filter: invert(1);
+}
+
+/* ============================================
+   Responsive - Contact
+   ============================================ */
+@media (max-width: 991px) {
+  .contact-form {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 767px) {
+  .div-block {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .div-block .primary-button {
+    width: 100%;
+  }
+
+  .contact-img {
+    height: 200px;
+  }
+}

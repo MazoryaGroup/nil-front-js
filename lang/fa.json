@@ -1,0 +1,76 @@
+{
+  "nav": {
+    "home": "خانه",
+    "about": "درباره ما",
+    "blogs": "بلاگ",
+    "contact": "تماس",
+    "search_placeholder": "اینجا جستجو کنید..."
+  },
+  "hero": {
+    "tagline": "زیبایی شما، اشتیاق ما",
+    "title": "آرامش زیبایی",
+    "description": "پوست خود را با نهایت لذت زیبایی نوازش دهید.",
+    "shop_now": "همین حالا بخرید"
+  },
+  "sections": {
+    "explore": "کاوش",
+    "categories": "دسته‌بندی‌ها",
+    "news": "اخبار",
+    "latest_articles": "آخرین مقالات",
+    "our_story": "داستان ما",
+    "about_us": "درباره ما",
+    "our_purpose": "هدف ما",
+    "vision_mission": "چشم‌انداز و ماموریت",
+    "experts": "متخصصان",
+    "meet_team": "تیم ما را بشناسید",
+    "faqs": "سوالات متداول",
+    "testimonials": "نظرات",
+    "clients_review": "نظر مشتریان",
+    "related": "مرتبط",
+    "similar_posts": "مقالات مشابه"
+  },
+  "categories": {
+    "skin_care": "مراقبت پوست",
+    "hair_care": "مراقبت مو",
+    "makeup": "آرایشی",
+    "fragrances": "عطر",
+    "beauty_tools": "ابزار زیبایی"
+  },
+  "buttons": {
+    "shop_now": "خرید کنید",
+    "read_more": "بیشتر بخوانید",
+    "subscribe": "عضویت",
+    "submit_now": "ارسال کنید",
+    "about_glomin": "درباره گلومین",
+    "sign_up": "ثبت‌نام",
+    "log_in": "ورود",
+    "place_order": "ثبت سفارش"
+  },
+  "cta": {
+    "title": "روتین پوستی خود را با گلومین متحول کنید. همین حالا برای پیشنهادات ویژه خرید کنید!",
+    "free_shipping": "*ارسال رایگان"
+  },
+  "footer": {
+    "pages": "صفحات",
+    "resource": "منابع",
+    "utility": "ابزارها",
+    "home": "خانه",
+    "about": "درباره ما",
+    "blogs": "بلاگ",
+    "faq": "سوالات متداول",
+    "contact": "تماس با ما",
+    "login": "ورود",
+    "newsletter_text": "برای دریافت به‌روزرسانی‌های ویژه با ما در ارتباط باشید!",
+    "email_placeholder": "آدرس ایمیل",
+    "rights": "تمامی حقوق محفوظ است"
+  },
+  "forms": {
+    "email": "آدرس ایمیل",
+    "first_name": "نام",
+    "last_name": "نام خانوادگی",
+    "phone": "شماره تماس",
+    "message": "پیام خود را اینجا بنویسید",
+    "password": "رمز عبور",
+    "submit": "ارسال"
+  }
+}
