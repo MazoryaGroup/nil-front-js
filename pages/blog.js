@@ -9,7 +9,7 @@ export async function BlogPage() {
     <section class="title-section">
       <div class="w-layout-blockcontainer container w-container">
         <div class="title-wrap">
-          <div class="subtitle">BLOGS</div>
+          <div class="subtitle">${t('sections.blogs') || 'BLOGS'}</div>
           <h1>${t('sections.latest_articles')}</h1>
         </div>
       </div>
@@ -18,6 +18,7 @@ export async function BlogPage() {
     <section class="section to-top">
       <div class="w-layout-blockcontainer container w-container">
         <div class="blog-outer">
+
           <!-- FEATURE BLOG -->
           <div class="w-dyn-list">
             <div role="list" class="w-dyn-items">
@@ -32,7 +33,9 @@ export async function BlogPage() {
             <div role="list" class="blog-list w-dyn-items" data-blog-list>
               <div class="loading-placeholder">${t('common.loading')}</div>
             </div>
+            <div role="navigation" class="pagination" data-pagination></div>
           </div>
+
         </div>
       </div>
     </section>
@@ -48,7 +51,7 @@ export async function BlogPage() {
 }
 
 // ============================================
-// Feature Blog (بزرگ بالای صفحه)
+// Feature Blog (کارت بزرگ)
 // ============================================
 function loadFeatureBlog() {
   const container = document.querySelector('[data-feature-blog]');
@@ -57,7 +60,7 @@ function loadFeatureBlog() {
   // TODO: apiGet('/blogs/featured')
   const blog = {
     title: 'How to choose perfect fragrance for every occasion',
-    slug: 'how-to-choose-perfect-fragrance',
+    slug: 'how-to-choose-perfect-fragrance-for-every-occasion',
     category: 'Fragrances',
     date: 'Aug 23, 2024',
     excerpt: "Discover Glomin's collection of perfumes and learn how to select the right scent for your style and mood.",
@@ -93,12 +96,12 @@ function loadBlogList() {
 
   // TODO: apiGet('/blogs')
   const blogs = [
-    { title: 'The ultimate guide to glomin\'s skincare essentials', slug: 'skincare-essentials', category: 'Skincare', date: 'Aug 23, 2024', image: '/img/blog-thumb-02.jpg' },
-    { title: 'Essential tools & accessories for professional beauty routine', slug: 'beauty-tools', category: 'Accessories', date: 'Aug 23, 2024', image: '/img/blog-thumb-03.jpg' },
-    { title: 'Behind the scenes how we develop our premium beauty products', slug: 'behind-the-scenes', category: 'Company Insights', date: 'Aug 23, 2024', image: '/img/blog-thumb-04.jpg' },
-    { title: 'The importance of sun protection in your skincare routine', slug: 'sun-protection', category: 'Skincare', date: 'Aug 23, 2024', image: '/img/blog-thumb-05.jpg' },
-    { title: 'Exploring the benefits of serums and how to use them', slug: 'serums-benefits', category: 'Accessories', date: 'Aug 23, 2024', image: '/img/blog-thumb-06.jpg' },
-    { title: 'Glomin\'s favorite beauty hacks you need to know make life easier', slug: 'beauty-hacks', category: 'Beauty Tips', date: 'Aug 23, 2024', image: '/img/blog-thumb-07.jpg' }
+    { title: "The ultimate guide to glomin's skincare essentials", slug: 'the-ultimate-guide-to-glomins-skincare-essentials', category: 'Skincare', date: 'Aug 23, 2024', image: '/img/blog-thumb-02.jpg' },
+    { title: 'Essential tools & accessories for professional beauty routine', slug: 'essential-tools-accessories-for-professional-beauty-routine', category: 'Accessories', date: 'Aug 23, 2024', image: '/img/blog-thumb-03.jpg' },
+    { title: 'Behind the scenes how we develop our premium beauty products', slug: 'behind-the-scenes-how-we-develop-our-premium-beauty-products', category: 'Company Insights', date: 'Aug 23, 2024', image: '/img/blog-thumb-04.jpg' },
+    { title: 'The importance of sun protection in your skincare routine', slug: 'the-importance-of-sun-protection-in-your-skincare-routine', category: 'Skincare', date: 'Aug 23, 2024', image: '/img/blog-thumb-05.jpg' },
+    { title: 'Exploring the benefits of serums and how to use them', slug: 'exploring-the-benefits-of-serums-and-how-to-use-them', category: 'Accessories', date: 'Aug 23, 2024', image: '/img/blog-thumb-06.jpg' },
+    { title: "Glomin's favorite beauty hacks you need to know make life easier", slug: 'glomins-favorite-beauty-hacks-you-need-to-know-make-life-easier', category: 'Beauty Tips', date: 'Aug 23, 2024', image: '/img/blog-thumb-07.jpg' }
   ];
 
   container.innerHTML = blogs.map(b => `
@@ -114,6 +117,7 @@ function loadBlogList() {
           </div>
           <h3 class="blog-title">${b.title}</h3>
         </div>
+        <div class="d-none">Blogs</div>
       </a>
     </div>
   `).join('');
