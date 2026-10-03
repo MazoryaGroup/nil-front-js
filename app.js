@@ -19,9 +19,10 @@ import { ContactPage } from './pages/contact.js';
 import { FaqPage } from './pages/faq.js';
 import { CheckoutPage } from './pages/checkout.js';
 import { LoginPage } from './pages/login.js';
-import { NotFoundPage } from './pages/not-found.js';
-import { DashboardPage } from './pages/dashboard.js';
 import { RegisterPage } from './pages/register.js';
+import { DashboardPage } from './pages/dashboard.js';
+import { GalleryPage } from './pages/gallery.js';
+import { NotFoundPage } from './pages/not-found.js';
 
 // ============================================
 // مسیرها
@@ -29,14 +30,15 @@ import { RegisterPage } from './pages/register.js';
 const routes = [
   { path: '/',              component: HomePage,       title: 'Nil Beauty' },
   { path: '/about',         component: AboutPage,      title: 'درباره ما' },
+  { path: '/gallery',       component: GalleryPage,    title: 'گالری' },
   { path: '/blog',          component: BlogPage,       title: 'بلاگ' },
   { path: '/blog/:slug',    component: BlogSinglePage, title: 'مقاله' },
   { path: '/contact',       component: ContactPage,    title: 'تماس' },
   { path: '/faq',           component: FaqPage,        title: 'سوالات' },
   { path: '/checkout',      component: CheckoutPage,   title: 'پرداخت' },
   { path: '/login',         component: LoginPage,      title: 'ورود' },
-  { path: '/dashboard',     component: DashboardPage,  title: 'داشبورد' },
   { path: '/register',      component: RegisterPage,   title: 'ثبت‌نام' },
+  { path: '/dashboard',     component: DashboardPage,  title: 'داشبورد' },
   { path: '*',              component: NotFoundPage,   title: '404' }
 ];
 
@@ -57,6 +59,7 @@ async function bootstrap() {
 
     window.__app = { router };
 
+    // بعد از هر تغییر صفحه، header رو دوباره init کن
     window.addEventListener('pageChanged', () => {
       setTimeout(() => initHeader(), 50);
     });

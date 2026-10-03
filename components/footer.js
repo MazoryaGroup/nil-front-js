@@ -82,11 +82,11 @@ export function Footer() {
               <a href="https://www.whatsapp.com/" target="_blank" class="social-link w-inline-block">
                 <img src="/img/whatsapp.png" loading="lazy" alt="WhatsApp" />
               </a>
-              <a href="https://www.youtube.com/" target="_blank" class="social-link w-inline-block">
-                <img src="/img/phone.png" loading="lazy" alt="Phone" />
-              </a>
+             <a href="tel:+982122634768" class="social-link w-inline-block">
+    <img src="/img/phone.png" loading="lazy" alt="Phone" />
+</a>
               <a href="https://www.instagram.com/" target="_blank" class="social-link w-inline-block">
-                <img src="/img/insta.svg" loading="lazy" alt="Instagram" />
+                <img src="/img/insta.png" loading="lazy" alt="Instagram" />
               </a>
             </div>
           </div>

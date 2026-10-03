@@ -6,7 +6,7 @@ let currentLang = 'en';
 let translations = {};
 
 const SUPPORTED_LANGS = ['fa', 'en'];
-const DEFAULT_LANG = 'en';  // ← انگلیسی پیش‌فرض
+const DEFAULT_LANG = 'en';
 const STORAGE_KEY = 'nil-beauty-lang';
 
 // ============================================
@@ -14,6 +14,7 @@ const STORAGE_KEY = 'nil-beauty-lang';
 // ============================================
 async function loadTranslations(lang) {
   try {
+    // ✅ مسیر از روت (asset روت هست)
     const res = await fetch(`/lang/${lang}.json`);
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
     return await res.json();

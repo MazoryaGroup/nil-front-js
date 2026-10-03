@@ -14,13 +14,13 @@ export async function HomePage() {
             <div class="hero-left">
               <div class="hero-avatar"></div>
               <div class="hero-middle">
-                <img src="/img/3.jpg" loading="eager" alt="Hero Left" class="cover-image" />
+                <img src="/img/Hero Left.jpg" loading="eager" alt="Hero Left" class="cover-image" />
               </div>
               <p class="line-height-150 capitalize">${t('hero.tagline')}</p>
             </div>
             <div class="hero-right">
               <div class="hero-image">
-                <img src="/asset/img/1.jpg" loading="eager" alt="Hero Center" class="cover-image" />
+                <img src="/asset/img/Hero Center.jpg" loading="eager" alt="Hero Center" class="cover-image" />
               </div>
               <div class="hero-content">
                 <div class="hero-top">
@@ -28,10 +28,10 @@ export async function HomePage() {
                     <h2 class="color-white">${t('hero.title')}</h2>
                     <p class="line-height-150">${t('hero.description')}</p>
                   </div>
-                  <a href="/product" class="hero-btn w-button">${t('hero.shop_now')}</a>
+                  <a href="/login" class="hero-btn w-button">${t('hero.shop_now')}</a>
                 </div>
                 <div class="hero-img">
-                  <img src="/asset/img/2.jpg" loading="eager" alt="Hero Right" class="cover-image" />
+                  <img src="/asset/img/Hero Right.jpg" loading="eager" alt="Hero Right" class="cover-image" />
                 </div>
               </div>
             </div>
@@ -55,7 +55,7 @@ export async function HomePage() {
               <div role="listitem" class="w-dyn-item">
                 <a href="/category/skin-care" class="feature-category w-inline-block" data-nav-link>
                   <div class="category-text">${t('categories.skin_care')}</div>
-                  <img src="/img/4.jpg" loading="eager" alt="${t('categories.skin_care')}" class="cover-image" />
+                  <img src="/img/skin-care.jpg" loading="eager" alt="${t('categories.skin_care')}" class="cover-image" />
                 </a>
               </div>
             </div>
@@ -64,25 +64,25 @@ export async function HomePage() {
             <div role="list" class="categories-wrap w-dyn-items">
               <div role="listitem" class="d-flex w-dyn-item">
                 <a href="/category/hair-care" class="category-card w-inline-block" data-nav-link>
-                  <img src="/img/6.jpg" loading="eager" alt="${t('categories.hair_care')}" class="cover-image" />
+                  <img src="/img/hair_care.jpg" loading="eager" alt="${t('categories.hair_care')}" class="cover-image" />
                   <div class="category-text">${t('categories.hair_care')}</div>
                 </a>
               </div>
               <div role="listitem" class="d-flex w-dyn-item">
                 <a href="/category/makeup" class="category-card w-inline-block" data-nav-link>
-                  <img src="/img/5.jpg" loading="eager" alt="${t('categories.makeup')}" class="cover-image" />
+                  <img src="/img/makeup.jpg" loading="eager" alt="${t('categories.makeup')}" class="cover-image" />
                   <div class="category-text">${t('categories.makeup')}</div>
                 </a>
               </div>
               <div role="listitem" class="d-flex w-dyn-item">
                 <a href="/category/fragrances" class="category-card w-inline-block" data-nav-link>
-                  <img src="/img/7.jpg" loading="eager" alt="${t('categories.fragrances')}" class="cover-image" />
+                  <img src="/img/fragrances.jpg" loading="eager" alt="${t('categories.fragrances')}" class="cover-image" />
                   <div class="category-text">${t('categories.fragrances')}</div>
                 </a>
               </div>
               <div role="listitem" class="d-flex w-dyn-item">
                 <a href="/category/beauty-tools" class="category-card w-inline-block" data-nav-link>
-                  <img src="/img/8.jpg" loading="eager" alt="${t('categories.beauty_tools')}" class="cover-image" />
+                  <img src="/img/beauty_tools.jpg" loading="eager" alt="${t('categories.beauty_tools')}" class="cover-image" />
                   <div class="category-text">${t('categories.beauty_tools')}</div>
                 </a>
               </div>
@@ -97,7 +97,7 @@ export async function HomePage() {
       <div class="w-layout-blockcontainer container w-container">
         <div class="about-block">
           <div class="about-img">
-            <img src="/img/9.jpg" loading="lazy" alt="About" class="cover-image" />
+            <img src="/img/about-img.jpg" loading="lazy" alt="About" class="cover-image" />
           </div>
           <div class="about-data">
             <div class="about-top">
@@ -109,7 +109,7 @@ export async function HomePage() {
             </div>
           </div>
           <div class="about-right">
-            <img src="/img/10.jpg" loading="lazy" alt="About Right" class="cover-image" />
+            <img src="/img/about-right.jpg" loading="lazy" alt="About Right" class="cover-image" />
           </div>
         </div>
       </div>
@@ -120,18 +120,18 @@ export async function HomePage() {
       <div class="w-layout-blockcontainer container w-container">
         <div class="w-dyn-list">
           <div role="list" class="category-list w-dyn-items">
-            <div style="background-image: url('/img/11.jpg');" role="listitem" class="category-block w-dyn-item">
+            <div style="background-image: url('/img/skin_care.jpg');" role="listitem" class="category-block w-dyn-item">
               <a href="/category/skin-care" class="caegory-link w-inline-block" data-nav-link>
                 <div class="body-x-small capitalize">Radiant Skin Solutions</div>
                 <h2 class="category-title">Shop premium beauty products at beauty bliss by glomin</h2>
-                <div class="secondary-button invert">${t('buttons.shop_now')}</div>
+                
               </a>
             </div>
-            <div style="background-image: url('/img/12.jpg');" role="listitem" class="category-block w-dyn-item">
+            <div style="background-image: url('/img/beauty-tools.jpg');" role="listitem" class="category-block w-dyn-item">
               <a href="/category/beauty-tools" class="caegory-link w-inline-block" data-nav-link>
                 <div class="body-x-small capitalize">Free Shipping</div>
                 <h2 class="category-title">Elevate your beauty routine every time with our premium products</h2>
-                <div class="secondary-button invert">${t('buttons.shop_now')}</div>
+                
               </a>
             </div>
           </div>
