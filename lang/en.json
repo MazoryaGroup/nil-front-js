@@ -4,7 +4,8 @@
     "about": "ABOUT",
     "blogs": "BLOGS",
     "contact": "CONTACT",
-    "search_placeholder": "Search here..."
+    "search_placeholder": "Search here...",
+    "dashboard": "DASHBOARD"
   },
   "hero": {
     "tagline": "Your Beauty, Our Passion",
@@ -74,6 +75,8 @@
     "submit": "SUBMIT"
   },
   "common": {
+    "optional": "Optional", 
+    "loading": "Loading...",
     ".loading" : "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum."
   },
   "auth": {
@@ -116,6 +119,10 @@
     "msg_error_send": "Error sending code",
     "msg_error_verify": "Invalid verification code",
     "msg_error_login": "Invalid email or password",
-    "loading": "Please wait..."
-}
+    "loading": "Please wait...",
+    "optional": "Optional",
+    "referral_label": "Referral Code",
+    "referral_placeholder": "Enter referral code (optional)"
+}, 
+"name_required": "Please enter your name"
 }

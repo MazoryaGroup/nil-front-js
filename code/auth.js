@@ -1,6 +1,7 @@
 // ============================================
 // Auth - احراز هویت
 // ============================================
+import { authApi } from './api.js';
 
 const TOKEN_KEY = 'auth_token';
 const USER_KEY = 'auth_user';
@@ -18,13 +19,12 @@ export function initAuth() {
     try {
       currentUser = JSON.parse(user);
     } catch {
-      logout();
+      clearAuth();
     }
   }
 
-  // گوش دادن به انقضای توکن
   window.addEventListener('auth:expired', () => {
-    logout();
+    clearAuth();
     window.dispatchEvent(new CustomEvent('auth:logout'));
   });
 }
@@ -40,32 +40,40 @@ export function setAuth(token, user) {
 }
 
 // ============================================
-// خروج
+// پاک کردن توکن
 // ============================================
-export function logout() {
+function clearAuth() {
   localStorage.removeItem(TOKEN_KEY);
   localStorage.removeItem(USER_KEY);
   currentUser = null;
-  window.dispatchEvent(new CustomEvent('auth:logout'));
 }
 
 // ============================================
-// گرفتن توکن
+// خروج (با API)
+// ============================================
+export async function logout() {
+  try {
+    await authApi.logout();
+  } catch (err) {
+    console.warn('⚠️ Logout API failed:', err.message);
+  } finally {
+    clearAuth();
+    window.dispatchEvent(new CustomEvent('auth:logout'));
+    window.__app?.router?.navigate('/login');
+  }
+}
+
+// ============================================
+// گرفتن‌ها
 // ============================================
 export function getToken() {
   return localStorage.getItem(TOKEN_KEY);
 }
 
-// ============================================
-// گرفتن کاربر فعلی
-// ============================================
 export function getUser() {
   return currentUser;
 }
 
-// ============================================
-// آیا لاگین است؟
-// ============================================
 export function isLoggedIn() {
   return !!getToken();
 }

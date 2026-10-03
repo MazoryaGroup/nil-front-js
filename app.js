@@ -18,8 +18,10 @@ import { BlogSinglePage } from './pages/blog-single.js';
 import { ContactPage } from './pages/contact.js';
 import { FaqPage } from './pages/faq.js';
 import { CheckoutPage } from './pages/checkout.js';
-import { AuthPage } from './pages/auth.js';
+import { LoginPage } from './pages/login.js';
 import { NotFoundPage } from './pages/not-found.js';
+import { DashboardPage } from './pages/dashboard.js';
+import { RegisterPage } from './pages/register.js';
 
 // ============================================
 // مسیرها
@@ -32,8 +34,9 @@ const routes = [
   { path: '/contact',       component: ContactPage,    title: 'تماس' },
   { path: '/faq',           component: FaqPage,        title: 'سوالات' },
   { path: '/checkout',      component: CheckoutPage,   title: 'پرداخت' },
-  { path: '/login',         component: AuthPage,       title: 'ورود' },
-  { path: '/register',      component: AuthPage,       title: 'ثبت‌نام' },
+  { path: '/login',         component: LoginPage,      title: 'ورود' },
+  { path: '/dashboard',     component: DashboardPage,  title: 'داشبورد' },
+  { path: '/register',      component: RegisterPage,   title: 'ثبت‌نام' },
   { path: '*',              component: NotFoundPage,   title: '404' }
 ];
 
@@ -54,11 +57,8 @@ async function bootstrap() {
 
     window.__app = { router };
 
-    // ✅ بعد از هر تغییر صفحه، initHeader رو صدا بزن
     window.addEventListener('pageChanged', () => {
-      setTimeout(() => {
-        initHeader();
-      }, 50);
+      setTimeout(() => initHeader(), 50);
     });
 
     console.log('🎉 Nil Beauty initialized');
