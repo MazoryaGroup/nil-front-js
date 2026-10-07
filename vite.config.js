@@ -76,8 +76,16 @@ export default defineConfig({
     port: 3000,
     open: true,
     proxy: {
+      // ✅ API Laravel
       '/api': {
-        target: 'http://localhost:8000',
+        target: 'http://localhost/nil-back/public',
+        changeOrigin: true,
+        secure: false
+      },
+
+      // ✅ Storage (عکس‌ها)
+      '/storage': {
+        target: 'http://localhost/nil-back/public',
         changeOrigin: true,
         secure: false
       }

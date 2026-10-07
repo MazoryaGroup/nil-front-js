@@ -1,26 +1,24 @@
 // ============================================
-// Layout - پوسته‌ی مشترک صفحات
+// Layout
 // ============================================
 import { Header, initHeader } from './Header.js';
-import { Footer } from './Footer.js';
+import { Footer, initFooter } from './Footer.js';
 
 export function Layout(content, options = {}) {
-  const { navbarClass = 'navbar w-nav', wrapInPageWrap = true } = options;
+  const { navbarClass = 'navbar w-nav' } = options;
 
   return `
     <div class="page-wrap">
       <div class="${navbarClass}" data-animation="default" data-collapse="medium">
         ${Header()}
       </div>
-
       ${content}
     </div>
-
     <div id="footer">${Footer()}</div>
   `;
 }
 
-// بعد از رندر هر صفحه صدا زده می‌شه
 export function initLayout() {
   initHeader();
+  initFooter();
 }

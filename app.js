@@ -9,6 +9,7 @@ import { Router } from './code/router.js';
 import { initI18n } from './code/i18n.js';
 import { initAuth } from './code/auth.js';
 import { initHeader } from './components/Header.js';
+import { initFooter } from './components/Footer.js';
 
 // صفحات
 import { HomePage } from './pages/home.js';
@@ -32,7 +33,7 @@ const routes = [
   { path: '/about',         component: AboutPage,      title: 'درباره ما' },
   { path: '/gallery',       component: GalleryPage,    title: 'گالری' },
   { path: '/blog',          component: BlogPage,       title: 'بلاگ' },
-  { path: '/blog/:slug',    component: BlogSinglePage, title: 'مقاله' },
+  { path: '/blog/:id',      component: BlogSinglePage, title: 'مقاله' },  // ✅ slug → id
   { path: '/contact',       component: ContactPage,    title: 'تماس' },
   { path: '/faq',           component: FaqPage,        title: 'سوالات' },
   { path: '/checkout',      component: CheckoutPage,   title: 'پرداخت' },
@@ -59,9 +60,12 @@ async function bootstrap() {
 
     window.__app = { router };
 
-    // بعد از هر تغییر صفحه، header رو دوباره init کن
+    // ✅ بعد از هر تغییر صفحه، header و footer رو دوباره init کن
     window.addEventListener('pageChanged', () => {
-      setTimeout(() => initHeader(), 50);
+      setTimeout(() => {
+        initHeader();
+        initFooter();
+      }, 100);
     });
 
     console.log('🎉 Nil Beauty initialized');

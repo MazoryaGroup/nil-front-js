@@ -3,9 +3,19 @@
 // ============================================
 import { Layout, initLayout } from '../components/Layout.js';
 import { t, getCurrentLang } from '../code/i18n.js';
-import { apiGet } from '../code/api.js';
+import { galleryApi } from '../code/api.js';
 
-const STORAGE_URL = 'https://demo2.mazoryagroup.ir/storage';
+// ✅ حذف localhost از URL عکس‌ها
+function fixImageUrl(url) {
+  if (!url) return '';
+  if (url.startsWith('http://localhost')) {
+    return url
+      .replace(/^http:\/\/localhost\/nil-back\/public/, '')
+      .replace(/^http:\/\/localhost/, '');
+  }
+  if (url.startsWith('/')) return url;
+  return '/' + url;
+}
 
 export async function GalleryPage() {
   const isFa = getCurrentLang() === 'fa';
@@ -72,12 +82,11 @@ function initGallery(isFa) {
   // ============================================
   async function loadCategories() {
     try {
-      const res = await apiGet('/v1/gallery/categories');
+      const res = await galleryApi.categories();
       console.log('📁 Categories response:', res);
 
       const categories = res.data || [];
 
-      // دکمه "همه" + دسته‌ها
       const allBtn = `
         <button class="gallery-filter-btn active" data-category="all">
           ${isFa ? 'همه' : 'All'}
@@ -92,7 +101,6 @@ function initGallery(isFa) {
 
       filtersEl.innerHTML = allBtn + catBtns;
 
-      // Listenerها
       filtersEl.querySelectorAll('[data-category]').forEach(btn => {
         btn.addEventListener('click', () => {
           filtersEl.querySelectorAll('.gallery-filter-btn').forEach(b => b.classList.remove('active'));
@@ -116,12 +124,7 @@ function initGallery(isFa) {
     gridEl.innerHTML = `<div class="loading-placeholder">${t('common.loading')}</div>`;
 
     try {
-      // اگه دسته انتخاب شده، فیلتر کن
-      const endpoint = categoryId
-        ? `/v1/gallery?category_id=${categoryId}`
-        : '/v1/gallery';
-
-      const res = await apiGet(endpoint);
+      const res = await galleryApi.list(categoryId);
       console.log('🖼️ Gallery response:', res);
 
       const items = res.data || [];
@@ -136,7 +139,7 @@ function initGallery(isFa) {
       }
 
       gridEl.innerHTML = items.map(item => {
-        const imageUrl = buildImageUrl(item.image);
+        const imageUrl = fixImageUrl(item.image);
         return `
           <div class="gallery-item" data-image="${imageUrl}" data-title="${item.title || ''}">
             <div class="gallery-item-img">
@@ -161,15 +164,6 @@ function initGallery(isFa) {
       console.error('❌ Gallery error:', err);
       gridEl.innerHTML = `<p>${isFa ? 'خطا در بارگذاری گالری' : 'Failed to load gallery'}</p>`;
     }
-  }
-
-  // ============================================
-  // ساخت URL تصویر
-  // ============================================
-  function buildImageUrl(imagePath) {
-    if (!imagePath) return '';
-    if (imagePath.startsWith('http')) return imagePath;
-    return `${STORAGE_URL}/${imagePath}`;
   }
 
   // ============================================

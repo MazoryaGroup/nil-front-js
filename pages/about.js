@@ -2,9 +2,12 @@
 // About Page
 // ============================================
 import { Layout, initLayout } from '../components/Layout.js';
-import { t } from '../code/i18n.js';
+import { t, getCurrentLang } from '../code/i18n.js';
+import { waitingListApi } from '../code/api.js';
 
 export async function AboutPage() {
+  const isFa = getCurrentLang() === 'fa';
+
   const html = Layout(`
     <!-- TITLE -->
     <section class="title-section">
@@ -180,7 +183,7 @@ export async function AboutPage() {
             <div class="section-title-wrap">
               <div class="title-wrap">
                 <div class="subtitle">FAQ's</div>
-                <h2>Frequently Asked Questions</h2>
+                <h2>${isFa ? 'سوالات متداول' : 'Frequently Asked Questions'}</h2>
               </div>
             </div>
             <div class="faq-wrap">
@@ -206,10 +209,23 @@ export async function AboutPage() {
                   <p class="body-small">${t('cta.free_shipping')}</p>
                 </div>
                 <div class="cta-form-block w-form">
-                  <form class="cta-form" data-cta-form>
-                    <input class="cta-field w-input" name="email" placeholder="${t('forms.email')}" type="email" required />
-                    <input type="submit" class="cta-btn w-button" value="${t('buttons.subscribe')}" />
-                  </form>
+                  <!-- ✅ div به جای form -->
+                  <div class="cta-form" data-cta-form>
+                    <input
+                      class="cta-field w-input"
+                      name="email"
+                      placeholder="${t('forms.email')}"
+                      type="email"
+                      dir="ltr"
+                      data-cta-email
+                    />
+                    <button
+                      type="button"
+                      class="cta-btn w-button"
+                      data-cta-submit
+                    >${t('buttons.subscribe')}</button>
+                  </div>
+                  <div class="form-message" data-cta-msg></div>
                 </div>
               </div>
             </div>
@@ -219,28 +235,37 @@ export async function AboutPage() {
     </section>
   `);
 
-  queueMicrotask(() => {
+  setTimeout(() => {
     initLayout();
-    loadFaqs();
-  });
+    loadFaqs(isFa);
+    initCtaForm(isFa);
+  }, 100);
 
   return html;
 }
 
 // ============================================
-// FAQ accordion
+// FAQ — پیش‌فرض
 // ============================================
-function loadFaqs() {
+function loadFaqs(isFa) {
   const container = document.querySelector('[data-faq-list]');
   if (!container) return;
 
-  const faqs = [
-    { q: 'What is Glomin\'s return policy?', a: 'We offer a 30-day return policy on all products. If you are not satisfied with your purchase, please contact our customer support team to initiate a return.' },
-    { q: 'Do you offer free shipping?', a: 'Yes, we offer free shipping on all orders over $50. For orders below $50, standard shipping rates apply. Free shipping is available for domestic orders only.' },
-    { q: 'Where are Glomin products made?', a: 'Yes, we offer international shipping to many countries. Shipping rates and delivery times vary based on the destination. Please refer to our shipping policy for more details.' },
-    { q: 'How do I use Glomin\'s skincare products?', a: 'Each product comes with detailed usage instructions on the packaging. For general guidance, start with cleansing your skin, apply serums or treatments as needed.' },
+  // ✅ سوالات پیش‌فرض (فارسی + انگلیسی)
+  const faqs = isFa ? [
+    { q: 'سیاست بازگشت گلومین چیست؟', a: 'ما ۳۰ روز ضمانت بازگشت برای همه‌ی محصولات داریم. اگه از خرید خود راضی نیستید، لطفاً با پشتیبانی تماس بگیرید.' },
+    { q: 'ارسال رایگان دارید؟', a: 'بله، برای سفارش‌های بالای ۵۰۰,۰۰۰ تومان ارسال رایگان است. برای سفارش‌های کمتر، هزینه‌ی ارسال استاندارد اعمال می‌شود.' },
+    { q: 'محصولات گلومین کجا تولید می‌شوند؟', a: 'ما ارسال بین‌المللی به بسیاری از کشورها داریم. هزینه و زمان ارسال بسته به مقصد متفاوت است.' },
+    { q: 'چطور از محصولات مراقبت پوست گلومین استفاده کنم؟', a: 'هر محصول دارای دستورالعمل استفاده روی بسته‌بندی است. برای راهنمایی کلی: ابتدا پوست را تمیز کنید، سپس سرم یا محصولات درمانی را اعمال کنید.' },
+    { q: 'چطور از محصولات جدید و تخفیف‌ها باخبر بشم؟', a: 'برای اطلاع از جدیدترین محصولات، تخفیف‌ها و پیشنهادات ویژه، در خبرنامه‌ی ما ثبت‌نام کنید.' },
+    { q: 'اگه محصول آسیب‌دیده یا اشتباه دریافت کردم چیکار کنم؟', a: 'اگه محصول آسیب‌دیده یا اشتباه دریافت کردید، لطفاً بلافاصله با پشتیبانی تماس بگیرید. شماره سفارش و جزئیات مشکل را ارسال کنید.' }
+  ] : [
+    { q: 'What is Glomin\'s return policy?', a: 'We offer a 30-day return policy on all products. If you are not satisfied with your purchase, please contact our customer support team.' },
+    { q: 'Do you offer free shipping?', a: 'Yes, we offer free shipping on all orders over $50. For orders below $50, standard shipping rates apply.' },
+    { q: 'Where are Glomin products made?', a: 'We offer international shipping to many countries. Shipping rates and delivery times vary based on the destination.' },
+    { q: 'How do I use Glomin\'s skincare products?', a: 'Each product comes with detailed usage instructions on the packaging. For general guidance, start with cleansing your skin, then apply serums or treatments as needed.' },
     { q: 'How can I stay updated on new products and promotions?', a: 'To stay informed about our latest products, promotions, and exclusive offers, sign up for our newsletter on our website.' },
-    { q: 'What should I do if I receive a damaged or incorrect item?', a: 'If you receive a damaged or incorrect item, please contact our customer support team immediately. Provide your order number and details about the issue.' }
+    { q: 'What should I do if I receive a damaged or incorrect item?', a: 'If you receive a damaged or incorrect item, please contact our customer support team immediately with your order number and details.' }
   ];
 
   container.innerHTML = faqs.map((f) => `
@@ -265,4 +290,87 @@ function loadFaqs() {
       toggle.classList.toggle('active', !isOpen);
     });
   });
+}
+
+// ============================================
+// CTA — فرم newsletter
+// ============================================
+function initCtaForm(isFa) {
+  const wrapper = document.querySelector('[data-cta-form]');
+  if (!wrapper || wrapper.dataset.initialized === 'true') return;
+
+  wrapper.dataset.initialized = 'true';
+
+  const submitBtn = wrapper.querySelector('[data-cta-submit]');
+  const emailInput = wrapper.querySelector('[data-cta-email]');
+  const msg = document.querySelector('[data-cta-msg]');
+
+  if (!submitBtn || !emailInput) return;
+
+  submitBtn.addEventListener('click', async (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+
+    if (submitBtn.disabled) return;
+
+    const email = (emailInput.value || '').trim();
+
+    if (!email || !isValidEmail(email)) {
+      showMsg(msg, isFa ? 'ایمیل معتبر وارد کنید' : 'Please enter a valid email', 'error');
+      return;
+    }
+
+    setLoading(submitBtn, true);
+    showMsg(msg, isFa ? 'در حال ارسال...' : 'Sending...', 'info');
+
+    try {
+      // ✅ فقط ایمیل
+      const res = await waitingListApi.subscribe(email);
+      console.log('📧 CTA subscribe response:', res);
+
+      showMsg(
+        msg,
+        isFa ? 'ایمیل شما ثبت شد ✓' : 'Your email has been registered ✓',
+        'success'
+      );
+
+      emailInput.value = '';
+    } catch (err) {
+      console.error('❌ CTA subscribe error:', err);
+      showMsg(msg, err.message || (isFa ? 'خطا در ثبت ایمیل' : 'Failed to subscribe'), 'error');
+    } finally {
+      setLoading(submitBtn, false);
+    }
+  });
+
+  // Enter روی input
+  emailInput.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      submitBtn.click();
+    }
+  });
+
+  // ---------- Helpers ----------
+  function isValidEmail(email) {
+    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+  }
+
+  function showMsg(el, text, type = 'info') {
+    if (!el) return;
+    el.textContent = text;
+    el.style.display = text ? 'block' : 'none';
+    el.style.color = type === 'error' ? '#e74c3c' : type === 'success' ? '#27ae60' : '#666';
+  }
+
+  function setLoading(btn, loading) {
+    if (!btn) return;
+    btn.disabled = loading;
+    if (loading) {
+      btn.dataset.originalText = btn.textContent;
+      btn.textContent = '...';
+    } else {
+      btn.textContent = btn.dataset.originalText || 'SUBSCRIBE';
+    }
+  }
 }

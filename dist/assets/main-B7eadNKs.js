@@ -1,9 +1,9 @@
-(function(){const e=document.createElement("link").relList;if(e&&e.supports&&e.supports("modulepreload"))return;for(const l of document.querySelectorAll('link[rel="modulepreload"]'))o(l);new MutationObserver(l=>{for(const c of l)if(c.type==="childList")for(const u of c.addedNodes)u.tagName==="LINK"&&u.rel==="modulepreload"&&o(u)}).observe(document,{childList:!0,subtree:!0});function i(l){const c={};return l.integrity&&(c.integrity=l.integrity),l.referrerPolicy&&(c.referrerPolicy=l.referrerPolicy),l.crossOrigin==="use-credentials"?c.credentials="include":l.crossOrigin==="anonymous"?c.credentials="omit":c.credentials="same-origin",c}function o(l){if(l.ep)return;l.ep=!0;const c=i(l);fetch(l.href,c)}})();class F{constructor(e,i="#app"){this.routes=e,this.container=document.querySelector(i),this.currentPath=null,this.handlePopState=this.handlePopState.bind(this),this.handleLinkClick=this.handleLinkClick.bind(this)}start(){window.addEventListener("popstate",this.handlePopState),document.addEventListener("click",this.handleLinkClick),this.handlePopState()}stop(){window.removeEventListener("popstate",this.handlePopState),document.removeEventListener("click",this.handleLinkClick)}navigate(e,i=!0){i&&window.history.pushState({},"",e),this.resolve(e)}async resolve(e){const i=e.split("?")[0];this.currentPath=i;const o=this.matchRoute(i);if(!o){console.warn("⚠️ No route matched:",i);return}const{route:l,params:c}=o;l.title&&(document.title=l.title+" | Nil Beauty");try{this.container.innerHTML='<div class="page-loading">در حال بارگذاری...</div>';const u=await l.component(c);this.container.innerHTML=u,window.scrollTo(0,0),this.reinitWebflow(),window.dispatchEvent(new CustomEvent("pageChanged",{detail:{path:i,params:c}}))}catch(u){console.error("❌ Render failed:",u),this.container.innerHTML=`
+(function(){const e=document.createElement("link").relList;if(e&&e.supports&&e.supports("modulepreload"))return;for(const s of document.querySelectorAll('link[rel="modulepreload"]'))o(s);new MutationObserver(s=>{for(const d of s)if(d.type==="childList")for(const v of d.addedNodes)v.tagName==="LINK"&&v.rel==="modulepreload"&&o(v)}).observe(document,{childList:!0,subtree:!0});function i(s){const d={};return s.integrity&&(d.integrity=s.integrity),s.referrerPolicy&&(d.referrerPolicy=s.referrerPolicy),s.crossOrigin==="use-credentials"?d.credentials="include":s.crossOrigin==="anonymous"?d.credentials="omit":d.credentials="same-origin",d}function o(s){if(s.ep)return;s.ep=!0;const d=i(s);fetch(s.href,d)}})();class Z{constructor(e,i="#app"){this.routes=e,this.container=document.querySelector(i),this.currentPath=null,this.handlePopState=this.handlePopState.bind(this),this.handleLinkClick=this.handleLinkClick.bind(this)}start(){window.addEventListener("popstate",this.handlePopState),document.addEventListener("click",this.handleLinkClick),this.handlePopState()}stop(){window.removeEventListener("popstate",this.handlePopState),document.removeEventListener("click",this.handleLinkClick)}navigate(e,i=!0){i&&window.history.pushState({},"",e),this.resolve(e)}async resolve(e){const i=e.split("?")[0];this.currentPath=i;const o=this.matchRoute(i);if(!o){console.warn("⚠️ No route matched:",i);return}const{route:s,params:d}=o;s.title&&(document.title=s.title+" | Nil Beauty");try{this.container.innerHTML='<div class="page-loading">در حال بارگذاری...</div>';const v=await s.component(d);this.container.innerHTML=v,window.scrollTo(0,0),this.reinitWebflow(),window.dispatchEvent(new CustomEvent("pageChanged",{detail:{path:i,params:d}}))}catch(v){console.error("❌ Render failed:",v),this.container.innerHTML=`
         <div style="padding:40px;text-align:center">
           <h2>خطا در بارگذاری صفحه</h2>
-          <p>${u.message}</p>
+          <p>${v.message}</p>
         </div>
-      `}}matchRoute(e){for(const i of this.routes){const o=this.matchPath(i.path,e);if(o!==null)return{route:i,params:o}}return null}matchPath(e,i){if(e==="*")return{};const o=e.split("/").filter(Boolean),l=i.split("/").filter(Boolean);if(o.length!==l.length)return null;const c={};for(let u=0;u<o.length;u++){const g=o[u],f=l[u];if(g.startsWith(":"))c[g.slice(1)]=decodeURIComponent(f);else if(g!==f)return null}return c}handlePopState(){this.resolve(window.location.pathname)}handleLinkClick(e){const i=e.target.closest("a");if(!i)return;const o=i.getAttribute("href");o&&(o.startsWith("http")||o.startsWith("//")||o.startsWith("#")||o.startsWith("mailto:")||o.startsWith("tel:")||i.target==="_blank"||(e.preventDefault(),this.navigate(o)))}reinitWebflow(){if(!(typeof window.Webflow>"u"))try{if(window.Webflow.require){const e=window.Webflow.require("ix2");e&&e.init&&e.init()}window.Webflow.destroy(),window.Webflow.ready()}catch(e){console.warn("⚠️ Webflow reinit failed:",e)}}}let W="en",G={};const U=["fa","en"],V="en",Y="nil-beauty-lang";async function X(t){try{const e=await fetch(`/lang/${t}.json`);if(!e.ok)throw new Error(`HTTP ${e.status}`);return await e.json()}catch(e){return console.error(`❌ Failed to load ${t}.json`,e),{}}}function Z(t,e){return e.split(".").reduce((i,o)=>i==null?void 0:i[o],t)}function ee(t){var i,o,l,c;const e=document.documentElement;t==="fa"?(e.setAttribute("dir","rtl"),e.setAttribute("lang","fa"),(i=document.body)==null||i.classList.add("lang-fa"),(o=document.body)==null||o.classList.remove("lang-en")):(e.setAttribute("dir","ltr"),e.setAttribute("lang","en"),(l=document.body)==null||l.classList.add("lang-en"),(c=document.body)==null||c.classList.remove("lang-fa"))}async function K(t){U.includes(t)||(t=V),W=t,localStorage.setItem(Y,t),G=await X(t),ee(t),window.dispatchEvent(new CustomEvent("languageChanged",{detail:{lang:t}}))}async function te(){const t=localStorage.getItem(Y),e=t&&U.includes(t)?t:V;await K(e)}function M(){return W}function a(t){const e=Z(G,t);return e!==void 0?e:t}const B={},ae=(B==null?void 0:B.VITE_API_URL)||"/api";async function ie(t,e,i=null,o={}){const l=`${ae}${e}`,c={method:t,headers:{Accept:"application/json","Content-Type":"application/json",...o.headers}},u=localStorage.getItem("auth_token");u&&(c.headers.Authorization=`Bearer ${u}`),i&&(c.body=JSON.stringify(i));try{const g=await fetch(l,c);g.status===401&&(localStorage.removeItem("auth_token"),localStorage.removeItem("auth_user"),window.dispatchEvent(new CustomEvent("auth:expired")));const f=await g.json().catch(()=>({}));if(!g.ok)throw new Error(f.message||f.error||`HTTP ${g.status}`);return f}catch(g){throw console.error(`❌ API ${t} ${e}:`,g),g}}const C=(t,e,i)=>ie("POST",t,e,i),j={registerSendCode:(t,e,i)=>{const o={name:t,phone:e};return i&&i.trim()&&(o.referral_code=i.trim()),C("/v1/auth/register/send-code",o)},registerVerify:(t,e)=>C("/v1/auth/register/verify",{phone:t,code:e}),loginPhoneSendCode:t=>C("/v1/auth/login/phone/send-code",{phone:t}),loginPhoneVerify:(t,e)=>C("/v1/auth/login/phone/verify",{phone:t,code:e}),loginEmail:(t,e)=>C("/v1/auth/login",{email:t,password:e}),forgotSendCode:t=>C("/v1/auth/forgot-password/send-code",{phone:t}),forgotVerify:(t,e)=>C("/v1/auth/forgot-password/verify",{phone:t,code:e}),forgotReset:(t,e,i,o)=>C("/v1/auth/forgot-password/reset",{phone:t,reset_token:e,password:i,password_confirmation:o}),logout:()=>C("/v1/auth/logout",{})},D="auth_token",H="auth_user";let R=null;function oe(){const t=localStorage.getItem(D),e=localStorage.getItem(H);if(t&&e)try{R=JSON.parse(e)}catch{z()}window.addEventListener("auth:expired",()=>{z(),window.dispatchEvent(new CustomEvent("auth:logout"))})}function O(t,e){localStorage.setItem(D,t),localStorage.setItem(H,JSON.stringify(e)),R=e,window.dispatchEvent(new CustomEvent("auth:login",{detail:{user:e}}))}function z(){localStorage.removeItem(D),localStorage.removeItem(H),R=null}async function ne(){var t,e;try{await j.logout()}catch(i){console.warn("⚠️ Logout API failed:",i.message)}finally{z(),window.dispatchEvent(new CustomEvent("auth:logout")),(e=(t=window.__app)==null?void 0:t.router)==null||e.navigate("/login")}}function se(){return localStorage.getItem(D)}function Q(){return R}function N(){return!!se()}function le(){const t=Q(),e=N(),i=window.location.pathname,o=c=>i===c,l=M()==="fa"?"EN":"FA";return`
+      `}}matchRoute(e){for(const i of this.routes){const o=this.matchPath(i.path,e);if(o!==null)return{route:i,params:o}}return null}matchPath(e,i){if(e==="*")return{};const o=e.split("/").filter(Boolean),s=i.split("/").filter(Boolean);if(o.length!==s.length)return null;const d={};for(let v=0;v<o.length;v++){const m=o[v],w=s[v];if(m.startsWith(":"))d[m.slice(1)]=decodeURIComponent(w);else if(m!==w)return null}return d}handlePopState(){this.resolve(window.location.pathname)}handleLinkClick(e){const i=e.target.closest("a");if(!i)return;const o=i.getAttribute("href");o&&(o.startsWith("http")||o.startsWith("//")||o.startsWith("#")||o.startsWith("mailto:")||o.startsWith("tel:")||i.target==="_blank"||(e.preventDefault(),this.navigate(o)))}reinitWebflow(){if(!(typeof window.Webflow>"u"))try{if(window.Webflow.require){const e=window.Webflow.require("ix2");e&&e.init&&e.init()}window.Webflow.destroy(),window.Webflow.ready()}catch(e){console.warn("⚠️ Webflow reinit failed:",e)}}}let W="en",U={};const V=["fa","en"],Y="en",K="nil-beauty-lang";async function ee(t){try{const e=await fetch(`/lang/${t}.json`);if(!e.ok)throw new Error(`HTTP ${e.status}`);return await e.json()}catch(e){return console.error(`❌ Failed to load ${t}.json`,e),{}}}function te(t,e){return e.split(".").reduce((i,o)=>i==null?void 0:i[o],t)}function ae(t){var i,o,s,d;const e=document.documentElement;t==="fa"?(e.setAttribute("dir","rtl"),e.setAttribute("lang","fa"),(i=document.body)==null||i.classList.add("lang-fa"),(o=document.body)==null||o.classList.remove("lang-en")):(e.setAttribute("dir","ltr"),e.setAttribute("lang","en"),(s=document.body)==null||s.classList.add("lang-en"),(d=document.body)==null||d.classList.remove("lang-fa"))}async function Q(t){V.includes(t)||(t=Y),W=t,localStorage.setItem(K,t),U=await ee(t),ae(t),window.dispatchEvent(new CustomEvent("languageChanged",{detail:{lang:t}}))}async function ie(){const t=localStorage.getItem(K),e=t&&V.includes(t)?t:Y;await Q(e)}function M(){return W}function a(t){const e=te(U,t);return e!==void 0?e:t}const O={},oe=(O==null?void 0:O.VITE_API_URL)||"/api";async function F(t,e,i=null,o={}){const s=`${oe}${e}`,d={method:t,headers:{Accept:"application/json","Content-Type":"application/json",...o.headers}},v=localStorage.getItem("auth_token");v&&(d.headers.Authorization=`Bearer ${v}`),i&&(d.body=JSON.stringify(i));try{const m=await fetch(s,d);m.status===401&&(localStorage.removeItem("auth_token"),localStorage.removeItem("auth_user"),window.dispatchEvent(new CustomEvent("auth:expired")));const w=await m.json().catch(()=>({}));if(!m.ok)throw new Error(w.message||w.error||`HTTP ${m.status}`);return w}catch(m){throw console.error(`❌ API ${t} ${e}:`,m),m}}const N=(t,e)=>F("GET",t,null,e),C=(t,e,i)=>F("POST",t,e,i),j={registerSendCode:(t,e,i)=>{const o={name:t,phone:e};return i&&i.trim()&&(o.referral_code=i.trim()),C("/v1/auth/register/send-code",o)},registerVerify:(t,e)=>C("/v1/auth/register/verify",{phone:t,code:e}),loginPhoneSendCode:t=>C("/v1/auth/login/phone/send-code",{phone:t}),loginPhoneVerify:(t,e)=>C("/v1/auth/login/phone/verify",{phone:t,code:e}),loginEmail:(t,e)=>C("/v1/auth/login",{email:t,password:e}),forgotSendCode:t=>C("/v1/auth/forgot-password/send-code",{phone:t}),forgotVerify:(t,e)=>C("/v1/auth/forgot-password/verify",{phone:t,code:e}),forgotReset:(t,e,i,o)=>C("/v1/auth/forgot-password/reset",{phone:t,reset_token:e,password:i,password_confirmation:o}),logout:()=>C("/v1/auth/logout",{})},R="auth_token",z="auth_user";let D=null;function ne(){const t=localStorage.getItem(R),e=localStorage.getItem(z);if(t&&e)try{D=JSON.parse(e)}catch{H()}window.addEventListener("auth:expired",()=>{H(),window.dispatchEvent(new CustomEvent("auth:logout"))})}function B(t,e){localStorage.setItem(R,t),localStorage.setItem(z,JSON.stringify(e)),D=e,window.dispatchEvent(new CustomEvent("auth:login",{detail:{user:e}}))}function H(){localStorage.removeItem(R),localStorage.removeItem(z),D=null}async function se(){var t,e;try{await j.logout()}catch(i){console.warn("⚠️ Logout API failed:",i.message)}finally{H(),window.dispatchEvent(new CustomEvent("auth:logout")),(e=(t=window.__app)==null?void 0:t.router)==null||e.navigate("/login")}}function le(){return localStorage.getItem(R)}function J(){return D}function G(){return!!le()}function re(){const t=J(),e=G(),i=window.location.pathname,o=d=>i===d,s=M()==="fa"?"EN":"FA";return`
     <div class="container w-container">
       <div class="nav-wrapper">
         <a href="/" class="brand w-nav-brand" data-nav-link>
@@ -52,7 +52,7 @@
 
         <!-- سوییچ زبان -->
         <button class="lang-switch" data-lang-switch title="Change language">
-          <span data-lang-current>${l}</span>
+          <span data-lang-current>${s}</span>
         </button>
 
         ${e?`
@@ -84,7 +84,7 @@
         </div>
       </div>
     </div>
-  `}function J(){const t=document.querySelector("[data-lang-switch]");t&&!t.dataset.initialized&&(t.dataset.initialized="true",t.addEventListener("click",async c=>{var f;c.preventDefault();const u=M(),g=u==="fa"?"en":"fa";console.log("🌐 Language:",u,"→",g),await K(g),(f=window.__app)!=null&&f.router?window.__app.router.resolve(window.location.pathname):window.location.reload()}));const e=document.querySelector("[data-logout-btn]");e&&!e.dataset.initialized&&(e.dataset.initialized="true",e.addEventListener("click",async c=>{var u,g;if(c.preventDefault(),!!confirm("آیا مطمئنید می‌خواهید خارج شوید؟")){e.disabled=!0;try{await ne()}catch(f){console.error("Logout error:",f),localStorage.removeItem("auth_token"),localStorage.removeItem("auth_user"),(g=(u=window.__app)==null?void 0:u.router)==null||g.navigate("/login")}}}));const i=document.querySelector("[data-menu-button]"),o=document.querySelector(".nav-menu");i&&o&&!i.dataset.initialized&&(i.dataset.initialized="true",i.addEventListener("click",()=>{o.classList.toggle("is-open"),i.classList.toggle("is-open")}));const l=document.querySelector("[data-search-form]");l&&!l.dataset.initialized&&(l.dataset.initialized="true",l.addEventListener("submit",c=>{var g,f;c.preventDefault();const u=l.querySelector('input[name="query"]').value;u&&((f=(g=window.__app)==null?void 0:g.router)==null||f.navigate(`/search?q=${encodeURIComponent(u)}`))}))}function re(){return`
+  `}function X(){const t=document.querySelector("[data-lang-switch]");t&&!t.dataset.initialized&&(t.dataset.initialized="true",t.addEventListener("click",async d=>{var w;d.preventDefault();const v=M(),m=v==="fa"?"en":"fa";console.log("🌐 Language:",v,"→",m),await Q(m),(w=window.__app)!=null&&w.router?window.__app.router.resolve(window.location.pathname):window.location.reload()}));const e=document.querySelector("[data-logout-btn]");e&&!e.dataset.initialized&&(e.dataset.initialized="true",e.addEventListener("click",async d=>{var v,m;if(d.preventDefault(),!!confirm("آیا مطمئنید می‌خواهید خارج شوید؟")){e.disabled=!0;try{await se()}catch(w){console.error("Logout error:",w),localStorage.removeItem("auth_token"),localStorage.removeItem("auth_user"),(m=(v=window.__app)==null?void 0:v.router)==null||m.navigate("/login")}}}));const i=document.querySelector("[data-menu-button]"),o=document.querySelector(".nav-menu");i&&o&&!i.dataset.initialized&&(i.dataset.initialized="true",i.addEventListener("click",()=>{o.classList.toggle("is-open"),i.classList.toggle("is-open")}));const s=document.querySelector("[data-search-form]");s&&!s.dataset.initialized&&(s.dataset.initialized="true",s.addEventListener("submit",d=>{var m,w;d.preventDefault();const v=s.querySelector('input[name="query"]').value;v&&((w=(m=window.__app)==null?void 0:m.router)==null||w.navigate(`/search?q=${encodeURIComponent(v)}`))}))}function ce(){return`
     <section class="footer">
       <div class="w-layout-blockcontainer container w-container">
         <div class="footer-wrap">
@@ -162,11 +162,11 @@
               <a href="https://www.whatsapp.com/" target="_blank" class="social-link w-inline-block">
                 <img src="/img/whatsapp.png" loading="lazy" alt="WhatsApp" />
               </a>
-              <a href="https://www.youtube.com/" target="_blank" class="social-link w-inline-block">
-                <img src="/img/phone.png" loading="lazy" alt="Phone" />
-              </a>
+             <a href="tel:+982122634768" class="social-link w-inline-block">
+    <img src="/img/phone.png" loading="lazy" alt="Phone" />
+</a>
               <a href="https://www.instagram.com/" target="_blank" class="social-link w-inline-block">
-                <img src="/img/insta.svg" loading="lazy" alt="Instagram" />
+                <img src="/img/insta.png" loading="lazy" alt="Instagram" />
               </a>
             </div>
           </div>
@@ -184,17 +184,17 @@
         </div>
       </div>
     </section>
-  `}function x(t,e={}){const{navbarClass:i="navbar w-nav",wrapInPageWrap:o=!0}=e;return`
+  `}function E(t,e={}){const{navbarClass:i="navbar w-nav",wrapInPageWrap:o=!0}=e;return`
     <div class="page-wrap">
       <div class="${i}" data-animation="default" data-collapse="medium">
-        ${le()}
+        ${re()}
       </div>
 
       ${t}
     </div>
 
-    <div id="footer">${re()}</div>
-  `}function T(){J()}async function ce(){const t=x(`
+    <div id="footer">${ce()}</div>
+  `}function L(){X()}async function de(){const t=E(`
     <!-- HERO -->
     <div class="hero">
       <section class="hero-section">
@@ -203,13 +203,13 @@
             <div class="hero-left">
               <div class="hero-avatar"></div>
               <div class="hero-middle">
-                <img src="/img/3.jpg" loading="eager" alt="Hero Left" class="cover-image" />
+                <img src="/img/Hero Left.jpg" loading="eager" alt="Hero Left" class="cover-image" />
               </div>
               <p class="line-height-150 capitalize">${a("hero.tagline")}</p>
             </div>
             <div class="hero-right">
               <div class="hero-image">
-                <img src="/asset/img/1.jpg" loading="eager" alt="Hero Center" class="cover-image" />
+                <img src="/img/Hero Center.jpg" loading="eager" alt="Hero Center" class="cover-image" />
               </div>
               <div class="hero-content">
                 <div class="hero-top">
@@ -217,10 +217,10 @@
                     <h2 class="color-white">${a("hero.title")}</h2>
                     <p class="line-height-150">${a("hero.description")}</p>
                   </div>
-                  <a href="/product" class="hero-btn w-button">${a("hero.shop_now")}</a>
+                  <a href="/login" class="hero-btn w-button">${a("hero.shop_now")}</a>
                 </div>
                 <div class="hero-img">
-                  <img src="/asset/img/2.jpg" loading="eager" alt="Hero Right" class="cover-image" />
+                  <img src="/img/Hero Right.jpg" loading="eager" alt="Hero Right" class="cover-image" />
                 </div>
               </div>
             </div>
@@ -244,7 +244,7 @@
               <div role="listitem" class="w-dyn-item">
                 <a href="/category/skin-care" class="feature-category w-inline-block" data-nav-link>
                   <div class="category-text">${a("categories.skin_care")}</div>
-                  <img src="/img/4.jpg" loading="eager" alt="${a("categories.skin_care")}" class="cover-image" />
+                  <img src="/img/skin-care.jpg" loading="eager" alt="${a("categories.skin_care")}" class="cover-image" />
                 </a>
               </div>
             </div>
@@ -253,25 +253,25 @@
             <div role="list" class="categories-wrap w-dyn-items">
               <div role="listitem" class="d-flex w-dyn-item">
                 <a href="/category/hair-care" class="category-card w-inline-block" data-nav-link>
-                  <img src="/img/6.jpg" loading="eager" alt="${a("categories.hair_care")}" class="cover-image" />
+                  <img src="/img/hair_care.jpg" loading="eager" alt="${a("categories.hair_care")}" class="cover-image" />
                   <div class="category-text">${a("categories.hair_care")}</div>
                 </a>
               </div>
               <div role="listitem" class="d-flex w-dyn-item">
                 <a href="/category/makeup" class="category-card w-inline-block" data-nav-link>
-                  <img src="/img/5.jpg" loading="eager" alt="${a("categories.makeup")}" class="cover-image" />
+                  <img src="/img/makeup.jpg" loading="eager" alt="${a("categories.makeup")}" class="cover-image" />
                   <div class="category-text">${a("categories.makeup")}</div>
                 </a>
               </div>
               <div role="listitem" class="d-flex w-dyn-item">
                 <a href="/category/fragrances" class="category-card w-inline-block" data-nav-link>
-                  <img src="/img/7.jpg" loading="eager" alt="${a("categories.fragrances")}" class="cover-image" />
+                  <img src="/img/fragrances.jpg" loading="eager" alt="${a("categories.fragrances")}" class="cover-image" />
                   <div class="category-text">${a("categories.fragrances")}</div>
                 </a>
               </div>
               <div role="listitem" class="d-flex w-dyn-item">
                 <a href="/category/beauty-tools" class="category-card w-inline-block" data-nav-link>
-                  <img src="/img/8.jpg" loading="eager" alt="${a("categories.beauty_tools")}" class="cover-image" />
+                  <img src="/img/beauty_tools.jpg" loading="eager" alt="${a("categories.beauty_tools")}" class="cover-image" />
                   <div class="category-text">${a("categories.beauty_tools")}</div>
                 </a>
               </div>
@@ -286,7 +286,7 @@
       <div class="w-layout-blockcontainer container w-container">
         <div class="about-block">
           <div class="about-img">
-            <img src="/img/9.jpg" loading="lazy" alt="About" class="cover-image" />
+            <img src="/img/about-img.jpg" loading="lazy" alt="About" class="cover-image" />
           </div>
           <div class="about-data">
             <div class="about-top">
@@ -298,7 +298,7 @@
             </div>
           </div>
           <div class="about-right">
-            <img src="/img/10.jpg" loading="lazy" alt="About Right" class="cover-image" />
+            <img src="/img/about-right.jpg" loading="lazy" alt="About Right" class="cover-image" />
           </div>
         </div>
       </div>
@@ -309,18 +309,18 @@
       <div class="w-layout-blockcontainer container w-container">
         <div class="w-dyn-list">
           <div role="list" class="category-list w-dyn-items">
-            <div style="background-image: url('/img/11.jpg');" role="listitem" class="category-block w-dyn-item">
+            <div style="background-image: url('/img/skin_care.jpg');" role="listitem" class="category-block w-dyn-item">
               <a href="/category/skin-care" class="caegory-link w-inline-block" data-nav-link>
                 <div class="body-x-small capitalize">Radiant Skin Solutions</div>
                 <h2 class="category-title">Shop premium beauty products at beauty bliss by glomin</h2>
-                <div class="secondary-button invert">${a("buttons.shop_now")}</div>
+                
               </a>
             </div>
-            <div style="background-image: url('/img/12.jpg');" role="listitem" class="category-block w-dyn-item">
+            <div style="background-image: url('/img/beauty-tools.jpg');" role="listitem" class="category-block w-dyn-item">
               <a href="/category/beauty-tools" class="caegory-link w-inline-block" data-nav-link>
                 <div class="body-x-small capitalize">Free Shipping</div>
                 <h2 class="category-title">Elevate your beauty routine every time with our premium products</h2>
-                <div class="secondary-button invert">${a("buttons.shop_now")}</div>
+                
               </a>
             </div>
           </div>
@@ -381,7 +381,7 @@
         <!-- گالری توسط JS پر می‌شه -->
       </div>
     </section>
-  `);return queueMicrotask(()=>{T(),de(),ue()}),t}function de(){const t=document.querySelector("[data-blog-list]");if(!t)return;const e=[{title:"The ultimate guide to glomin's skincare essentials",slug:"skincare-essentials",category:"Skincare",date:"Aug 23, 2024",image:"/img/blog-thumb-02.jpg"},{title:"Essential tools & accessories for professional beauty routine",slug:"beauty-tools",category:"Accessories",date:"Aug 23, 2024",image:"/img/blog-thumb-03.jpg"},{title:"Behind the scenes how we develop our premium beauty products",slug:"behind-the-scenes",category:"Company Insights",date:"Aug 23, 2024",image:"/img/blog-thumb-04.jpg"}];t.innerHTML=e.map(i=>`
+  `);return queueMicrotask(()=>{L(),ue(),ve()}),t}function ue(){const t=document.querySelector("[data-blog-list]");if(!t)return;const e=[{title:"The ultimate guide to glomin's skincare essentials",slug:"skincare-essentials",category:"Skincare",date:"Aug 23, 2024",image:"/img/blog-thumb-02.jpg"},{title:"Essential tools & accessories for professional beauty routine",slug:"beauty-tools",category:"Accessories",date:"Aug 23, 2024",image:"/img/blog-thumb-03.jpg"},{title:"Behind the scenes how we develop our premium beauty products",slug:"behind-the-scenes",category:"Company Insights",date:"Aug 23, 2024",image:"/img/blog-thumb-04.jpg"}];t.innerHTML=e.map(i=>`
     <div role="listitem" class="d-flex w-dyn-item">
       <a href="/blog/${i.slug}" class="blog-card w-inline-block" data-nav-link>
         <div class="blog-thumb">
@@ -396,11 +396,11 @@
         </div>
       </a>
     </div>
-  `).join("")}function ue(){const t=document.querySelector("[data-gallery]");if(!t)return;const i=`
+  `).join("")}function ve(){const t=document.querySelector("[data-gallery]");if(!t)return;const i=`
     <div class="gallery-wrap">
-      ${["/img/gallery-1.jpg","/img/gallery-2.jpg","/img/gallery-3.jpg","/img/gallery-4.jpg","/img/gallery-5.jpg"].map((o,l)=>`
+      ${["/img/gallery-1.jpg","/img/gallery-2.jpg","/img/gallery-3.jpg","/img/gallery-4.jpg","/img/gallery-5.jpg"].map((o,s)=>`
         <a href="https://www.instagram.com/" target="_blank" class="gallery-link w-inline-block">
-          <img src="${o}" loading="lazy" alt="Gallery ${l+1}" class="cover-image" />
+          <img src="${o}" loading="lazy" alt="Gallery ${s+1}" class="cover-image" />
           <div class="gallery-overlay">
             <div class="social-link">
               <img src="/img/ic-insta.svg" loading="lazy" alt="Instagram" />
@@ -409,7 +409,7 @@
         </a>
       `).join("")}
     </div>
-  `;t.innerHTML=i.repeat(4)}async function ve(){const t=x(`
+  `;t.innerHTML=i.repeat(4)}async function me(){const t=E(`
     <!-- TITLE -->
     <section class="title-section">
       <div class="w-layout-blockcontainer container w-container">
@@ -621,7 +621,7 @@
         </div>
       </div>
     </section>
-  `);return queueMicrotask(()=>{T(),me()}),t}function me(){const t=document.querySelector("[data-faq-list]");if(!t)return;const e=[{q:"What is Glomin's return policy?",a:"We offer a 30-day return policy on all products. If you are not satisfied with your purchase, please contact our customer support team to initiate a return."},{q:"Do you offer free shipping?",a:"Yes, we offer free shipping on all orders over $50. For orders below $50, standard shipping rates apply. Free shipping is available for domestic orders only."},{q:"Where are Glomin products made?",a:"Yes, we offer international shipping to many countries. Shipping rates and delivery times vary based on the destination. Please refer to our shipping policy for more details."},{q:"How do I use Glomin's skincare products?",a:"Each product comes with detailed usage instructions on the packaging. For general guidance, start with cleansing your skin, apply serums or treatments as needed."},{q:"How can I stay updated on new products and promotions?",a:"To stay informed about our latest products, promotions, and exclusive offers, sign up for our newsletter on our website."},{q:"What should I do if I receive a damaged or incorrect item?",a:"If you receive a damaged or incorrect item, please contact our customer support team immediately. Provide your order number and details about the issue."}];t.innerHTML=e.map(i=>`
+  `);return queueMicrotask(()=>{L(),ge()}),t}function ge(){const t=document.querySelector("[data-faq-list]");if(!t)return;const e=[{q:"What is Glomin's return policy?",a:"We offer a 30-day return policy on all products. If you are not satisfied with your purchase, please contact our customer support team to initiate a return."},{q:"Do you offer free shipping?",a:"Yes, we offer free shipping on all orders over $50. For orders below $50, standard shipping rates apply. Free shipping is available for domestic orders only."},{q:"Where are Glomin products made?",a:"Yes, we offer international shipping to many countries. Shipping rates and delivery times vary based on the destination. Please refer to our shipping policy for more details."},{q:"How do I use Glomin's skincare products?",a:"Each product comes with detailed usage instructions on the packaging. For general guidance, start with cleansing your skin, apply serums or treatments as needed."},{q:"How can I stay updated on new products and promotions?",a:"To stay informed about our latest products, promotions, and exclusive offers, sign up for our newsletter on our website."},{q:"What should I do if I receive a damaged or incorrect item?",a:"If you receive a damaged or incorrect item, please contact our customer support team immediately. Provide your order number and details about the issue."}];t.innerHTML=e.map(i=>`
     <div class="faq" data-faq-item>
       <div class="question-block" data-faq-toggle>
         <p class="body-large color-black">${i.q}</p>
@@ -633,7 +633,7 @@
         <div class="faq-answer"><p>${i.a}</p></div>
       </div>
     </div>
-  `).join(""),t.querySelectorAll("[data-faq-toggle]").forEach(i=>{i.addEventListener("click",()=>{const o=i.nextElementSibling,l=o.style.display!=="none";o.style.display=l?"none":"block",i.classList.toggle("active",!l)})})}async function ge(){const t=x(`
+  `).join(""),t.querySelectorAll("[data-faq-toggle]").forEach(i=>{i.addEventListener("click",()=>{const o=i.nextElementSibling,s=o.style.display!=="none";o.style.display=s?"none":"block",i.classList.toggle("active",!s)})})}async function pe(){const t=E(`
     <section class="title-section">
       <div class="w-layout-blockcontainer container w-container">
         <div class="title-wrap">
@@ -667,7 +667,7 @@
         </div>
       </div>
     </section>
-  `);return queueMicrotask(()=>{T(),pe(),he()}),t}function pe(){const t=document.querySelector("[data-feature-blog]");if(!t)return;const e={title:"How to choose perfect fragrance for every occasion",slug:"how-to-choose-perfect-fragrance-for-every-occasion",category:"Fragrances",date:"Aug 23, 2024",excerpt:"Discover Glomin's collection of perfumes and learn how to select the right scent for your style and mood.",image:"/img/blog-main-01.jpg"};t.innerHTML=`
+  `);return queueMicrotask(()=>{L(),he(),ye()}),t}function he(){const t=document.querySelector("[data-feature-blog]");if(!t)return;const e={title:"How to choose perfect fragrance for every occasion",slug:"how-to-choose-perfect-fragrance-for-every-occasion",category:"Fragrances",date:"Aug 23, 2024",excerpt:"Discover Glomin's collection of perfumes and learn how to select the right scent for your style and mood.",image:"/img/blog-main-01.jpg"};t.innerHTML=`
     <a href="/blog/${e.slug}" class="blog-wrap w-inline-block" data-nav-link>
       <div class="feature-img">
         <img src="${e.image}" loading="eager" alt="${e.title}" class="cover-image" />
@@ -684,7 +684,7 @@
         <div class="secondary-button">${a("buttons.read_more")}</div>
       </div>
     </a>
-  `}function he(){const t=document.querySelector("[data-blog-list]");if(!t)return;const e=[{title:"The ultimate guide to glomin's skincare essentials",slug:"the-ultimate-guide-to-glomins-skincare-essentials",category:"Skincare",date:"Aug 23, 2024",image:"/img/blog-thumb-02.jpg"},{title:"Essential tools & accessories for professional beauty routine",slug:"essential-tools-accessories-for-professional-beauty-routine",category:"Accessories",date:"Aug 23, 2024",image:"/img/blog-thumb-03.jpg"},{title:"Behind the scenes how we develop our premium beauty products",slug:"behind-the-scenes-how-we-develop-our-premium-beauty-products",category:"Company Insights",date:"Aug 23, 2024",image:"/img/blog-thumb-04.jpg"},{title:"The importance of sun protection in your skincare routine",slug:"the-importance-of-sun-protection-in-your-skincare-routine",category:"Skincare",date:"Aug 23, 2024",image:"/img/blog-thumb-05.jpg"},{title:"Exploring the benefits of serums and how to use them",slug:"exploring-the-benefits-of-serums-and-how-to-use-them",category:"Accessories",date:"Aug 23, 2024",image:"/img/blog-thumb-06.jpg"},{title:"Glomin's favorite beauty hacks you need to know make life easier",slug:"glomins-favorite-beauty-hacks-you-need-to-know-make-life-easier",category:"Beauty Tips",date:"Aug 23, 2024",image:"/img/blog-thumb-07.jpg"}];t.innerHTML=e.map(i=>`
+  `}function ye(){const t=document.querySelector("[data-blog-list]");if(!t)return;const e=[{title:"The ultimate guide to glomin's skincare essentials",slug:"the-ultimate-guide-to-glomins-skincare-essentials",category:"Skincare",date:"Aug 23, 2024",image:"/img/blog-thumb-02.jpg"},{title:"Essential tools & accessories for professional beauty routine",slug:"essential-tools-accessories-for-professional-beauty-routine",category:"Accessories",date:"Aug 23, 2024",image:"/img/blog-thumb-03.jpg"},{title:"Behind the scenes how we develop our premium beauty products",slug:"behind-the-scenes-how-we-develop-our-premium-beauty-products",category:"Company Insights",date:"Aug 23, 2024",image:"/img/blog-thumb-04.jpg"},{title:"The importance of sun protection in your skincare routine",slug:"the-importance-of-sun-protection-in-your-skincare-routine",category:"Skincare",date:"Aug 23, 2024",image:"/img/blog-thumb-05.jpg"},{title:"Exploring the benefits of serums and how to use them",slug:"exploring-the-benefits-of-serums-and-how-to-use-them",category:"Accessories",date:"Aug 23, 2024",image:"/img/blog-thumb-06.jpg"},{title:"Glomin's favorite beauty hacks you need to know make life easier",slug:"glomins-favorite-beauty-hacks-you-need-to-know-make-life-easier",category:"Beauty Tips",date:"Aug 23, 2024",image:"/img/blog-thumb-07.jpg"}];t.innerHTML=e.map(i=>`
     <div role="listitem" class="d-flex w-dyn-item">
       <a href="/blog/${i.slug}" class="blog-card w-inline-block" data-nav-link>
         <div class="blog-thumb">
@@ -700,7 +700,7 @@
         <div class="d-none">Blogs</div>
       </a>
     </div>
-  `).join("")}async function ye(t){const{slug:e}=t,i=x(`
+  `).join("")}async function fe(t){const{slug:e}=t,i=E(`
     <section class="title-section">
       <div class="w-layout-blockcontainer container w-container">
         <div class="blog-card align-center" data-blog-detail>
@@ -708,7 +708,7 @@
         </div>
       </div>
     </section>
-  `);return queueMicrotask(()=>{T(),fe()}),i}async function fe(t){const e=document.querySelector("[data-blog-detail]");if(e)try{const i={title:"Sample Blog Title",category:"Skincare",date:"2024-08-23",content:"<p>Blog content goes here...</p>"};e.innerHTML=`
+  `);return queueMicrotask(()=>{L(),be()}),i}async function be(t){const e=document.querySelector("[data-blog-detail]");if(e)try{const i={title:"Sample Blog Title",category:"Skincare",date:"2024-08-23",content:"<p>Blog content goes here...</p>"};e.innerHTML=`
       <h2>${i.title}</h2>
       <div class="blog-data small">
         <div class="blog-category">${i.category}</div>
@@ -718,7 +718,7 @@
       <div class="blog-details">
         <div class="richtext w-richtext">${i.content}</div>
       </div>
-    `}catch{e.innerHTML=`<p>${a("common.error")}</p>`}}async function be(){const t=x(`
+    `}catch{e.innerHTML=`<p>${a("common.error")}</p>`}}async function we(){const t=E(`
     <!-- TITLE -->
     <section class="title-section">
       <div class="w-layout-blockcontainer container w-container">
@@ -863,7 +863,7 @@
         </div>
       </div>
     </section>
-  `);return queueMicrotask(()=>{T(),we()}),t}function we(){const t=document.querySelector("[data-contact-form]"),e=document.querySelector("[data-form-message]");t&&t.addEventListener("submit",async i=>{i.preventDefault();const o=Object.fromEntries(new FormData(t));e&&(e.textContent="⏳ در حال ارسال...",e.style.color="#666",e.style.display="block");try{console.log("📩 Contact form:",o),await new Promise(l=>setTimeout(l,500)),e&&(e.textContent="✅ "+(a("forms.success_message")||"Thank you! Your message has been sent."),e.style.color="green"),t.reset()}catch(l){console.error("❌ Contact error:",l),e&&(e.textContent="❌ "+(l.message||"Error sending message"),e.style.color="red")}})}async function ke(){const t=x(`
+  `);return queueMicrotask(()=>{L(),ke()}),t}function ke(){const t=document.querySelector("[data-contact-form]"),e=document.querySelector("[data-form-message]");t&&t.addEventListener("submit",async i=>{i.preventDefault();const o=Object.fromEntries(new FormData(t));e&&(e.textContent="⏳ در حال ارسال...",e.style.color="#666",e.style.display="block");try{console.log("📩 Contact form:",o),await new Promise(s=>setTimeout(s,500)),e&&(e.textContent="✅ "+(a("forms.success_message")||"Thank you! Your message has been sent."),e.style.color="green"),t.reset()}catch(s){console.error("❌ Contact error:",s),e&&(e.textContent="❌ "+(s.message||"Error sending message"),e.style.color="red")}})}async function $e(){const t=E(`
     <section class="title-section">
       <div class="w-layout-blockcontainer container w-container">
         <div class="title-wrap">
@@ -880,7 +880,7 @@
         </div>
       </div>
     </section>
-  `);return queueMicrotask(()=>{T(),$e()}),t}async function $e(){const t=document.querySelector("[data-faq-list]");if(!t)return;const e=[{q:"What is Glomin’s return policy?",a:"We offer a 30-day return policy."},{q:"Do you offer free shipping?",a:"Yes, on orders over $50."}];t.innerHTML=e.map(i=>`
+  `);return queueMicrotask(()=>{L(),Se()}),t}async function Se(){const t=document.querySelector("[data-faq-list]");if(!t)return;const e=[{q:"What is Glomin’s return policy?",a:"We offer a 30-day return policy."},{q:"Do you offer free shipping?",a:"Yes, on orders over $50."}];t.innerHTML=e.map(i=>`
     <div class="faq w-dropdown" data-faq-item>
       <div class="question-block w-dropdown-toggle" data-faq-toggle>
         <p class="body-large color-black">${i.q}</p>
@@ -890,7 +890,7 @@
         <div class="faq-answer"><p>${i.a}</p></div>
       </nav>
     </div>
-  `).join(""),t.querySelectorAll("[data-faq-toggle]").forEach(i=>{i.addEventListener("click",()=>{const o=i.nextElementSibling,l=o.style.display!=="none";o.style.display=l?"none":"block"})})}async function Se(t={}){if(!N())return setTimeout(()=>{var g,f;return(f=(g=window.__app)==null?void 0:g.router)==null?void 0:f.navigate("/login")},100),x('<div class="loading-placeholder">در حال انتقال...</div>');const e=M()==="fa",i=t.query||{},o=i.service,l=i.date,c=i.time,u=x(`
+  `).join(""),t.querySelectorAll("[data-faq-toggle]").forEach(i=>{i.addEventListener("click",()=>{const o=i.nextElementSibling,s=o.style.display!=="none";o.style.display=s?"none":"block"})})}async function qe(t={}){if(!G())return setTimeout(()=>{var m,w;return(w=(m=window.__app)==null?void 0:m.router)==null?void 0:w.navigate("/login")},100),E('<div class="loading-placeholder">در حال انتقال...</div>');const e=M()==="fa",i=t.query||{},o=i.service,s=i.date,d=i.time,v=E(`
     <div class="checkout-page">
       <div class="w-layout-blockcontainer container w-container">
 
@@ -976,11 +976,11 @@
         </div>
       </div>
     </div>
-  `);return queueMicrotask(()=>{T(),qe({serviceId:o,date:l,time:c,isFa:e})}),u}function qe({serviceId:t,date:e,time:i,isFa:o}){let l=null;const c=document.querySelector("[data-booking-info]"),u=document.querySelector("[data-total-price]"),g=document.querySelector("[data-total-tax]"),f=document.querySelector("[data-total-final]"),q=document.querySelector("[data-checkout-msg]"),k=document.querySelector("[data-pay-btn]");_();async function _(){try{l={1:{name:o?"میکاپ عروس":"Bridal Makeup",price:5e6},2:{name:o?"رنگ و مش":"Hair Color",price:25e5},3:{name:o?"کراتین مو":"Keratin Treatment",price:35e5},4:{name:o?"پاکسازی پوست":"Facial Cleansing",price:15e5},5:{name:o?"میکاپ ساده":"Simple Makeup",price:12e5},6:{name:o?"میکاپ مجلسی":"Party Makeup",price:2e6}}[t]||{name:"—",price:0},c.innerHTML=`
-        <div class="info-row"><span>${o?"خدمت":"Service"}</span><strong>${l.name}</strong></div>
+  `);return queueMicrotask(()=>{L(),_e({serviceId:o,date:s,time:d,isFa:e})}),v}function _e({serviceId:t,date:e,time:i,isFa:o}){let s=null;const d=document.querySelector("[data-booking-info]"),v=document.querySelector("[data-total-price]"),m=document.querySelector("[data-total-tax]"),w=document.querySelector("[data-total-final]"),_=document.querySelector("[data-checkout-msg]"),$=document.querySelector("[data-pay-btn]");f();async function f(){try{s={1:{name:o?"میکاپ عروس":"Bridal Makeup",price:5e6},2:{name:o?"رنگ و مش":"Hair Color",price:25e5},3:{name:o?"کراتین مو":"Keratin Treatment",price:35e5},4:{name:o?"پاکسازی پوست":"Facial Cleansing",price:15e5},5:{name:o?"میکاپ ساده":"Simple Makeup",price:12e5},6:{name:o?"میکاپ مجلسی":"Party Makeup",price:2e6}}[t]||{name:"—",price:0},d.innerHTML=`
+        <div class="info-row"><span>${o?"خدمت":"Service"}</span><strong>${s.name}</strong></div>
         <div class="info-row"><span>${o?"تاریخ":"Date"}</span><strong>${e||"—"}</strong></div>
         <div class="info-row"><span>${o?"ساعت":"Time"}</span><strong>${i||"—"}</strong></div>
-      `;const b=Math.round(l.price*.09);u.textContent=E(l.price),g.textContent=E(b),f.textContent=E(l.price+b)}catch(v){console.error(v),c.innerHTML="<p>خطا در بارگذاری</p>"}}k==null||k.addEventListener("click",async()=>{var m;const v=document.querySelector("[data-checkout-form]");if(!v.checkValidity()){v.reportValidity();return}const b=Object.fromEntries(new FormData(v)),d=((m=document.querySelector('input[name="payment"]:checked'))==null?void 0:m.value)||"online";S(k,!0),w(q,o?"در حال پردازش...":"Processing...","info");try{const n={service_id:t,date:e,time:i,name:b.name,phone:b.phone,note:b.note,payment_method:d};console.log("📅 Booking:",n),await new Promise(s=>setTimeout(s,1200)),d==="online"?(w(q,o?"در حال انتقال به درگاه...":"Redirecting to gateway...","success"),setTimeout(()=>{var s,p;return(p=(s=window.__app)==null?void 0:s.router)==null?void 0:p.navigate("/dashboard")},2e3)):(w(q,o?"رزرو با موفقیت ثبت شد!":"Booked successfully!","success"),setTimeout(()=>{var s,p;return(p=(s=window.__app)==null?void 0:s.router)==null?void 0:p.navigate("/dashboard")},2e3))}catch(n){w(q,n.message||(o?"خطا در پرداخت":"Payment error"),"error")}finally{S(k,!1)}});function w(v,b,d="info"){v&&(v.textContent=b,v.style.display=b?"block":"none",v.style.color=d==="error"?"#e74c3c":d==="success"?"#27ae60":"#666")}function S(v,b){v&&(v.disabled=b,b?(v.dataset.originalText=v.textContent,v.textContent=o?"لطفاً صبر کنید...":"Please wait..."):v.textContent=v.dataset.originalText||v.textContent)}function E(v){return new Intl.NumberFormat(o?"fa-IR":"en-US").format(v)+(o?" تومان":" IRR")}}async function _e(){console.log("🟢 LoginPage started");const t=x(`
+      `;const b=Math.round(s.price*.09);v.textContent=x(s.price),m.textContent=x(b),w.textContent=x(s.price+b)}catch(c){console.error(c),d.innerHTML="<p>خطا در بارگذاری</p>"}}$==null||$.addEventListener("click",async()=>{var g;const c=document.querySelector("[data-checkout-form]");if(!c.checkValidity()){c.reportValidity();return}const b=Object.fromEntries(new FormData(c)),u=((g=document.querySelector('input[name="payment"]:checked'))==null?void 0:g.value)||"online";S($,!0),k(_,o?"در حال پردازش...":"Processing...","info");try{const n={service_id:t,date:e,time:i,name:b.name,phone:b.phone,note:b.note,payment_method:u};console.log("📅 Booking:",n),await new Promise(l=>setTimeout(l,1200)),u==="online"?(k(_,o?"در حال انتقال به درگاه...":"Redirecting to gateway...","success"),setTimeout(()=>{var l,p;return(p=(l=window.__app)==null?void 0:l.router)==null?void 0:p.navigate("/dashboard")},2e3)):(k(_,o?"رزرو با موفقیت ثبت شد!":"Booked successfully!","success"),setTimeout(()=>{var l,p;return(p=(l=window.__app)==null?void 0:l.router)==null?void 0:p.navigate("/dashboard")},2e3))}catch(n){k(_,n.message||(o?"خطا در پرداخت":"Payment error"),"error")}finally{S($,!1)}});function k(c,b,u="info"){c&&(c.textContent=b,c.style.display=b?"block":"none",c.style.color=u==="error"?"#e74c3c":u==="success"?"#27ae60":"#666")}function S(c,b){c&&(c.disabled=b,b?(c.dataset.originalText=c.textContent,c.textContent=o?"لطفاً صبر کنید...":"Please wait..."):c.textContent=c.dataset.originalText||c.textContent)}function x(c){return new Intl.NumberFormat(o?"fa-IR":"en-US").format(c)+(o?" تومان":" IRR")}}async function xe(){console.log("🟢 LoginPage started");const t=E(`
     <div class="auth-page">
       <div class="auth-container">
 
@@ -1062,16 +1062,72 @@
 
       </div>
     </div>
-  `);return console.log("🟢 HTML generated"),setTimeout(()=>{console.log("🎬 Initializing login listeners...");const e=document.querySelectorAll("[data-tab]"),i=document.querySelector("[data-otp-step]");console.log("Tabs found:",e.length),console.log("OTP step found:",!!i),T(),xe(),console.log("✅ Login listeners attached")},100),t}function xe(){console.log("🔧 initLogin started");let t="",e=null;const i=document.querySelector("[data-tabs]"),o=document.querySelector("[data-otp-step]"),l=document.querySelector("[data-main-footer]"),c=document.querySelector("[data-msg]"),u=document.querySelector("[data-phone-display]"),g=document.querySelector("[data-resend-btn]"),f=document.querySelector("[data-timer]"),q=document.querySelector("[data-back-btn]"),k=document.querySelectorAll("[data-tab]");console.log("🔧 Found",k.length,"tabs"),k.forEach(n=>{n.addEventListener("click",s=>{s.preventDefault(),console.log("🖱️ Tab clicked:",n.dataset.tab);const p=n.dataset.tab;document.querySelectorAll("[data-tab]").forEach(h=>h.classList.remove("active")),document.querySelectorAll("[data-tab-content]").forEach(h=>h.style.display="none"),n.classList.add("active");const y=document.querySelector(`[data-tab-content="${p}"]`);y&&(y.style.display="block"),v("")})});const _=document.querySelector("[data-phone-form]");console.log("🔧 Phone form:",!!_),_==null||_.addEventListener("submit",async n=>{n.preventDefault(),console.log("📱 Phone form submitted");const s=Object.fromEntries(new FormData(_)),p=d(s.phone);if(!m(p)){v(a("auth.msg_invalid_phone"),"error");return}t=p;const y=_.querySelector("[data-submit-btn]");b(y,!0);try{const h=await j.loginPhoneSendCode(p);console.log("📱 Send code response:",h),u&&(u.textContent=p),i&&(i.style.display="none"),document.querySelectorAll("[data-tab-content]").forEach($=>$.style.display="none"),l&&(l.style.display="none"),o&&(o.style.display="block"),E(60),v(""),setTimeout(()=>{var $;return($=o==null?void 0:o.querySelector('input[name="code"]'))==null?void 0:$.focus()},100)}catch(h){console.error("❌ Send code error:",h),v(h.message||a("auth.msg_error_send"),"error")}finally{b(y,!1)}});const w=document.querySelector("[data-otp-form]");console.log("🔧 OTP form:",!!w),w==null||w.addEventListener("submit",async n=>{var y,h,$;n.preventDefault(),console.log("🔐 OTP form submitted");const s=Object.fromEntries(new FormData(w));if(!s.code||s.code.length<5){v(a("auth.msg_otp_incomplete"),"error");return}const p=w.querySelector("[data-otp-submit]");b(p,!0);try{const r=await j.loginPhoneVerify(t,s.code);console.log("✅ Verify response:",r);const L=(r==null?void 0:r.token)||(r==null?void 0:r.access_token)||((y=r==null?void 0:r.data)==null?void 0:y.token)||((h=r==null?void 0:r.data)==null?void 0:h.access_token),I=(r==null?void 0:r.user)||(($=r==null?void 0:r.data)==null?void 0:$.user)||{phone:t};if(!L)throw new Error(a("auth.msg_error_verify"));O(L,I),v(a("auth.msg_login_success"),"success"),setTimeout(()=>{var A,P;return(P=(A=window.__app)==null?void 0:A.router)==null?void 0:P.navigate("/dashboard")},800)}catch(r){console.error("❌ Verify error:",r),v(r.message||a("auth.msg_error_verify"),"error")}finally{b(p,!1)}});const S=document.querySelector("[data-email-form]");console.log("🔧 Email form:",!!S),S==null||S.addEventListener("submit",async n=>{var y,h,$;n.preventDefault(),console.log("📧 Email form submitted");const s=Object.fromEntries(new FormData(S)),p=S.querySelector("[data-submit-btn]");b(p,!0);try{const r=await j.loginEmail(s.email,s.password);console.log("📧 Email login response:",r);const L=(r==null?void 0:r.token)||(r==null?void 0:r.access_token)||((y=r==null?void 0:r.data)==null?void 0:y.token)||((h=r==null?void 0:r.data)==null?void 0:h.access_token),I=(r==null?void 0:r.user)||(($=r==null?void 0:r.data)==null?void 0:$.user)||{email:s.email};if(!L)throw new Error(a("auth.msg_error_login"));O(L,I),v(a("auth.msg_login_success"),"success"),setTimeout(()=>{var A,P;return(P=(A=window.__app)==null?void 0:A.router)==null?void 0:P.navigate("/dashboard")},800)}catch(r){console.error("❌ Email login error:",r),v(r.message||a("auth.msg_error_login"),"error")}finally{b(p,!1)}}),g==null||g.addEventListener("click",async()=>{if(!g.disabled)try{await j.loginPhoneSendCode(t),v(a("auth.msg_otp_resent"),"success"),E(60)}catch(n){v(n.message,"error")}}),q==null||q.addEventListener("click",()=>{o&&(o.style.display="none"),i&&(i.style.display="flex");const n=document.querySelector('[data-tab-content="phone"]');n&&(n.style.display="block"),l&&(l.style.display="flex"),w&&w.reset(),e&&clearInterval(e),v("")});function E(n){e&&clearInterval(e);let s=n;g&&(g.disabled=!0,g.style.opacity="0.5");const p=()=>{if(s<=0){clearInterval(e),g&&(g.disabled=!1,g.style.opacity="1"),f&&(f.textContent="");return}f&&(f.textContent=`(${s}s)`),s--};p(),e=setInterval(p,1e3)}function v(n,s="info"){c&&(c.textContent=n,c.style.display=n?"block":"none",c.style.color=s==="error"?"#e74c3c":s==="success"?"#27ae60":"#666")}function b(n,s){n&&(n.disabled=s,s?(n.dataset.originalText=n.textContent,n.textContent=a("auth.loading")):n.textContent=n.dataset.originalText||n.textContent)}function d(n){const s="۰۱۲۳۴۵۶۷۸۹",p="٠١٢٣٤٥٦٧٨٩";let y=n.toString();for(let h=0;h<10;h++)y=y.replace(new RegExp(s[h],"g"),h),y=y.replace(new RegExp(p[h],"g"),h);return y.replace(/\D/g,"")}function m(n){return/^09\d{9}$/.test(n)||/^989\d{9}$/.test(n)}console.log("✅ initLogin completed")}async function Ee(){const t=x(`
-    <div class="section" style="min-height:60vh;display:flex;align-items:center;justify-content:center;text-align:center">
-      <div>
-        <h1 style="font-size:6rem;margin:0">404</h1>
-        <h2>${a("not_found.title")}</h2>
-        <p>${a("not_found.description")}</p>
-        <a href="/" class="primary-button w-button" data-nav-link>${a("not_found.back_home")}</a>
+  `);return console.log("🟢 HTML generated"),setTimeout(()=>{console.log("🎬 Initializing login listeners...");const e=document.querySelectorAll("[data-tab]"),i=document.querySelector("[data-otp-step]");console.log("Tabs found:",e.length),console.log("OTP step found:",!!i),L(),Ee(),console.log("✅ Login listeners attached")},100),t}function Ee(){console.log("🔧 initLogin started");let t="",e=null;const i=document.querySelector("[data-tabs]"),o=document.querySelector("[data-otp-step]"),s=document.querySelector("[data-main-footer]"),d=document.querySelector("[data-msg]"),v=document.querySelector("[data-phone-display]"),m=document.querySelector("[data-resend-btn]"),w=document.querySelector("[data-timer]"),_=document.querySelector("[data-back-btn]"),$=document.querySelectorAll("[data-tab]");console.log("🔧 Found",$.length,"tabs"),$.forEach(n=>{n.addEventListener("click",l=>{l.preventDefault(),console.log("🖱️ Tab clicked:",n.dataset.tab);const p=n.dataset.tab;document.querySelectorAll("[data-tab]").forEach(h=>h.classList.remove("active")),document.querySelectorAll("[data-tab-content]").forEach(h=>h.style.display="none"),n.classList.add("active");const y=document.querySelector(`[data-tab-content="${p}"]`);y&&(y.style.display="block"),c("")})});const f=document.querySelector("[data-phone-form]");console.log("🔧 Phone form:",!!f),f==null||f.addEventListener("submit",async n=>{n.preventDefault(),console.log("📱 Phone form submitted");const l=Object.fromEntries(new FormData(f)),p=u(l.phone);if(!g(p)){c(a("auth.msg_invalid_phone"),"error");return}t=p;const y=f.querySelector("[data-submit-btn]");b(y,!0);try{const h=await j.loginPhoneSendCode(p);console.log("📱 Send code response:",h),v&&(v.textContent=p),i&&(i.style.display="none"),document.querySelectorAll("[data-tab-content]").forEach(q=>q.style.display="none"),s&&(s.style.display="none"),o&&(o.style.display="block"),x(60),c(""),setTimeout(()=>{var q;return(q=o==null?void 0:o.querySelector('input[name="code"]'))==null?void 0:q.focus()},100)}catch(h){console.error("❌ Send code error:",h),c(h.message||a("auth.msg_error_send"),"error")}finally{b(y,!1)}});const k=document.querySelector("[data-otp-form]");console.log("🔧 OTP form:",!!k),k==null||k.addEventListener("submit",async n=>{var y,h,q;n.preventDefault(),console.log("🔐 OTP form submitted");const l=Object.fromEntries(new FormData(k));if(!l.code||l.code.length<5){c(a("auth.msg_otp_incomplete"),"error");return}const p=k.querySelector("[data-otp-submit]");b(p,!0);try{const r=await j.loginPhoneVerify(t,l.code);console.log("✅ Verify response:",r);const T=(r==null?void 0:r.token)||(r==null?void 0:r.access_token)||((y=r==null?void 0:r.data)==null?void 0:y.token)||((h=r==null?void 0:r.data)==null?void 0:h.access_token),I=(r==null?void 0:r.user)||((q=r==null?void 0:r.data)==null?void 0:q.user)||{phone:t};if(!T)throw new Error(a("auth.msg_error_verify"));B(T,I),c(a("auth.msg_login_success"),"success"),setTimeout(()=>{var A,P;return(P=(A=window.__app)==null?void 0:A.router)==null?void 0:P.navigate("/dashboard")},800)}catch(r){console.error("❌ Verify error:",r),c(r.message||a("auth.msg_error_verify"),"error")}finally{b(p,!1)}});const S=document.querySelector("[data-email-form]");console.log("🔧 Email form:",!!S),S==null||S.addEventListener("submit",async n=>{var y,h,q;n.preventDefault(),console.log("📧 Email form submitted");const l=Object.fromEntries(new FormData(S)),p=S.querySelector("[data-submit-btn]");b(p,!0);try{const r=await j.loginEmail(l.email,l.password);console.log("📧 Email login response:",r);const T=(r==null?void 0:r.token)||(r==null?void 0:r.access_token)||((y=r==null?void 0:r.data)==null?void 0:y.token)||((h=r==null?void 0:r.data)==null?void 0:h.access_token),I=(r==null?void 0:r.user)||((q=r==null?void 0:r.data)==null?void 0:q.user)||{email:l.email};if(!T)throw new Error(a("auth.msg_error_login"));B(T,I),c(a("auth.msg_login_success"),"success"),setTimeout(()=>{var A,P;return(P=(A=window.__app)==null?void 0:A.router)==null?void 0:P.navigate("/dashboard")},800)}catch(r){console.error("❌ Email login error:",r),c(r.message||a("auth.msg_error_login"),"error")}finally{b(p,!1)}}),m==null||m.addEventListener("click",async()=>{if(!m.disabled)try{await j.loginPhoneSendCode(t),c(a("auth.msg_otp_resent"),"success"),x(60)}catch(n){c(n.message,"error")}}),_==null||_.addEventListener("click",()=>{o&&(o.style.display="none"),i&&(i.style.display="flex");const n=document.querySelector('[data-tab-content="phone"]');n&&(n.style.display="block"),s&&(s.style.display="flex"),k&&k.reset(),e&&clearInterval(e),c("")});function x(n){e&&clearInterval(e);let l=n;m&&(m.disabled=!0,m.style.opacity="0.5");const p=()=>{if(l<=0){clearInterval(e),m&&(m.disabled=!1,m.style.opacity="1"),w&&(w.textContent="");return}w&&(w.textContent=`(${l}s)`),l--};p(),e=setInterval(p,1e3)}function c(n,l="info"){d&&(d.textContent=n,d.style.display=n?"block":"none",d.style.color=l==="error"?"#e74c3c":l==="success"?"#27ae60":"#666")}function b(n,l){n&&(n.disabled=l,l?(n.dataset.originalText=n.textContent,n.textContent=a("auth.loading")):n.textContent=n.dataset.originalText||n.textContent)}function u(n){const l="۰۱۲۳۴۵۶۷۸۹",p="٠١٢٣٤٥٦٧٨٩";let y=n.toString();for(let h=0;h<10;h++)y=y.replace(new RegExp(l[h],"g"),h),y=y.replace(new RegExp(p[h],"g"),h);return y.replace(/\D/g,"")}function g(n){return/^09\d{9}$/.test(n)||/^989\d{9}$/.test(n)}console.log("✅ initLogin completed")}async function Le(){console.log("🟢 RegisterPage started");const t=E(`
+    <div class="auth-page">
+      <div class="auth-container">
+
+        <div class="auth-header">
+          <h2>${a("auth.register_title")}</h2>
+          <p>${a("auth.register_subtitle")}</p>
+        </div>
+
+        <!-- STEP 1: نام + شماره + کد معرف -->
+        <div data-step="phone">
+          <form class="auth-form" data-phone-form>
+            <div class="auth-field">
+              <label>${a("auth.name_label")}</label>
+              <input type="text" name="name" placeholder="${a("auth.name_placeholder")}" class="auth-input" required />
+            </div>
+            <div class="auth-field">
+              <label>${a("auth.phone_label")}</label>
+              <input type="tel" name="phone" placeholder="${a("auth.phone_placeholder")}" class="auth-input" required dir="ltr" />
+            </div>
+            <div class="auth-field">
+              <label>${a("auth.referral_label")||"کد معرف"} <span style="font-size:12px;color:#999;font-weight:400">(${a("common.optional")||"اختیاری"})</span></label>
+              <input type="text" name="referral_code" placeholder="${a("auth.referral_placeholder")||"مثلاً: ABC123"}" class="auth-input" dir="ltr" />
+            </div>
+            <button type="submit" class="primary-button w-button" data-submit-btn>
+              ${a("auth.btn_send_otp_register")}
+            </button>
+          </form>
+        </div>
+
+        <!-- STEP 2: کد OTP -->
+        <div data-step="otp" style="display:none">
+          <div class="auth-header" style="margin-bottom:20px">
+            <p>${a("auth.otp_subtitle").replace("{phone}","<strong data-phone-display></strong>")}</p>
+          </div>
+
+          <form class="auth-form" data-otp-form>
+            <div class="auth-field">
+              <label>${a("auth.otp_label")}</label>
+              <input type="text" name="code" placeholder="${a("auth.otp_placeholder")}" class="auth-input otp-input" maxlength="6" inputmode="numeric" pattern="[0-9]*" required dir="ltr" />
+            </div>
+            <button type="submit" class="primary-button w-button" data-otp-submit>
+              ${a("auth.btn_verify_register")}
+            </button>
+          </form>
+
+          <div class="auth-resend">
+            <button type="button" class="auth-link-btn" data-resend-btn>${a("auth.btn_resend")}</button>
+            <span class="auth-timer" data-timer></span>
+          </div>
+
+          <div style="text-align:center;margin-top:12px">
+            <button type="button" class="auth-link-btn" data-back-btn>${a("auth.btn_back")}</button>
+          </div>
+        </div>
+
+        <div class="form-message" data-msg></div>
+
+        <div class="auth-footer" data-main-footer>
+          <span>${a("auth.have_account")}</span>
+          <a href="/login" data-nav-link>${a("auth.link_login")}</a>
+        </div>
+
       </div>
     </div>
-  `);return queueMicrotask(()=>T()),t}async function Le(){if(!N())return setTimeout(()=>{var o,l;return(l=(o=window.__app)==null?void 0:o.router)==null?void 0:l.navigate("/login")},100),x('<div class="loading-placeholder">در حال انتقال...</div>');const t=Q(),e=M()==="fa",i=x(`
+  `);return setTimeout(()=>{L(),Te()},100),t}function Te(){console.log("🔧 initRegister started");let t="",e="",i="",o=null;const s=document.querySelector('[data-step="phone"]'),d=document.querySelector('[data-step="otp"]'),v=document.querySelector("[data-phone-form]"),m=document.querySelector("[data-otp-form]"),w=document.querySelector("[data-phone-display]"),_=document.querySelector("[data-msg]"),$=document.querySelector("[data-resend-btn]"),f=document.querySelector("[data-timer]"),k=document.querySelector("[data-back-btn]"),S=document.querySelector("[data-main-footer]");v==null||v.addEventListener("submit",async n=>{n.preventDefault(),console.log("📝 Register form submitted");const l=Object.fromEntries(new FormData(v)),p=(l.name||"").trim(),y=u(l.phone),h=(l.referral_code||"").trim().toUpperCase();if(!p){c(a("auth.name_required")||"نام را وارد کنید","error");return}if(!g(y)){c(a("auth.msg_invalid_phone"),"error");return}t=y,e=p,i=h;const q=v.querySelector("[data-submit-btn]");b(q,!0);try{const r=await j.registerSendCode(p,y,h);console.log("📱 Register send code response:",r),w&&(w.textContent=y),s&&(s.style.display="none"),d&&(d.style.display="block"),S&&(S.style.display="none"),x(60),c(""),setTimeout(()=>{var T;return(T=d==null?void 0:d.querySelector('input[name="code"]'))==null?void 0:T.focus()},100)}catch(r){console.error("❌ Register send code error:",r),c(r.message||a("auth.msg_error_send"),"error")}finally{b(q,!1)}}),m==null||m.addEventListener("submit",async n=>{var y,h,q;n.preventDefault(),console.log("🔐 Register OTP submitted");const l=Object.fromEntries(new FormData(m));if(!l.code||l.code.length<5){c(a("auth.msg_otp_incomplete"),"error");return}const p=m.querySelector("[data-otp-submit]");b(p,!0);try{const r=await j.registerVerify(t,l.code);console.log("✅ Register verify response:",r);const T=(r==null?void 0:r.token)||(r==null?void 0:r.access_token)||((y=r==null?void 0:r.data)==null?void 0:y.token)||((h=r==null?void 0:r.data)==null?void 0:h.access_token),I=(r==null?void 0:r.user)||((q=r==null?void 0:r.data)==null?void 0:q.user)||{phone:t,name:e};if(!T)throw new Error(a("auth.msg_error_verify"));B(T,I),c(a("auth.msg_register_success"),"success"),setTimeout(()=>{var A,P;return(P=(A=window.__app)==null?void 0:A.router)==null?void 0:P.navigate("/dashboard")},800)}catch(r){console.error("❌ Register verify error:",r),c(r.message||a("auth.msg_error_verify"),"error")}finally{b(p,!1)}}),$==null||$.addEventListener("click",async()=>{if(!$.disabled)try{await j.registerSendCode(e,t,i),c(a("auth.msg_otp_resent"),"success"),x(60)}catch(n){c(n.message,"error")}}),k==null||k.addEventListener("click",()=>{d&&(d.style.display="none"),s&&(s.style.display="block"),S&&(S.style.display="flex"),m&&m.reset(),o&&clearInterval(o),c("")});function x(n){o&&clearInterval(o);let l=n;$&&($.disabled=!0,$.style.opacity="0.5");const p=()=>{if(l<=0){clearInterval(o),$&&($.disabled=!1,$.style.opacity="1"),f&&(f.textContent="");return}f&&(f.textContent=`(${l}s)`),l--};p(),o=setInterval(p,1e3)}function c(n,l="info"){_&&(_.textContent=n,_.style.display=n?"block":"none",_.style.color=l==="error"?"#e74c3c":l==="success"?"#27ae60":"#666")}function b(n,l){n&&(n.disabled=l,l?(n.dataset.originalText=n.textContent,n.textContent=a("auth.loading")):n.textContent=n.dataset.originalText||n.textContent)}function u(n){const l="۰۱۲۳۴۵۶۷۸۹",p="٠١٢٣٤٥٦٧٨٩";let y=n.toString();for(let h=0;h<10;h++)y=y.replace(new RegExp(l[h],"g"),h),y=y.replace(new RegExp(p[h],"g"),h);return y.replace(/\D/g,"")}function g(n){return/^09\d{9}$/.test(n)||/^989\d{9}$/.test(n)}console.log("✅ initRegister completed")}async function Ce(){if(!G())return setTimeout(()=>{var o,s;return(s=(o=window.__app)==null?void 0:o.router)==null?void 0:s.navigate("/login")},100),E('<div class="loading-placeholder">در حال انتقال...</div>');const t=J(),e=M()==="fa",i=E(`
     <div class="dashboard-page">
       <div class="w-layout-blockcontainer container w-container">
 
@@ -1169,112 +1225,110 @@
 
       </div>
     </div>
-  `);return queueMicrotask(()=>{T(),Te(t,e)}),i}function Te(t,e){var E,v,b;let i=[],o=null,l=null,c=null,u=1;(E=document.querySelector("[data-logout-btn]"))==null||E.addEventListener("click",()=>{var d,m;localStorage.removeItem("auth_token"),localStorage.removeItem("auth_user"),(m=(d=window.__app)==null?void 0:d.router)==null||m.navigate("/login")}),document.querySelectorAll("[data-dash-tab]").forEach(d=>{d.addEventListener("click",()=>{document.querySelectorAll("[data-dash-tab]").forEach(n=>n.classList.remove("active")),document.querySelectorAll("[data-dash-content]").forEach(n=>n.style.display="none"),d.classList.add("active");const m=document.querySelector(`[data-dash-content="${d.dataset.dashTab}"]`);m&&(m.style.display="block")})}),g(),f();async function g(){const d=document.querySelector("[data-services-grid]");if(d)try{i=[{id:1,name:e?"میکاپ عروس":"Bridal Makeup",description:e?"میکاپ حرفه‌ای عروس":"Professional bridal makeup",price:5e6,duration:120,image:"/img/service-1.jpg"},{id:2,name:e?"رنگ و مش":"Hair Color",description:e?"رنگ و مش مو":"Hair coloring & highlights",price:25e5,duration:90,image:"/img/service-2.jpg"},{id:3,name:e?"کراتین مو":"Keratin Treatment",description:e?"صافی و درخشندگی مو":"Hair smoothing & shine",price:35e5,duration:150,image:"/img/service-3.jpg"},{id:4,name:e?"پاکسازی پوست":"Facial Cleansing",description:e?"پاکسازی و آبرسانی پوست":"Deep skin cleansing",price:15e5,duration:60,image:"/img/service-4.jpg"},{id:5,name:e?"میکاپ ساده":"Simple Makeup",description:e?"میکاپ روزانه":"Daily makeup",price:12e5,duration:45,image:"/img/service-5.jpg"},{id:6,name:e?"میکاپ مجلسی":"Party Makeup",description:e?"میکاپ مجلسی":"Evening party makeup",price:2e6,duration:60,image:"/img/service-6.jpg"}],d.innerHTML=i.map(m=>`
-        <div class="service-card" data-service-id="${m.id}">
+  `);return queueMicrotask(()=>{L(),Ae(t,e)}),i}function Ae(t,e){var x,c,b;let i=[],o=null,s=null,d=null,v=1;(x=document.querySelector("[data-logout-btn]"))==null||x.addEventListener("click",()=>{var u,g;localStorage.removeItem("auth_token"),localStorage.removeItem("auth_user"),(g=(u=window.__app)==null?void 0:u.router)==null||g.navigate("/login")}),document.querySelectorAll("[data-dash-tab]").forEach(u=>{u.addEventListener("click",()=>{document.querySelectorAll("[data-dash-tab]").forEach(n=>n.classList.remove("active")),document.querySelectorAll("[data-dash-content]").forEach(n=>n.style.display="none"),u.classList.add("active");const g=document.querySelector(`[data-dash-content="${u.dataset.dashTab}"]`);g&&(g.style.display="block")})}),m(),w();async function m(){const u=document.querySelector("[data-services-grid]");if(u)try{i=[{id:1,name:e?"میکاپ عروس":"Bridal Makeup",description:e?"میکاپ حرفه‌ای عروس":"Professional bridal makeup",price:5e6,duration:120,image:"/img/service-1.jpg"},{id:2,name:e?"رنگ و مش":"Hair Color",description:e?"رنگ و مش مو":"Hair coloring & highlights",price:25e5,duration:90,image:"/img/service-2.jpg"},{id:3,name:e?"کراتین مو":"Keratin Treatment",description:e?"صافی و درخشندگی مو":"Hair smoothing & shine",price:35e5,duration:150,image:"/img/service-3.jpg"},{id:4,name:e?"پاکسازی پوست":"Facial Cleansing",description:e?"پاکسازی و آبرسانی پوست":"Deep skin cleansing",price:15e5,duration:60,image:"/img/service-4.jpg"},{id:5,name:e?"میکاپ ساده":"Simple Makeup",description:e?"میکاپ روزانه":"Daily makeup",price:12e5,duration:45,image:"/img/service-5.jpg"},{id:6,name:e?"میکاپ مجلسی":"Party Makeup",description:e?"میکاپ مجلسی":"Evening party makeup",price:2e6,duration:60,image:"/img/service-6.jpg"}],u.innerHTML=i.map(g=>`
+        <div class="service-card" data-service-id="${g.id}">
           <div class="service-img">
-            <img src="${m.image}" loading="lazy" alt="${m.name}" class="cover-image" />
+            <img src="${g.image}" loading="lazy" alt="${g.name}" class="cover-image" />
           </div>
           <div class="service-content">
-            <h3 class="service-name">${m.name}</h3>
-            <p class="service-desc">${m.description}</p>
+            <h3 class="service-name">${g.name}</h3>
+            <p class="service-desc">${g.description}</p>
             <div class="service-meta">
-              <span class="service-price">${S(m.price)}</span>
-              <span class="service-duration">${m.duration} ${e?"دقیقه":"min"}</span>
+              <span class="service-price">${S(g.price)}</span>
+              <span class="service-duration">${g.duration} ${e?"دقیقه":"min"}</span>
             </div>
-            <button class="primary-button w-button" data-book-service="${m.id}">
+            <button class="primary-button w-button" data-book-service="${g.id}">
               ${e?"رزرو":"Book"}
             </button>
           </div>
         </div>
-      `).join(""),d.querySelectorAll("[data-book-service]").forEach(m=>{m.addEventListener("click",n=>{n.stopPropagation();const s=Number(m.dataset.bookService),p=i.find(y=>y.id===s);p&&q(p)})})}catch(m){console.error("❌ Services load error:",m),d.innerHTML=`<p>${e?"خطا در بارگذاری":"Failed to load"}</p>`}}async function f(){var m;const d=document.querySelector("[data-appointments-list]");if(d)try{const n=[];if(n.length===0){d.innerHTML=`
+      `).join(""),u.querySelectorAll("[data-book-service]").forEach(g=>{g.addEventListener("click",n=>{n.stopPropagation();const l=Number(g.dataset.bookService),p=i.find(y=>y.id===l);p&&_(p)})})}catch(g){console.error("❌ Services load error:",g),u.innerHTML=`<p>${e?"خطا در بارگذاری":"Failed to load"}</p>`}}async function w(){var g;const u=document.querySelector("[data-appointments-list]");if(u)try{const n=[];if(n.length===0){u.innerHTML=`
           <div class="empty-state">
             <p>${e?"هنوز نوبتی رزرو نکرده‌اید":"No appointments yet"}</p>
             <button class="primary-button w-button" data-goto-services>
               ${e?"رزرو اولین نوبت":"Book your first appointment"}
             </button>
           </div>
-        `,(m=d.querySelector("[data-goto-services]"))==null||m.addEventListener("click",()=>{document.querySelector('[data-dash-tab="services"]').click()});return}d.innerHTML=n.map(s=>`
+        `,(g=u.querySelector("[data-goto-services]"))==null||g.addEventListener("click",()=>{document.querySelector('[data-dash-tab="services"]').click()});return}u.innerHTML=n.map(l=>`
         <div class="appointment-card">
           <div class="appointment-info">
-            <h3>${s.service}</h3>
+            <h3>${l.service}</h3>
             <div class="appointment-meta">
-              <span>📅 ${s.date}</span>
-              <span>🕐 ${s.time}</span>
+              <span>📅 ${l.date}</span>
+              <span>🕐 ${l.time}</span>
             </div>
           </div>
-          <div class="appointment-status status-${s.status}">${s.status}</div>
+          <div class="appointment-status status-${l.status}">${l.status}</div>
         </div>
-      `).join("")}catch(n){console.error("❌ Appointments load error:",n)}}function q(d){o=d,l=null,c=null,u=1;const m=document.querySelector("[data-booking-modal]"),n=m.querySelector("[data-modal-title]"),s=m.querySelector("[data-modal-subtitle]");n.textContent=d.name,s.textContent=d.description,m.querySelector('[data-step="date"]').style.display="block",m.querySelector('[data-step="time"]').style.display="none",m.querySelector("[data-booking-summary]").style.display="none",m.querySelector("[data-booking-prev]").style.display="none",m.querySelector("[data-booking-next]").textContent=e?"ادامه":"Continue",m.querySelector("[data-booking-next]").disabled=!0,k(),m.style.display="flex",document.body.style.overflow="hidden"}function k(){const d=document.querySelector("[data-date-picker]");if(!d)return;const m=[],n=new Date;for(let s=0;s<14;s++){const p=new Date(n);p.setDate(n.getDate()+s),m.push(p)}d.innerHTML=m.map(s=>{const p=s.toISOString().split("T")[0],y=s.toLocaleDateString(e?"fa-IR":"en-US",{weekday:"short"}),h=s.getDate(),$=s.toLocaleDateString(e?"fa-IR":"en-US",{month:"short"});return`
+      `).join("")}catch(n){console.error("❌ Appointments load error:",n)}}function _(u){o=u,s=null,d=null,v=1;const g=document.querySelector("[data-booking-modal]"),n=g.querySelector("[data-modal-title]"),l=g.querySelector("[data-modal-subtitle]");n.textContent=u.name,l.textContent=u.description,g.querySelector('[data-step="date"]').style.display="block",g.querySelector('[data-step="time"]').style.display="none",g.querySelector("[data-booking-summary]").style.display="none",g.querySelector("[data-booking-prev]").style.display="none",g.querySelector("[data-booking-next]").textContent=e?"ادامه":"Continue",g.querySelector("[data-booking-next]").disabled=!0,$(),g.style.display="flex",document.body.style.overflow="hidden"}function $(){const u=document.querySelector("[data-date-picker]");if(!u)return;const g=[],n=new Date;for(let l=0;l<14;l++){const p=new Date(n);p.setDate(n.getDate()+l),g.push(p)}u.innerHTML=g.map(l=>{const p=l.toISOString().split("T")[0],y=l.toLocaleDateString(e?"fa-IR":"en-US",{weekday:"short"}),h=l.getDate(),q=l.toLocaleDateString(e?"fa-IR":"en-US",{month:"short"});return`
         <button class="date-item" data-date="${p}">
           <span class="date-day">${y}</span>
           <span class="date-num">${h}</span>
-          <span class="date-month">${$}</span>
+          <span class="date-month">${q}</span>
         </button>
-      `}).join(""),d.querySelectorAll("[data-date]").forEach(s=>{s.addEventListener("click",()=>{d.querySelectorAll(".date-item").forEach(p=>p.classList.remove("active")),s.classList.add("active"),l=s.dataset.date,w()})})}function _(){const d=document.querySelector("[data-time-picker]");if(!d)return;const m=[];for(let n=9;n<=20;n++)m.push(`${String(n).padStart(2,"0")}:00`),n<20&&m.push(`${String(n).padStart(2,"0")}:30`);d.innerHTML=m.map(n=>`
+      `}).join(""),u.querySelectorAll("[data-date]").forEach(l=>{l.addEventListener("click",()=>{u.querySelectorAll(".date-item").forEach(p=>p.classList.remove("active")),l.classList.add("active"),s=l.dataset.date,k()})})}function f(){const u=document.querySelector("[data-time-picker]");if(!u)return;const g=[];for(let n=9;n<=20;n++)g.push(`${String(n).padStart(2,"0")}:00`),n<20&&g.push(`${String(n).padStart(2,"0")}:30`);u.innerHTML=g.map(n=>`
       <button class="time-item" data-time="${n}">${n}</button>
-    `).join(""),d.querySelectorAll("[data-time]").forEach(n=>{n.addEventListener("click",()=>{d.querySelectorAll(".time-item").forEach(s=>s.classList.remove("active")),n.classList.add("active"),c=n.dataset.time,w()})})}(v=document.querySelector("[data-booking-next]"))==null||v.addEventListener("click",()=>{var d,m;if(u===1&&l)u=2,document.querySelector('[data-step="date"]').style.display="none",document.querySelector('[data-step="time"]').style.display="block",document.querySelector("[data-booking-prev]").style.display="block",_(),w();else if(u===2&&c)u=3,document.querySelector('[data-step="time"]').style.display="none",document.querySelector("[data-booking-summary]").style.display="block",document.querySelector("[data-booking-next]").textContent=e?"پرداخت":"Proceed to Payment",document.querySelector("[data-summary-service]").textContent=o.name,document.querySelector("[data-summary-date]").textContent=l,document.querySelector("[data-summary-time]").textContent=c,document.querySelector("[data-summary-price]").textContent=S(o.price);else if(u===3){const n=new URLSearchParams({service:o.id,date:l,time:c});(m=(d=window.__app)==null?void 0:d.router)==null||m.navigate(`/checkout?${n.toString()}`)}}),(b=document.querySelector("[data-booking-prev]"))==null||b.addEventListener("click",()=>{u===2?(u=1,document.querySelector('[data-step="time"]').style.display="none",document.querySelector('[data-step="date"]').style.display="block",document.querySelector("[data-booking-prev]").style.display="none",w()):u===3&&(u=2,document.querySelector("[data-booking-summary]").style.display="none",document.querySelector('[data-step="time"]').style.display="block",document.querySelector("[data-booking-next]").textContent=e?"ادامه":"Continue",w())}),document.querySelectorAll("[data-modal-close]").forEach(d=>{d.addEventListener("click",()=>{document.querySelector("[data-booking-modal]").style.display="none",document.body.style.overflow=""})});function w(){const d=document.querySelector("[data-booking-next]");d&&(u===1?d.disabled=!l:u===2?d.disabled=!c:d.disabled=!1)}function S(d){return new Intl.NumberFormat(e?"fa-IR":"en-US").format(d)+(e?" تومان":" IRR")}}async function Ce(){console.log("🟢 RegisterPage started");const t=x(`
-    <div class="auth-page">
-      <div class="auth-container">
+    `).join(""),u.querySelectorAll("[data-time]").forEach(n=>{n.addEventListener("click",()=>{u.querySelectorAll(".time-item").forEach(l=>l.classList.remove("active")),n.classList.add("active"),d=n.dataset.time,k()})})}(c=document.querySelector("[data-booking-next]"))==null||c.addEventListener("click",()=>{var u,g;if(v===1&&s)v=2,document.querySelector('[data-step="date"]').style.display="none",document.querySelector('[data-step="time"]').style.display="block",document.querySelector("[data-booking-prev]").style.display="block",f(),k();else if(v===2&&d)v=3,document.querySelector('[data-step="time"]').style.display="none",document.querySelector("[data-booking-summary]").style.display="block",document.querySelector("[data-booking-next]").textContent=e?"پرداخت":"Proceed to Payment",document.querySelector("[data-summary-service]").textContent=o.name,document.querySelector("[data-summary-date]").textContent=s,document.querySelector("[data-summary-time]").textContent=d,document.querySelector("[data-summary-price]").textContent=S(o.price);else if(v===3){const n=new URLSearchParams({service:o.id,date:s,time:d});(g=(u=window.__app)==null?void 0:u.router)==null||g.navigate(`/checkout?${n.toString()}`)}}),(b=document.querySelector("[data-booking-prev]"))==null||b.addEventListener("click",()=>{v===2?(v=1,document.querySelector('[data-step="time"]').style.display="none",document.querySelector('[data-step="date"]').style.display="block",document.querySelector("[data-booking-prev]").style.display="none",k()):v===3&&(v=2,document.querySelector("[data-booking-summary]").style.display="none",document.querySelector('[data-step="time"]').style.display="block",document.querySelector("[data-booking-next]").textContent=e?"ادامه":"Continue",k())}),document.querySelectorAll("[data-modal-close]").forEach(u=>{u.addEventListener("click",()=>{document.querySelector("[data-booking-modal]").style.display="none",document.body.style.overflow=""})});function k(){const u=document.querySelector("[data-booking-next]");u&&(v===1?u.disabled=!s:v===2?u.disabled=!d:u.disabled=!1)}function S(u){return new Intl.NumberFormat(e?"fa-IR":"en-US").format(u)+(e?" تومان":" IRR")}}const Pe="https://demo2.mazoryagroup.ir/storage";async function je(){const t=M()==="fa",e=E(`
+    <section class="title-section">
+      <div class="w-layout-blockcontainer container w-container">
+        <div class="title-wrap">
+          <div class="subtitle">${t?"نمونه کارها":"PORTFOLIO"}</div>
+          <h1>${t?"گالری":"Gallery"}</h1>
+        </div>
+      </div>
+    </section>
 
-        <div class="auth-header">
-          <h2>${a("auth.register_title")}</h2>
-          <p>${a("auth.register_subtitle")}</p>
+    <section class="section">
+      <div class="w-layout-blockcontainer container w-container">
+
+        <!-- فیلتر دسته‌بندی -->
+        <div class="gallery-filters" data-gallery-filters>
+          <div class="loading-placeholder">${a("common.loading")}</div>
         </div>
 
-        <!-- STEP 1: نام + شماره + کد معرف -->
-        <div data-step="phone">
-          <form class="auth-form" data-phone-form>
-            <div class="auth-field">
-              <label>${a("auth.name_label")}</label>
-              <input type="text" name="name" placeholder="${a("auth.name_placeholder")}" class="auth-input" required />
-            </div>
-            <div class="auth-field">
-              <label>${a("auth.phone_label")}</label>
-              <input type="tel" name="phone" placeholder="${a("auth.phone_placeholder")}" class="auth-input" required dir="ltr" />
-            </div>
-            <div class="auth-field">
-              <label>${a("auth.referral_label")||"کد معرف"} <span style="font-size:12px;color:#999;font-weight:400">(${a("common.optional")||"اختیاری"})</span></label>
-              <input type="text" name="referral_code" placeholder="${a("auth.referral_placeholder")||"مثلاً: ABC123"}" class="auth-input" dir="ltr" />
-            </div>
-            <button type="submit" class="primary-button w-button" data-submit-btn>
-              ${a("auth.btn_send_otp_register")}
-            </button>
-          </form>
-        </div>
-
-        <!-- STEP 2: کد OTP -->
-        <div data-step="otp" style="display:none">
-          <div class="auth-header" style="margin-bottom:20px">
-            <p>${a("auth.otp_subtitle").replace("{phone}","<strong data-phone-display></strong>")}</p>
-          </div>
-
-          <form class="auth-form" data-otp-form>
-            <div class="auth-field">
-              <label>${a("auth.otp_label")}</label>
-              <input type="text" name="code" placeholder="${a("auth.otp_placeholder")}" class="auth-input otp-input" maxlength="6" inputmode="numeric" pattern="[0-9]*" required dir="ltr" />
-            </div>
-            <button type="submit" class="primary-button w-button" data-otp-submit>
-              ${a("auth.btn_verify_register")}
-            </button>
-          </form>
-
-          <div class="auth-resend">
-            <button type="button" class="auth-link-btn" data-resend-btn>${a("auth.btn_resend")}</button>
-            <span class="auth-timer" data-timer></span>
-          </div>
-
-          <div style="text-align:center;margin-top:12px">
-            <button type="button" class="auth-link-btn" data-back-btn>${a("auth.btn_back")}</button>
-          </div>
-        </div>
-
-        <div class="form-message" data-msg></div>
-
-        <div class="auth-footer" data-main-footer>
-          <span>${a("auth.have_account")}</span>
-          <a href="/login" data-nav-link>${a("auth.link_login")}</a>
+        <!-- گرید گالری -->
+        <div class="gallery-grid" data-gallery-grid>
+          <div class="loading-placeholder">${a("common.loading")}</div>
         </div>
 
       </div>
+    </section>
+
+    <!-- Lightbox -->
+    <div class="gallery-lightbox" data-lightbox style="display:none">
+      <div class="gallery-lightbox-backdrop" data-lightbox-close></div>
+      <button class="gallery-lightbox-close" data-lightbox-close>✕</button>
+      <img src="" alt="" class="gallery-lightbox-img" data-lightbox-img />
     </div>
-  `);return setTimeout(()=>{T(),Ae()},100),t}function Ae(){console.log("🔧 initRegister started");let t="",e="",i="",o=null;const l=document.querySelector('[data-step="phone"]'),c=document.querySelector('[data-step="otp"]'),u=document.querySelector("[data-phone-form]"),g=document.querySelector("[data-otp-form]"),f=document.querySelector("[data-phone-display]"),q=document.querySelector("[data-msg]"),k=document.querySelector("[data-resend-btn]"),_=document.querySelector("[data-timer]"),w=document.querySelector("[data-back-btn]"),S=document.querySelector("[data-main-footer]");u==null||u.addEventListener("submit",async n=>{n.preventDefault(),console.log("📝 Register form submitted");const s=Object.fromEntries(new FormData(u)),p=(s.name||"").trim(),y=d(s.phone),h=(s.referral_code||"").trim().toUpperCase();if(!p){v(a("auth.name_required")||"نام را وارد کنید","error");return}if(!m(y)){v(a("auth.msg_invalid_phone"),"error");return}t=y,e=p,i=h;const $=u.querySelector("[data-submit-btn]");b($,!0);try{const r=await j.registerSendCode(p,y,h);console.log("📱 Register send code response:",r),f&&(f.textContent=y),l&&(l.style.display="none"),c&&(c.style.display="block"),S&&(S.style.display="none"),E(60),v(""),setTimeout(()=>{var L;return(L=c==null?void 0:c.querySelector('input[name="code"]'))==null?void 0:L.focus()},100)}catch(r){console.error("❌ Register send code error:",r),v(r.message||a("auth.msg_error_send"),"error")}finally{b($,!1)}}),g==null||g.addEventListener("submit",async n=>{var y,h,$;n.preventDefault(),console.log("🔐 Register OTP submitted");const s=Object.fromEntries(new FormData(g));if(!s.code||s.code.length<5){v(a("auth.msg_otp_incomplete"),"error");return}const p=g.querySelector("[data-otp-submit]");b(p,!0);try{const r=await j.registerVerify(t,s.code);console.log("✅ Register verify response:",r);const L=(r==null?void 0:r.token)||(r==null?void 0:r.access_token)||((y=r==null?void 0:r.data)==null?void 0:y.token)||((h=r==null?void 0:r.data)==null?void 0:h.access_token),I=(r==null?void 0:r.user)||(($=r==null?void 0:r.data)==null?void 0:$.user)||{phone:t,name:e};if(!L)throw new Error(a("auth.msg_error_verify"));O(L,I),v(a("auth.msg_register_success"),"success"),setTimeout(()=>{var A,P;return(P=(A=window.__app)==null?void 0:A.router)==null?void 0:P.navigate("/dashboard")},800)}catch(r){console.error("❌ Register verify error:",r),v(r.message||a("auth.msg_error_verify"),"error")}finally{b(p,!1)}}),k==null||k.addEventListener("click",async()=>{if(!k.disabled)try{await j.registerSendCode(e,t,i),v(a("auth.msg_otp_resent"),"success"),E(60)}catch(n){v(n.message,"error")}}),w==null||w.addEventListener("click",()=>{c&&(c.style.display="none"),l&&(l.style.display="block"),S&&(S.style.display="flex"),g&&g.reset(),o&&clearInterval(o),v("")});function E(n){o&&clearInterval(o);let s=n;k&&(k.disabled=!0,k.style.opacity="0.5");const p=()=>{if(s<=0){clearInterval(o),k&&(k.disabled=!1,k.style.opacity="1"),_&&(_.textContent="");return}_&&(_.textContent=`(${s}s)`),s--};p(),o=setInterval(p,1e3)}function v(n,s="info"){q&&(q.textContent=n,q.style.display=n?"block":"none",q.style.color=s==="error"?"#e74c3c":s==="success"?"#27ae60":"#666")}function b(n,s){n&&(n.disabled=s,s?(n.dataset.originalText=n.textContent,n.textContent=a("auth.loading")):n.textContent=n.dataset.originalText||n.textContent)}function d(n){const s="۰۱۲۳۴۵۶۷۸۹",p="٠١٢٣٤٥٦٧٨٩";let y=n.toString();for(let h=0;h<10;h++)y=y.replace(new RegExp(s[h],"g"),h),y=y.replace(new RegExp(p[h],"g"),h);return y.replace(/\D/g,"")}function m(n){return/^09\d{9}$/.test(n)||/^989\d{9}$/.test(n)}console.log("✅ initRegister completed")}window.addEventListener("error",t=>console.error("🚨",t.error||t.message));window.addEventListener("unhandledrejection",t=>console.error("🚨",t.reason));const Pe=[{path:"/",component:ce,title:"Nil Beauty"},{path:"/about",component:ve,title:"درباره ما"},{path:"/blog",component:ge,title:"بلاگ"},{path:"/blog/:slug",component:ye,title:"مقاله"},{path:"/contact",component:be,title:"تماس"},{path:"/faq",component:ke,title:"سوالات"},{path:"/checkout",component:Se,title:"پرداخت"},{path:"/login",component:_e,title:"ورود"},{path:"/dashboard",component:Le,title:"داشبورد"},{path:"/register",component:Ce,title:"ثبت‌نام"},{path:"*",component:Ee,title:"404"}];async function je(){console.log("🚀 Bootstrap started");try{if(await te(),oe(),!document.querySelector("#app"))throw new Error("#app not found");const e=new F(Pe,"#app");e.start(),window.__app={router:e},window.addEventListener("pageChanged",()=>{setTimeout(()=>J(),50)}),console.log("🎉 Nil Beauty initialized")}catch(t){console.error("❌ Bootstrap failed:",t);const e=document.getElementById("app");e&&(e.innerHTML=`<div style="padding:40px;color:red"><h2>خطا</h2><pre>${t.message}</pre></div>`)}}je();
+  `);return setTimeout(()=>{L(),Ie(t)},100),e}function Ie(t){let e=null;const i=document.querySelector("[data-gallery-filters]"),o=document.querySelector("[data-gallery-grid]"),s=document.querySelector("[data-lightbox]"),d=document.querySelector("[data-lightbox-img]");v(),m(null);async function v(){try{const f=await N("/v1/gallery/categories");console.log("📁 Categories response:",f);const k=f.data||[],S=`
+        <button class="gallery-filter-btn active" data-category="all">
+          ${t?"همه":"All"}
+        </button>
+      `,x=k.map(c=>`
+        <button class="gallery-filter-btn" data-category="${c.id}">
+          ${c.name}
+        </button>
+      `).join("");i.innerHTML=S+x,i.querySelectorAll("[data-category]").forEach(c=>{c.addEventListener("click",()=>{i.querySelectorAll(".gallery-filter-btn").forEach(u=>u.classList.remove("active")),c.classList.add("active");const b=c.dataset.category;e=b==="all"?null:b,m(e)})})}catch(f){console.error("❌ Categories error:",f),i.innerHTML=`<p>${t?"خطا در بارگذاری دسته‌ها":"Failed to load categories"}</p>`}}async function m(f){o.innerHTML=`<div class="loading-placeholder">${a("common.loading")}</div>`;try{const k=f?`/v1/gallery?category_id=${f}`:"/v1/gallery",S=await N(k);console.log("🖼️ Gallery response:",S);const x=S.data||[];if(x.length===0){o.innerHTML=`
+          <div class="gallery-empty">
+            <p>${t?"تصویری در این دسته وجود ندارد":"No images in this category"}</p>
+          </div>
+        `;return}o.innerHTML=x.map(c=>{var u;const b=w(c.image);return`
+          <div class="gallery-item" data-image="${b}" data-title="${c.title||""}">
+            <div class="gallery-item-img">
+              <img src="${b}" loading="lazy" alt="${c.title||""}" />
+            </div>
+            <div class="gallery-item-info">
+              <h3 class="gallery-item-title">${c.title||""}</h3>
+              <div class="gallery-item-category">${((u=c.category)==null?void 0:u.name)||""}</div>
+            </div>
+          </div>
+        `}).join(""),o.querySelectorAll(".gallery-item").forEach(c=>{c.addEventListener("click",()=>{_(c.dataset.image,c.dataset.title)})})}catch(k){console.error("❌ Gallery error:",k),o.innerHTML=`<p>${t?"خطا در بارگذاری گالری":"Failed to load gallery"}</p>`}}function w(f){return f?f.startsWith("http")?f:`${Pe}/${f}`:""}function _(f,k){!s||!d||(d.src=f,d.alt=k||"",s.style.display="flex",document.body.style.overflow="hidden")}function $(){s&&(s.style.display="none",d.src="",document.body.style.overflow="")}document.querySelectorAll("[data-lightbox-close]").forEach(f=>{f.addEventListener("click",$)}),document.addEventListener("keydown",f=>{f.key==="Escape"&&s&&s.style.display==="flex"&&$()})}async function Me(){const t=E(`
+    <div class="section" style="min-height:60vh;display:flex;align-items:center;justify-content:center;text-align:center">
+      <div>
+        <h1 style="font-size:6rem;margin:0">404</h1>
+        <h2>${a("not_found.title")}</h2>
+        <p>${a("not_found.description")}</p>
+        <a href="/" class="primary-button w-button" data-nav-link>${a("not_found.back_home")}</a>
+      </div>
+    </div>
+  `);return queueMicrotask(()=>L()),t}window.addEventListener("error",t=>console.error("🚨",t.error||t.message));window.addEventListener("unhandledrejection",t=>console.error("🚨",t.reason));const Re=[{path:"/",component:de,title:"Nil Beauty"},{path:"/about",component:me,title:"درباره ما"},{path:"/gallery",component:je,title:"گالری"},{path:"/blog",component:pe,title:"بلاگ"},{path:"/blog/:slug",component:fe,title:"مقاله"},{path:"/contact",component:we,title:"تماس"},{path:"/faq",component:$e,title:"سوالات"},{path:"/checkout",component:qe,title:"پرداخت"},{path:"/login",component:xe,title:"ورود"},{path:"/register",component:Le,title:"ثبت‌نام"},{path:"/dashboard",component:Ce,title:"داشبورد"},{path:"*",component:Me,title:"404"}];async function De(){console.log("🚀 Bootstrap started");try{if(await ie(),ne(),!document.querySelector("#app"))throw new Error("#app not found");const e=new Z(Re,"#app");e.start(),window.__app={router:e},window.addEventListener("pageChanged",()=>{setTimeout(()=>X(),50)}),console.log("🎉 Nil Beauty initialized")}catch(t){console.error("❌ Bootstrap failed:",t);const e=document.getElementById("app");e&&(e.innerHTML=`<div style="padding:40px;color:red"><h2>خطا</h2><pre>${t.message}</pre></div>`)}}De();

@@ -2,7 +2,7 @@
 // Header Component
 // ============================================
 import { t, getCurrentLang, setLanguage } from '../code/i18n.js';
-import { isLoggedIn, getUser, logout } from '../code/auth.js';
+import { isLoggedIn, getUser } from '../code/auth.js';
 
 export function Header() {
   const user = getUser();
@@ -10,7 +10,6 @@ export function Header() {
   const currentPath = window.location.pathname;
   const isActive = (path) => currentPath === path;
 
-  // برچسب زبان (برای نمایش روی دکمه)
   const langLabel = getCurrentLang() === 'fa' ? 'EN' : 'FA';
 
   return `
@@ -67,18 +66,9 @@ export function Header() {
 
         ${loggedIn ? `
           <!-- کاربر لاگین شده -->
-          <div class="user-menu">
-            <a href="/dashboard" class="user-link w-inline-block" data-nav-link title="${user?.name || user?.phone || ''}">
-              <img src="/img/users-icon-dark.svg" loading="lazy" alt="User" />
-            </a>
-            <button class="logout-btn" data-logout-btn title="${t('auth.logout') || 'خروج'}">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
-                <polyline points="16 17 21 12 16 7"></polyline>
-                <line x1="21" y1="12" x2="9" y2="12"></line>
-              </svg>
-            </button>
-          </div>
+          <a href="/dashboard" class="user-link w-inline-block" data-nav-link title="${user?.name || user?.phone || ''}">
+            <img src="/img/users-icon-dark.svg" loading="lazy" alt="User" />
+          </a>
         ` : `
           <!-- کاربر مهمان -->
           <a href="/login" class="user-link w-inline-block" data-nav-link title="Login / Sign up">
@@ -103,9 +93,11 @@ export function Header() {
 export function initHeader() {
   // ---------- سوییچ زبان ----------
   const langBtn = document.querySelector('[data-lang-switch]');
-  if (langBtn && !langBtn.dataset.initialized) {
-    langBtn.dataset.initialized = 'true';
-    langBtn.addEventListener('click', async (e) => {
+  if (langBtn) {
+    const newLangBtn = langBtn.cloneNode(true);
+    langBtn.parentNode.replaceChild(newLangBtn, langBtn);
+
+    newLangBtn.addEventListener('click', async (e) => {
       e.preventDefault();
       const current = getCurrentLang();
       const next = current === 'fa' ? 'en' : 'fa';
@@ -113,7 +105,6 @@ export function initHeader() {
 
       await setLanguage(next);
 
-      // رندر مجدد صفحه
       if (window.__app?.router) {
         window.__app.router.resolve(window.location.pathname);
       } else {
@@ -122,45 +113,28 @@ export function initHeader() {
     });
   }
 
-  // ---------- Logout ----------
-  const logoutBtn = document.querySelector('[data-logout-btn]');
-  if (logoutBtn && !logoutBtn.dataset.initialized) {
-    logoutBtn.dataset.initialized = 'true';
-    logoutBtn.addEventListener('click', async (e) => {
-      e.preventDefault();
-      if (!confirm('آیا مطمئنید می‌خواهید خارج شوید؟')) return;
-
-      logoutBtn.disabled = true;
-      try {
-        await logout();
-      } catch (err) {
-        console.error('Logout error:', err);
-        // حتی اگه API خطا داد، پاک کن
-        localStorage.removeItem('auth_token');
-        localStorage.removeItem('auth_user');
-        window.__app?.router?.navigate('/login');
-      }
-    });
-  }
-
   // ---------- منوی موبایل ----------
   const menuBtn = document.querySelector('[data-menu-button]');
   const navMenu = document.querySelector('.nav-menu');
-  if (menuBtn && navMenu && !menuBtn.dataset.initialized) {
-    menuBtn.dataset.initialized = 'true';
-    menuBtn.addEventListener('click', () => {
+  if (menuBtn && navMenu) {
+    const newMenuBtn = menuBtn.cloneNode(true);
+    menuBtn.parentNode.replaceChild(newMenuBtn, menuBtn);
+
+    newMenuBtn.addEventListener('click', () => {
       navMenu.classList.toggle('is-open');
-      menuBtn.classList.toggle('is-open');
+      newMenuBtn.classList.toggle('is-open');
     });
   }
 
   // ---------- فرم جستجو ----------
   const searchForm = document.querySelector('[data-search-form]');
-  if (searchForm && !searchForm.dataset.initialized) {
-    searchForm.dataset.initialized = 'true';
-    searchForm.addEventListener('submit', (e) => {
+  if (searchForm) {
+    const newForm = searchForm.cloneNode(true);
+    searchForm.parentNode.replaceChild(newForm, searchForm);
+
+    newForm.addEventListener('submit', (e) => {
       e.preventDefault();
-      const query = searchForm.querySelector('input[name="query"]').value;
+      const query = newForm.querySelector('input[name="query"]').value;
       if (query) {
         window.__app?.router?.navigate(`/search?q=${encodeURIComponent(query)}`);
       }

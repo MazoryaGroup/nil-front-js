@@ -40,7 +40,7 @@ export function setAuth(token, user) {
 }
 
 // ============================================
-// پاک کردن توکن
+// پاک کردن توکن (بدون navigate)
 // ============================================
 function clearAuth() {
   localStorage.removeItem(TOKEN_KEY);
@@ -49,18 +49,34 @@ function clearAuth() {
 }
 
 // ============================================
-// خروج (با API)
+// خروج (با API + navigate)
 // ============================================
 export async function logout() {
+  console.log('🚪 Logging out...');
+
   try {
+    // صدا زدن API (اگه fail داد، مهم نیست)
     await authApi.logout();
+    console.log('✅ Logout API success');
   } catch (err) {
     console.warn('⚠️ Logout API failed:', err.message);
-  } finally {
-    clearAuth();
-    window.dispatchEvent(new CustomEvent('auth:logout'));
-    window.__app?.router?.navigate('/login');
   }
+
+  // پاک کردن localStorage
+  clearAuth();
+  console.log('🗑️ Auth cleared');
+
+  // dispatch event
+  window.dispatchEvent(new CustomEvent('auth:logout'));
+
+  // ریدایرکت
+  setTimeout(() => {
+    if (window.__app?.router) {
+      window.__app.router.navigate('/login');
+    } else {
+      window.location.href = '/login';
+    }
+  }, 100);
 }
 
 // ============================================
