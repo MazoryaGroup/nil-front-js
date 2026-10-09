@@ -1,142 +1,302 @@
+
+import {
+  t,
+  getCurrentLang,
+  setLanguage
+} from '../code/i18n.js';
+
+import {
+  isLoggedIn,
+  getUser
+} from '../code/auth.js';
+
 // ============================================
-// Header Component
+// Helpers
 // ============================================
-import { t, getCurrentLang, setLanguage } from '../code/i18n.js';
-import { isLoggedIn, getUser } from '../code/auth.js';
+
+function escapeHtml(value = '') {
+  return String(value ?? '')
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
+
+function isActivePath(path) {
+  const current = window.location.pathname;
+
+  if (path === '/') {
+    return current === '/';
+  }
+
+  return current === path || current.startsWith(path + '/');
+}
+
+// ============================================
+// Header HTML
+// ============================================
 
 export function Header() {
   const user = getUser();
   const loggedIn = isLoggedIn();
-  const currentPath = window.location.pathname;
-  const isActive = (path) => currentPath === path;
+  const isFa = getCurrentLang() === 'fa';
 
-  const langLabel = getCurrentLang() === 'fa' ? 'EN' : 'FA';
+  const langLabel = isFa ? 'EN' : 'FA';
+
+  const userTitle = escapeHtml(
+    user?.name ||
+    user?.phone ||
+    (isFa ? 'حساب کاربری' : 'My account')
+  );
+
+  const navLinks = [
+    {
+      path: '/',
+      label: t('nav.home')
+    },
+    {
+      path: '/about',
+      label: t('nav.about')
+    },
+    {
+      path: '/gallery',
+      label: isFa ? 'گالری' : 'Gallery'
+    },
+    {
+      path: '/blog',
+      label: t('nav.blogs')
+    },
+    {
+      path: '/contact',
+      label: t('nav.contact')
+    }
+  ];
+
+  if (loggedIn) {
+    navLinks.push({
+      path: '/dashboard',
+      label: t('nav.dashboard') || (isFa ? 'داشبورد' : 'Dashboard')
+    });
+  }
 
   return `
     <div class="container w-container">
       <div class="nav-wrapper">
-        <a href="/" class="brand w-nav-brand" data-nav-link>
+
+        <!-- BRAND -->
+        <a
+          href="/"
+          class="brand w-nav-brand"
+          data-nav-link
+          aria-label="NIL Beauty"
+        >
           <div>NIL</div>
         </a>
 
-        <nav role="navigation" class="nav-menu w-nav-menu">
+        <!-- NAVIGATION -->
+        <nav
+          role="navigation"
+          class="nav-menu w-nav-menu"
+          id="nil-mobile-navigation"
+          data-nav-menu
+          aria-label="${isFa ? 'منوی اصلی' : 'Main navigation'}"
+        >
           <div class="nav-inner">
-            <a href="/" class="nav-link w-inline-block ${isActive('/') ? 'w--current' : ''}" data-nav-link>
-              <div class="nav-link-inner">${t('nav.home')}</div>
-              <div class="bottom-underline"></div>
-            </a>
-            <a href="/about" class="nav-link w-inline-block ${isActive('/about') ? 'w--current' : ''}" data-nav-link>
-              <div class="nav-link-inner">${t('nav.about')}</div>
-              <div class="bottom-underline"></div>
-            </a>
-            <a href="/blog" class="nav-link w-inline-block ${isActive('/blog') ? 'w--current' : ''}" data-nav-link>
-              <div class="nav-link-inner">${t('nav.blogs')}</div>
-              <div class="bottom-underline"></div>
-            </a>
-            <a href="/contact" class="nav-link w-inline-block ${isActive('/contact') ? 'w--current' : ''}" data-nav-link>
-              <div class="nav-link-inner">${t('nav.contact')}</div>
-              <div class="bottom-underline"></div>
-            </a>
-            ${loggedIn ? `
-              <a href="/dashboard" class="nav-link w-inline-block ${isActive('/dashboard') ? 'w--current' : ''}" data-nav-link>
-                <div class="nav-link-inner">${t('nav.dashboard') || 'Dashboard'}</div>
+
+            ${navLinks.map(link => `
+              <a
+                href="${link.path}"
+                class="nav-link w-inline-block ${
+                  isActivePath(link.path) ? 'w--current' : ''
+                }"
+                data-nav-link
+                ${isActivePath(link.path) ? 'aria-current="page"' : ''}
+              >
+                <div class="nav-link-inner">
+                  ${escapeHtml(link.label)}
+                </div>
+
                 <div class="bottom-underline"></div>
               </a>
-            ` : ''}
-          </div>
+            `).join('')}
 
-          <form action="/search" class="search w-form" data-search-form>
-            <input
-              class="search-input w-input"
-              maxlength="256"
-              name="query"
-              placeholder="${t('nav.search_placeholder')}"
-              type="search"
-              id="search"
-              required
-            />
-            <input type="submit" class="search-button w-button" value="" />
-          </form>
+          </div>
         </nav>
 
-        <!-- سوییچ زبان -->
-        <button class="lang-switch" data-lang-switch title="Change language">
-          <span data-lang-current>${langLabel}</span>
+        <!-- LANGUAGE SWITCH -->
+        <button
+          type="button"
+          class="lang-switch"
+          data-lang-switch
+          aria-label="${isFa ? 'تغییر زبان به انگلیسی' : 'Switch to Persian'}"
+          title="${isFa ? 'English' : 'فارسی'}"
+        >
+          <span data-lang-current>
+            ${langLabel}
+          </span>
         </button>
 
+        <!-- USER -->
         ${loggedIn ? `
-          <!-- کاربر لاگین شده -->
-          <a href="/dashboard" class="user-link w-inline-block" data-nav-link title="${user?.name || user?.phone || ''}">
-            <img src="/img/users-icon-dark.svg" loading="lazy" alt="User" />
+          <a
+            href="/dashboard"
+            class="user-link w-inline-block"
+            data-nav-link
+            title="${userTitle}"
+            aria-label="${userTitle}"
+          >
+            <img
+              src="/img/users-icon-dark.svg"
+              loading="lazy"
+              alt=""
+            />
           </a>
         ` : `
-          <!-- کاربر مهمان -->
-          <a href="/login" class="user-link w-inline-block" data-nav-link title="Login / Sign up">
-            <img src="/img/users-icon-dark.svg" loading="lazy" alt="User" />
+          <a
+            href="/login"
+            class="user-link w-inline-block"
+            data-nav-link
+            title="${isFa ? 'ورود / ثبت‌نام' : 'Login / Register'}"
+            aria-label="${isFa ? 'ورود / ثبت‌نام' : 'Login / Register'}"
+          >
+            <img
+              src="/img/users-icon-dark.svg"
+              loading="lazy"
+              alt=""
+            />
           </a>
         `}
 
-        <!-- منوی موبایل -->
-        <div class="menu-button w-nav-button" data-menu-button>
+        <!-- MOBILE MENU -->
+        <button
+          type="button"
+          class="menu-button w-nav-button"
+          data-menu-button
+          aria-label="${isFa ? 'باز کردن منو' : 'Open menu'}"
+          aria-controls="nil-mobile-navigation"
+          aria-expanded="false"
+        >
           <div class="nav-top-line"></div>
           <div class="nav-middle-line"></div>
           <div class="nav-bottom-line"></div>
-        </div>
+        </button>
+
       </div>
     </div>
   `;
 }
 
 // ============================================
-// راه‌اندازی event listener های هدر
+// Header Events
 // ============================================
-export function initHeader() {
-  // ---------- سوییچ زبان ----------
-  const langBtn = document.querySelector('[data-lang-switch]');
-  if (langBtn) {
-    const newLangBtn = langBtn.cloneNode(true);
-    langBtn.parentNode.replaceChild(newLangBtn, langBtn);
 
-    newLangBtn.addEventListener('click', async (e) => {
-      e.preventDefault();
+export function initHeader() {
+  const langBtn = document.querySelector(
+    '[data-lang-switch]'
+  );
+
+  const menuBtn = document.querySelector(
+    '[data-menu-button]'
+  );
+
+  const navMenu = document.querySelector(
+    '[data-nav-menu]'
+  );
+
+  // ============================================
+  // Language Switch
+  // ============================================
+
+  if (langBtn && !langBtn.dataset.initialized) {
+    langBtn.dataset.initialized = 'true';
+
+    langBtn.addEventListener('click', async event => {
+      event.preventDefault();
+
+      if (langBtn.disabled) return;
+
+      langBtn.disabled = true;
+
       const current = getCurrentLang();
       const next = current === 'fa' ? 'en' : 'fa';
-      console.log('🌐 Language:', current, '→', next);
 
-      await setLanguage(next);
+      try {
+        await setLanguage(next);
 
-      if (window.__app?.router) {
-        window.__app.router.resolve(window.location.pathname);
-      } else {
-        window.location.reload();
+        if (window.__app?.router) {
+          await window.__app.router.resolve(
+            window.location.pathname
+          );
+        } else {
+          window.location.reload();
+        }
+
+      } catch (error) {
+        console.error(
+          '❌ Language switch error:',
+          error
+        );
+
+      } finally {
+        if (langBtn.isConnected) {
+          langBtn.disabled = false;
+        }
       }
     });
   }
 
-  // ---------- منوی موبایل ----------
-  const menuBtn = document.querySelector('[data-menu-button]');
-  const navMenu = document.querySelector('.nav-menu');
-  if (menuBtn && navMenu) {
-    const newMenuBtn = menuBtn.cloneNode(true);
-    menuBtn.parentNode.replaceChild(newMenuBtn, menuBtn);
+  // ============================================
+  // Mobile Menu
+  // ============================================
 
-    newMenuBtn.addEventListener('click', () => {
-      navMenu.classList.toggle('is-open');
-      newMenuBtn.classList.toggle('is-open');
+  if (
+    menuBtn &&
+    navMenu &&
+    !menuBtn.dataset.initialized
+  ) {
+    menuBtn.dataset.initialized = 'true';
+
+    function setMenuOpen(open) {
+      navMenu.classList.toggle('is-open', open);
+      menuBtn.classList.toggle('is-open', open);
+
+      menuBtn.setAttribute(
+        'aria-expanded',
+        String(open)
+      );
+    }
+
+    menuBtn.addEventListener('click', () => {
+      const isOpen = navMenu.classList.contains(
+        'is-open'
+      );
+
+      setMenuOpen(!isOpen);
     });
-  }
 
-  // ---------- فرم جستجو ----------
-  const searchForm = document.querySelector('[data-search-form]');
-  if (searchForm) {
-    const newForm = searchForm.cloneNode(true);
-    searchForm.parentNode.replaceChild(newForm, searchForm);
+    // Close after navigation
+    navMenu.addEventListener('click', event => {
+      const link = event.target.closest(
+        'a[data-nav-link]'
+      );
 
-    newForm.addEventListener('submit', (e) => {
-      e.preventDefault();
-      const query = newForm.querySelector('input[name="query"]').value;
-      if (query) {
-        window.__app?.router?.navigate(`/search?q=${encodeURIComponent(query)}`);
+      if (link) {
+        setMenuOpen(false);
+      }
+    });
+
+    // Escape closes the menu
+    menuBtn.addEventListener('keydown', event => {
+      if (event.key === 'Escape') {
+        setMenuOpen(false);
+      }
+    });
+
+    navMenu.addEventListener('keydown', event => {
+      if (event.key === 'Escape') {
+        setMenuOpen(false);
+        menuBtn.focus();
       }
     });
   }

@@ -1,369 +1,558 @@
-// ============================================
-// Login Page
-// ============================================
+
 import { Layout, initLayout } from '../components/Layout.js';
 import { t } from '../code/i18n.js';
 import { authApi } from '../code/api.js';
 import { setAuth } from '../code/auth.js';
+import '../asset/css/custom.css';
+
+const tr = (key, fallback) => {
+  const value = t(key);
+  return value && value !== key ? value : fallback;
+};
+
+const normalizeDigits = (value = '') => {
+  const fa = '۰۱۲۳۴۵۶۷۸۹';
+  const ar = '٠١٢٣٤٥٦٧٨٩';
+
+  return String(value)
+    .replace(/[۰-۹]/g, char => String(fa.indexOf(char)))
+    .replace(/[٠-٩]/g, char => String(ar.indexOf(char)));
+};
+
+const normalizePhone = value =>
+  normalizeDigits(value).replace(/\D/g, '');
+
+const validPhone = value =>
+  /^(09\d{9}|989\d{9})$/.test(value);
+
+const getToken = res =>
+  res?.token ||
+  res?.access_token ||
+  res?.data?.token ||
+  res?.data?.access_token;
+
+const setLoading = (button, loading) => {
+  if (!button) return;
+
+  if (loading) {
+    button.dataset.originalText = button.textContent;
+    button.disabled = true;
+    button.textContent = tr('auth.loading', 'لطفاً صبر کنید...');
+  } else {
+    button.disabled = false;
+    button.textContent =
+      button.dataset.originalText || button.textContent;
+  }
+};
 
 export async function LoginPage() {
-  console.log('🟢 LoginPage started');
-
   const html = Layout(`
     <div class="auth-page">
+
+
       <div class="auth-container">
 
+        <div class="auth-mobile-brand">
+          <div class="auth-mobile-logo">N</div>
+          <div>
+            <strong>NIL.</strong>
+            <small>BEAUTY STUDIO</small>
+          </div>
+        </div>
+
         <div class="auth-header">
-          <h2>${t('auth.login_title')}</h2>
-          <p>${t('auth.login_subtitle')}</p>
+          <h2>${tr('auth.login_title', 'خوش اومدی!')}</h2>
+          <p>${tr(
+            'auth.login_subtitle',
+            'برای ورود به حساب کاربری اطلاعاتت رو وارد کن.'
+          )}</p>
         </div>
 
-        <!-- Tabs -->
         <div class="auth-tabs" data-tabs>
-          <button type="button" class="auth-tab active" data-tab="phone">${t('auth.tab_phone')}</button>
-          <button type="button" class="auth-tab" data-tab="email">${t('auth.tab_email')}</button>
+          <button
+            type="button"
+            class="auth-tab active"
+            data-tab="phone"
+            aria-selected="true"
+          >
+            ${tr('auth.tab_phone', 'شماره موبایل')}
+          </button>
+
+          <button
+            type="button"
+            class="auth-tab"
+            data-tab="email"
+            aria-selected="false"
+          >
+            ${tr('auth.tab_email', 'ایمیل')}
+          </button>
         </div>
 
-        <!-- Phone Tab -->
         <div class="auth-tab-content" data-tab-content="phone">
           <form class="auth-form" data-phone-form>
+
             <div class="auth-field">
-              <label>${t('auth.phone_label')}</label>
-              <input type="tel" name="phone" placeholder="${t('auth.phone_placeholder')}" class="auth-input" required dir="ltr" />
+              <label for="login-phone">
+                ${tr('auth.phone_label', 'شماره موبایل')}
+              </label>
+              <input
+                id="login-phone"
+                type="tel"
+                name="phone"
+                class="auth-input"
+                placeholder="09123456789"
+                autocomplete="tel"
+                inputmode="tel"
+                dir="ltr"
+                required
+              />
             </div>
-            <button type="submit" class="primary-button w-button" data-submit-btn>
-              ${t('auth.btn_send_otp_login')}
+            <div style="text-align:left; margin-top:-8px;">
+  <a
+    href="/forgot-password"
+    data-nav-link
+    class="auth-link-btn"
+  >
+    رمز عبورت رو فراموش کردی؟
+  </a>
+</div>
+
+            <button
+              type="submit"
+              class="primary-button w-button"
+              data-submit-btn
+            >
+              ${tr('auth.btn_send_otp_login', 'ارسال کد تأیید')}
             </button>
+
           </form>
         </div>
 
-        <!-- Email Tab -->
-        <div class="auth-tab-content" data-tab-content="email" style="display:none">
+        <div
+          class="auth-tab-content"
+          data-tab-content="email"
+          style="display:none"
+        >
           <form class="auth-form" data-email-form>
+
             <div class="auth-field">
-              <label>${t('auth.email_label')}</label>
-              <input type="email" name="email" placeholder="${t('auth.email_placeholder')}" class="auth-input" required dir="ltr" />
+              <label for="login-email">
+                ${tr('auth.email_label', 'ایمیل')}
+              </label>
+              <input
+                id="login-email"
+                type="email"
+                name="email"
+                class="auth-input"
+                placeholder="example@email.com"
+                autocomplete="email"
+                dir="ltr"
+                required
+              />
             </div>
+
             <div class="auth-field">
-              <label>${t('auth.password_label')}</label>
-              <input type="password" name="password" placeholder="${t('auth.password_placeholder')}" class="auth-input" required dir="ltr" />
+              <label for="login-password">
+                ${tr('auth.password_label', 'رمز عبور')}
+              </label>
+              <input
+                id="login-password"
+                type="password"
+                name="password"
+                class="auth-input"
+                autocomplete="current-password"
+                dir="ltr"
+                required
+              />
             </div>
-            <button type="submit" class="primary-button w-button" data-submit-btn>
-              ${t('auth.btn_login')}
+            <div style="text-align:left; margin-top:-8px;">
+  <a
+    href="/forgot-password"
+    data-nav-link
+    class="auth-link-btn"
+  >
+    رمز عبورت رو فراموش کردی؟
+  </a>
+</div>
+
+            <button
+              type="submit"
+              class="primary-button w-button"
+              data-submit-btn
+            >
+              ${tr('auth.btn_login', 'ورود به حساب')}
             </button>
+
+            <div style="text-align:center">
+              <a href="/forgot-password" data-nav-link class="auth-link-btn">
+                ${tr('auth.forgot_password', 'رمز عبورت رو فراموش کردی؟')}
+              </a>
+            </div>
+
           </form>
         </div>
 
-        <!-- OTP Step -->
-        <div class="auth-otp-step" data-otp-step style="display:none">
-          <div class="auth-header" style="margin-bottom:20px">
-            <p>${t('auth.otp_subtitle').replace('{phone}', '<strong data-phone-display></strong>')}</p>
+        <div
+          class="auth-otp-step"
+          data-otp-step
+          style="display:none"
+        >
+          <div class="auth-header">
+            <h2>${tr('auth.otp_label', 'تأیید شماره موبایل')}</h2>
+            <p>
+              کد ارسال‌شده به شماره
+              <strong data-phone-display dir="ltr"></strong>
+              را وارد کن.
+            </p>
           </div>
 
           <form class="auth-form" data-otp-form>
             <div class="auth-field">
-              <label>${t('auth.otp_label')}</label>
-              <input type="text" name="code" placeholder="${t('auth.otp_placeholder')}" class="auth-input otp-input" maxlength="6" inputmode="numeric" pattern="[0-9]*" required dir="ltr" />
+              <label for="login-otp">
+                ${tr('auth.otp_label', 'کد تأیید')}
+              </label>
+              <input
+                id="login-otp"
+                type="text"
+                name="code"
+                class="auth-input otp-input"
+                placeholder="------"
+                maxlength="6"
+                inputmode="numeric"
+                autocomplete="one-time-code"
+                pattern="[0-9]{6}"
+                dir="ltr"
+                required
+              />
             </div>
-            <button type="submit" class="primary-button w-button" data-otp-submit>
-              ${t('auth.btn_verify_login')}
+
+            <button
+              type="submit"
+              class="primary-button w-button"
+              data-otp-submit
+            >
+              ${tr('auth.btn_verify_login', 'تأیید و ورود')}
             </button>
           </form>
 
           <div class="auth-resend">
-            <button type="button" class="auth-link-btn" data-resend-btn>${t('auth.btn_resend')}</button>
+            <button
+              type="button"
+              class="auth-link-btn"
+              data-resend-btn
+            >
+              ${tr('auth.btn_resend', 'ارسال مجدد کد')}
+            </button>
             <span class="auth-timer" data-timer></span>
           </div>
 
-          <div style="text-align:center;margin-top:12px">
-            <button type="button" class="auth-link-btn" data-back-btn>${t('auth.btn_back')}</button>
+          <div style="text-align:center;margin-top:16px">
+            <button
+              type="button"
+              class="auth-link-btn"
+              data-back-btn
+            >
+              ${tr('auth.btn_back', 'بازگشت و تغییر شماره')}
+            </button>
           </div>
         </div>
 
-        <!-- Message -->
-        <div class="form-message" data-msg></div>
+        <div
+          class="form-message"
+          data-msg
+          role="status"
+          aria-live="polite"
+        ></div>
 
-        <!-- Footer -->
         <div class="auth-footer" data-main-footer>
-          <span>${t('auth.no_account')}</span>
-          <a href="/register" data-nav-link>${t('auth.link_register')}</a>
+          <span>${tr('auth.no_account', 'حساب کاربری نداری؟')}</span>
+          <a href="/register" data-nav-link>
+            ${tr('auth.link_register', 'ثبت‌نام کن')}
+          </a>
         </div>
 
       </div>
     </div>
   `);
 
-  console.log('🟢 HTML generated');
-
-  // ✅ بعد از رندر، listener ها رو وصل کن
   setTimeout(() => {
-    console.log('🎬 Initializing login listeners...');
-
-    const tabs = document.querySelectorAll('[data-tab]');
-    const otpStep = document.querySelector('[data-otp-step]');
-
-    console.log('Tabs found:', tabs.length);
-    console.log('OTP step found:', !!otpStep);
-
     initLayout();
     initLogin();
-
-    console.log('✅ Login listeners attached');
   }, 100);
 
   return html;
 }
 
-// ============================================
-// Login Logic
-// ============================================
 function initLogin() {
-  console.log('🔧 initLogin started');
+  const root = document.querySelector('.auth-page');
+  if (!root) return;
+
+  const $ = selector => root.querySelector(selector);
+  const $$ = selector => root.querySelectorAll(selector);
+
+  const tabsEl = $('[data-tabs]');
+  const otpStep = $('[data-otp-step]');
+  const footer = $('[data-main-footer]');
+  const msg = $('[data-msg]');
+  const phoneDisplay = $('[data-phone-display]');
+  const resendBtn = $('[data-resend-btn]');
+  const timerEl = $('[data-timer]');
+  const backBtn = $('[data-back-btn]');
+  const phoneForm = $('[data-phone-form]');
+  const emailForm = $('[data-email-form]');
+  const otpForm = $('[data-otp-form]');
 
   let currentPhone = '';
   let resendTimer = null;
 
-  const tabsEl = document.querySelector('[data-tabs]');
-  const otpStep = document.querySelector('[data-otp-step]');
-  const mainFooter = document.querySelector('[data-main-footer]');
-  const msg = document.querySelector('[data-msg]');
-  const phoneDisplay = document.querySelector('[data-phone-display]');
-  const resendBtn = document.querySelector('[data-resend-btn]');
-  const timerEl = document.querySelector('[data-timer]');
-  const backBtn = document.querySelector('[data-back-btn]');
+  function showMsg(message = '', type = 'info') {
+    if (!msg) return;
 
-  // ============================================
-  // Tabs
-  // ============================================
-  const tabs = document.querySelectorAll('[data-tab]');
-  console.log('🔧 Found', tabs.length, 'tabs');
+    msg.textContent = message;
+    msg.style.display = message ? 'block' : 'none';
+    msg.style.color =
+      type === 'error' ? '#b42318' :
+      type === 'success' ? '#626a4e' : '#111111';
+  }
 
-  tabs.forEach(tab => {
-    tab.addEventListener('click', (e) => {
-      e.preventDefault();
-      console.log('🖱️ Tab clicked:', tab.dataset.tab);
+  function showTab(name) {
+    $$('.auth-tab').forEach(tab => {
+      const active = tab.dataset.tab === name;
+      tab.classList.toggle('active', active);
+      tab.setAttribute('aria-selected', String(active));
+    });
 
-      const target = tab.dataset.tab;
-      document.querySelectorAll('[data-tab]').forEach(t => t.classList.remove('active'));
-      document.querySelectorAll('[data-tab-content]').forEach(c => c.style.display = 'none');
+    $$('[data-tab-content]').forEach(content => {
+      content.style.display =
+        content.dataset.tabContent === name ? 'block' : 'none';
+    });
 
-      tab.classList.add('active');
-      const content = document.querySelector(`[data-tab-content="${target}"]`);
-      if (content) content.style.display = 'block';
+    showMsg();
+  }
 
-      showMsg('');
+  $$('.auth-tab').forEach(tab => {
+    tab.addEventListener('click', () => {
+      showTab(tab.dataset.tab);
     });
   });
 
-  // ============================================
-  // Phone Form
-  // ============================================
-  const phoneForm = document.querySelector('[data-phone-form]');
-  console.log('🔧 Phone form:', !!phoneForm);
-
-  phoneForm?.addEventListener('submit', async (e) => {
-    e.preventDefault();
-    console.log('📱 Phone form submitted');
-
-    const data = Object.fromEntries(new FormData(phoneForm));
-    const phone = normalizePhone(data.phone);
-
-    if (!isValidPhone(phone)) {
-      showMsg(t('auth.msg_invalid_phone'), 'error');
-      return;
-    }
-
-    currentPhone = phone;
-    const btn = phoneForm.querySelector('[data-submit-btn]');
-    setLoading(btn, true);
-
-    try {
-      const res = await authApi.loginPhoneSendCode(phone);
-      console.log('📱 Send code response:', res);
-
-      if (phoneDisplay) phoneDisplay.textContent = phone;
-
-      if (tabsEl) tabsEl.style.display = 'none';
-      document.querySelectorAll('[data-tab-content]').forEach(c => c.style.display = 'none');
-      if (mainFooter) mainFooter.style.display = 'none';
-
-      if (otpStep) otpStep.style.display = 'block';
-      startResendTimer(60);
-      showMsg('');
-
-      setTimeout(() => otpStep?.querySelector('input[name="code"]')?.focus(), 100);
-    } catch (err) {
-      console.error('❌ Send code error:', err);
-      showMsg(err.message || t('auth.msg_error_send'), 'error');
-    } finally {
-      setLoading(btn, false);
-    }
-  });
-
-  // ============================================
-  // OTP Form
-  // ============================================
-  const otpForm = document.querySelector('[data-otp-form]');
-  console.log('🔧 OTP form:', !!otpForm);
-
-  otpForm?.addEventListener('submit', async (e) => {
-    e.preventDefault();
-    console.log('🔐 OTP form submitted');
-
-    const data = Object.fromEntries(new FormData(otpForm));
-
-    if (!data.code || data.code.length < 5) {
-      showMsg(t('auth.msg_otp_incomplete'), 'error');
-      return;
-    }
-
-    const btn = otpForm.querySelector('[data-otp-submit]');
-    setLoading(btn, true);
-
-    try {
-      const res = await authApi.loginPhoneVerify(currentPhone, data.code);
-      console.log('✅ Verify response:', res);
-
-      const token = res?.token || res?.access_token || res?.data?.token || res?.data?.access_token;
-      const user = res?.user || res?.data?.user || { phone: currentPhone };
-
-      if (!token) throw new Error(t('auth.msg_error_verify'));
-
-      setAuth(token, user);
-      showMsg(t('auth.msg_login_success'), 'success');
-
-      setTimeout(() => window.__app?.router?.navigate('/dashboard'), 800);
-    } catch (err) {
-      console.error('❌ Verify error:', err);
-      showMsg(err.message || t('auth.msg_error_verify'), 'error');
-    } finally {
-      setLoading(btn, false);
-    }
-  });
-
-  // ============================================
-  // Email Form
-  // ============================================
-  const emailForm = document.querySelector('[data-email-form]');
-  console.log('🔧 Email form:', !!emailForm);
-
-  emailForm?.addEventListener('submit', async (e) => {
-    e.preventDefault();
-    console.log('📧 Email form submitted');
-
-    const data = Object.fromEntries(new FormData(emailForm));
-    const btn = emailForm.querySelector('[data-submit-btn]');
-    setLoading(btn, true);
-
-    try {
-      const res = await authApi.loginEmail(data.email, data.password);
-      console.log('📧 Email login response:', res);
-
-      const token = res?.token || res?.access_token || res?.data?.token || res?.data?.access_token;
-      const user = res?.user || res?.data?.user || { email: data.email };
-
-      if (!token) throw new Error(t('auth.msg_error_login'));
-
-      setAuth(token, user);
-      showMsg(t('auth.msg_login_success'), 'success');
-
-      setTimeout(() => window.__app?.router?.navigate('/dashboard'), 800);
-    } catch (err) {
-      console.error('❌ Email login error:', err);
-      showMsg(err.message || t('auth.msg_error_login'), 'error');
-    } finally {
-      setLoading(btn, false);
-    }
-  });
-
-  // ============================================
-  // Resend
-  // ============================================
-  resendBtn?.addEventListener('click', async () => {
-    if (resendBtn.disabled) return;
-    try {
-      await authApi.loginPhoneSendCode(currentPhone);
-      showMsg(t('auth.msg_otp_resent'), 'success');
-      startResendTimer(60);
-    } catch (err) {
-      showMsg(err.message, 'error');
-    }
-  });
-
-  // ============================================
-  // Back
-  // ============================================
-  backBtn?.addEventListener('click', () => {
-    if (otpStep) otpStep.style.display = 'none';
-    if (tabsEl) tabsEl.style.display = 'flex';
-    const phoneTab = document.querySelector('[data-tab-content="phone"]');
-    if (phoneTab) phoneTab.style.display = 'block';
-    if (mainFooter) mainFooter.style.display = 'flex';
-    if (otpForm) otpForm.reset();
+  function startResendTimer(seconds = 60) {
     if (resendTimer) clearInterval(resendTimer);
-    showMsg('');
-  });
 
-  // ============================================
-  // Helpers
-  // ============================================
-  function startResendTimer(seconds) {
-    if (resendTimer) clearInterval(resendTimer);
     let remaining = seconds;
-    if (resendBtn) {
-      resendBtn.disabled = true;
-      resendBtn.style.opacity = '0.5';
-    }
+
+    resendBtn.disabled = true;
 
     const update = () => {
       if (remaining <= 0) {
         clearInterval(resendTimer);
-        if (resendBtn) {
-          resendBtn.disabled = false;
-          resendBtn.style.opacity = '1';
-        }
-        if (timerEl) timerEl.textContent = '';
+        resendTimer = null;
+        resendBtn.disabled = false;
+        timerEl.textContent = '';
         return;
       }
-      if (timerEl) timerEl.textContent = `(${remaining}s)`;
+
+      timerEl.textContent = `(${remaining}s)`;
       remaining--;
     };
+
     update();
     resendTimer = setInterval(update, 1000);
   }
 
-  function showMsg(text, type = 'info') {
-    if (!msg) return;
-    msg.textContent = text;
-    msg.style.display = text ? 'block' : 'none';
-    msg.style.color = type === 'error' ? '#e74c3c' : type === 'success' ? '#27ae60' : '#666';
+  function showOtpStep() {
+    tabsEl.style.display = 'none';
+
+    $$('[data-tab-content]').forEach(content => {
+      content.style.display = 'none';
+    });
+
+    footer.style.display = 'none';
+    otpStep.style.display = 'block';
+    phoneDisplay.textContent = currentPhone;
+
+    startResendTimer(60);
+    showMsg();
+
+    setTimeout(() => {
+      otpForm.querySelector('[name="code"]')?.focus();
+    }, 100);
   }
 
-  function setLoading(btn, loading) {
-    if (!btn) return;
-    btn.disabled = loading;
-    if (loading) {
-      btn.dataset.originalText = btn.textContent;
-      btn.textContent = t('auth.loading');
-    } else {
-      btn.textContent = btn.dataset.originalText || btn.textContent;
+  phoneForm?.addEventListener('submit', async event => {
+    event.preventDefault();
+
+    const phone = normalizePhone(
+      new FormData(phoneForm).get('phone') || ''
+    );
+
+    if (!validPhone(phone)) {
+      showMsg(
+        tr('auth.msg_invalid_phone', 'شماره موبایل معتبر نیست.'),
+        'error'
+      );
+      return;
     }
-  }
 
-  function normalizePhone(phone) {
-    const persianDigits = '۰۱۲۳۴۵۶۷۸۹';
-    const arabicDigits = '٠١٢٣٤٥٦٧٨٩';
-    let result = phone.toString();
-    for (let i = 0; i < 10; i++) {
-      result = result.replace(new RegExp(persianDigits[i], 'g'), i);
-      result = result.replace(new RegExp(arabicDigits[i], 'g'), i);
+    const button = phoneForm.querySelector('[data-submit-btn]');
+    setLoading(button, true);
+
+    try {
+      await authApi.loginPhoneSendCode(phone);
+
+      currentPhone = phone;
+      showOtpStep();
+    } catch (error) {
+      showMsg(
+        error.message ||
+        tr('auth.msg_error_send', 'ارسال کد با خطا مواجه شد.'),
+        'error'
+      );
+    } finally {
+      setLoading(button, false);
     }
-    return result.replace(/\D/g, '');
-  }
+  });
 
-  function isValidPhone(phone) {
-    return /^09\d{9}$/.test(phone) || /^989\d{9}$/.test(phone);
-  }
+  otpForm?.addEventListener('submit', async event => {
+    event.preventDefault();
 
-  console.log('✅ initLogin completed');
+    const code = normalizeDigits(
+      new FormData(otpForm).get('code') || ''
+    ).trim();
+
+    if (!/^\d{6}$/.test(code)) {
+      showMsg(
+        tr('auth.msg_otp_incomplete', 'کد شش‌رقمی را وارد کن.'),
+        'error'
+      );
+      return;
+    }
+
+    const button = $('[data-otp-submit]');
+    setLoading(button, true);
+
+    try {
+      const res = await authApi.loginPhoneVerify(
+        currentPhone,
+        code
+      );
+
+      const token = getToken(res);
+      const user =
+        res?.user || res?.data?.user || {
+          phone: currentPhone
+        };
+
+      if (!token) {
+        throw new Error(
+          tr('auth.msg_error_verify', 'تأیید کد ناموفق بود.')
+        );
+      }
+
+      setAuth(token, user);
+
+      showMsg(
+        tr('auth.msg_login_success', 'ورود موفقیت‌آمیز بود.'),
+        'success'
+      );
+
+      setTimeout(() => {
+        window.__app?.router?.navigate('/dashboard');
+      }, 800);
+    } catch (error) {
+      showMsg(
+        error.message ||
+        tr('auth.msg_error_verify', 'کد تأیید نامعتبر است.'),
+        'error'
+      );
+    } finally {
+      setLoading(button, false);
+    }
+  });
+
+  emailForm?.addEventListener('submit', async event => {
+    event.preventDefault();
+
+    const data = Object.fromEntries(new FormData(emailForm));
+    const button = emailForm.querySelector('[data-submit-btn]');
+
+    setLoading(button, true);
+
+    try {
+      const res = await authApi.loginEmail(
+        data.email,
+        data.password
+      );
+
+      const token = getToken(res);
+      const user =
+        res?.user || res?.data?.user || {
+          email: data.email
+        };
+
+      if (!token) {
+        throw new Error(
+          tr('auth.msg_error_login', 'ورود ناموفق بود.')
+        );
+      }
+
+      setAuth(token, user);
+
+      showMsg(
+        tr('auth.msg_login_success', 'ورود موفقیت‌آمیز بود.'),
+        'success'
+      );
+
+      setTimeout(() => {
+        window.__app?.router?.navigate('/dashboard');
+      }, 800);
+    } catch (error) {
+      showMsg(
+        error.message ||
+        tr('auth.msg_error_login', 'ایمیل یا رمز عبور اشتباه است.'),
+        'error'
+      );
+    } finally {
+      setLoading(button, false);
+    }
+  });
+
+  resendBtn?.addEventListener('click', async () => {
+    if (resendBtn.disabled || !currentPhone) return;
+
+    resendBtn.disabled = true;
+
+    try {
+      await authApi.loginPhoneSendCode(currentPhone);
+
+      showMsg(
+        tr('auth.msg_otp_resent', 'کد جدید ارسال شد.'),
+        'success'
+      );
+
+      startResendTimer(60);
+    } catch (error) {
+      resendBtn.disabled = false;
+      showMsg(error.message || 'خطا در ارسال مجدد کد.', 'error');
+    }
+  });
+
+  backBtn?.addEventListener('click', () => {
+    if (resendTimer) clearInterval(resendTimer);
+    resendTimer = null;
+
+    otpStep.style.display = 'none';
+    tabsEl.style.display = 'flex';
+    footer.style.display = 'flex';
+
+    otpForm.reset();
+    showTab('phone');
+  });
+
+  otpForm?.querySelector('[name="code"]')
+    ?.addEventListener('input', event => {
+      event.target.value = normalizeDigits(
+        event.target.value
+      ).replace(/\D/g, '').slice(0, 6);
+    });
 }

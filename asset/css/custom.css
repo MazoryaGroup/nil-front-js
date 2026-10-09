@@ -425,6 +425,25 @@ ul, ol {
   border-color: var(--color-black);
 }
 
+.blog-image-placeholder {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  min-height: 180px;
+  background: #f0f1ec;
+  color: #7d8566;
+}
+
+.blog-image-placeholder span {
+  font-family: Georgia, serif;
+  font-size: 32px;
+  font-weight: 700;
+  letter-spacing: 5px;
+}
+
+
 /* ============================================
    ۲۶. Responsive - Blog
    ============================================ */
@@ -2261,3 +2280,2471 @@ ul, ol {
     font-size: 24px;
   }
 }
+
+
+
+/* ============================================================
+   NIL BEAUTY — CHECKOUT
+   Theme: White / Black / Olive #7d8566
+   ============================================================ */
+
+.nil-checkout {
+  --nil-bg: #ffffff;
+  --nil-white: #ffffff;
+  --nil-black: #111111;
+  --nil-olive: #7d8566;
+  --nil-olive-dark: #626a4e;
+  --nil-olive-light: #f3f5ef;
+  --nil-muted: #666666;
+  --nil-border: #e4e7df;
+  --nil-soft: #f8f9f6;
+
+  min-height: 100vh;
+  background: var(--nil-bg);
+  color: var(--nil-black);
+  padding: 24px 20px 65px;
+  font-family: inherit;
+}
+
+.nil-checkout *,
+.nil-checkout *::before,
+.nil-checkout *::after {
+  box-sizing: border-box;
+}
+
+.nil-checkout [hidden] {
+  display: none !important;
+}
+
+.nil-checkout button {
+  font-family: inherit;
+}
+
+.nil-checkout-container {
+  width: 100%;
+  max-width: 1120px;
+  margin: 0 auto;
+}
+
+/* ============================================================
+   HEADER
+   ============================================================ */
+
+.nil-checkout-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  padding: 22px 0 28px;
+  border-bottom: 1px solid var(--nil-border);
+}
+
+.nil-checkout-back {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  background: transparent;
+  border: none;
+  padding: 10px 0;
+  cursor: pointer;
+  color: var(--nil-black);
+  font-size: 13px;
+  font-weight: 500;
+  transition: color .2s ease;
+}
+
+.nil-checkout-back:hover {
+  color: var(--nil-olive);
+}
+
+.nil-checkout-brand {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  font-size: 13px;
+  font-weight: 800;
+  letter-spacing: 2px;
+  color: var(--nil-black);
+}
+
+.nil-checkout-logo {
+  width: 39px;
+  height: 39px;
+  background: var(--nil-black);
+  color: var(--nil-white);
+  display: grid;
+  place-items: center;
+  border-radius: 12px;
+  font-family: Georgia, serif;
+  font-size: 23px;
+}
+
+/* ============================================================
+   PAGE HEADING
+   ============================================================ */
+
+.nil-checkout-heading {
+  padding: 54px 0 40px;
+  max-width: 650px;
+}
+
+.nil-checkout-eyebrow {
+  display: block;
+  color: var(--nil-olive);
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 2px;
+}
+
+.nil-checkout-heading h1 {
+  margin: 14px 0;
+  font-size: clamp(28px, 4vw, 44px);
+  font-weight: 750;
+  line-height: 1.45;
+  color: var(--nil-black);
+}
+
+.nil-checkout-heading p,
+.nil-checkout-muted {
+  color: var(--nil-muted);
+  font-size: 14px;
+  line-height: 2;
+  margin: 0;
+}
+
+/* ============================================================
+   MAIN GRID
+   ============================================================ */
+
+.nil-checkout-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.25fr) minmax(0, .85fr);
+  gap: 24px;
+  align-items: start;
+}
+
+.nil-checkout-card {
+  min-width: 0;
+  padding: 32px;
+  background: var(--nil-white);
+  border: 1px solid var(--nil-border);
+  border-radius: 22px;
+  box-shadow: 0 10px 38px rgba(0, 0, 0, .035);
+  transition: border-color .2s ease;
+}
+
+.nil-checkout-card:hover {
+  border-color: var(--nil-olive);
+}
+
+.nil-checkout-card-title {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 30px;
+}
+
+.nil-checkout-card-title h2 {
+  font-size: 19px;
+  font-weight: 700;
+  margin: 6px 0 0;
+  color: var(--nil-black);
+}
+
+.nil-checkout-card-icon {
+  width: 48px;
+  height: 48px;
+  display: grid;
+  place-items: center;
+  background: var(--nil-olive-light);
+  color: var(--nil-olive);
+  border: 1px solid var(--nil-border);
+  border-radius: 14px;
+  font-size: 24px;
+  flex-shrink: 0;
+}
+
+/* ============================================================
+   BOOKING DETAILS
+   ============================================================ */
+
+.nil-checkout-booking-number {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 15px;
+  background: var(--nil-olive-light);
+  border: 1px solid var(--nil-border);
+  padding: 17px 19px;
+  border-radius: 13px;
+  margin-bottom: 28px;
+  font-size: 13px;
+}
+
+.nil-checkout-booking-number span {
+  color: var(--nil-muted);
+}
+
+.nil-checkout-booking-number strong {
+  color: var(--nil-olive-dark);
+  font-size: 16px;
+  font-weight: 800;
+}
+
+.nil-checkout-info {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 27px 20px;
+}
+
+.nil-checkout-info-item {
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+  font-size: 13px;
+  min-width: 0;
+}
+
+.nil-checkout-info-item span {
+  color: var(--nil-muted);
+}
+
+.nil-checkout-info-item strong {
+  color: var(--nil-black);
+  font-size: 14px;
+  font-weight: 700;
+  overflow-wrap: anywhere;
+}
+
+.nil-checkout-divider {
+  height: 1px;
+  background: var(--nil-border);
+  margin: 30px 0;
+}
+
+.nil-checkout-subtitle {
+  margin: 0 0 18px;
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--nil-black);
+}
+
+/* ============================================================
+   SELECTED SERVICES
+   ============================================================ */
+
+.nil-checkout-services {
+  display: flex;
+  flex-direction: column;
+  gap: 13px;
+}
+
+.nil-checkout-service {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 15px;
+  padding: 17px;
+  background: var(--nil-soft);
+  border: 1px solid var(--nil-border);
+  border-radius: 13px;
+  transition: background .2s ease, border-color .2s ease;
+}
+
+.nil-checkout-service:hover {
+  background: var(--nil-olive-light);
+  border-color: var(--nil-olive);
+}
+
+.nil-checkout-service > div {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  min-width: 0;
+}
+
+.nil-checkout-service strong {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--nil-black);
+}
+
+.nil-checkout-service small {
+  font-size: 11px;
+  color: var(--nil-muted);
+}
+
+.nil-checkout-service > span {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--nil-olive-dark);
+  white-space: nowrap;
+}
+
+/* ============================================================
+   PAYMENT SUMMARY
+   ============================================================ */
+
+.nil-checkout-payment {
+  border-top: 3px solid var(--nil-olive);
+}
+
+.nil-checkout-price-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 15px;
+  margin: 22px 0;
+  font-size: 13px;
+}
+
+.nil-checkout-price-row span {
+  color: var(--nil-muted);
+}
+
+.nil-checkout-price-row strong {
+  color: var(--nil-black);
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.nil-checkout-total {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 15px;
+  margin-bottom: 27px;
+}
+
+.nil-checkout-total > span {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--nil-black);
+}
+
+.nil-checkout-total > div {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+}
+
+.nil-checkout-total strong {
+  color: var(--nil-olive-dark);
+  font-size: clamp(22px, 3vw, 30px);
+  font-weight: 800;
+}
+
+.nil-checkout-total small {
+  font-size: 12px;
+  color: var(--nil-muted);
+}
+
+/* ============================================================
+   PAYMENT BUTTON
+   ============================================================ */
+
+.nil-checkout-button {
+  width: 100%;
+  min-height: 56px;
+  border: 1px solid var(--nil-olive);
+  border-radius: 13px;
+  background: var(--nil-olive);
+  color: var(--nil-white);
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  transition:
+    background .2s ease,
+    transform .2s ease,
+    box-shadow .2s ease;
+}
+
+.nil-checkout-button:hover:not(:disabled) {
+  background: var(--nil-olive-dark);
+  border-color: var(--nil-olive-dark);
+  transform: translateY(-2px);
+  box-shadow: 0 9px 24px rgba(125, 133, 102, .22);
+}
+
+.nil-checkout-button:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+.nil-checkout-button:disabled {
+  opacity: .55;
+  cursor: not-allowed;
+}
+
+.nil-checkout-button:focus-visible,
+.nil-checkout-back:focus-visible {
+  outline: 3px solid var(--nil-olive);
+  outline-offset: 3px;
+}
+
+.nil-checkout-secure {
+  text-align: center;
+  color: var(--nil-muted);
+  font-size: 11px;
+  margin: 18px 0 0;
+}
+
+/* ============================================================
+   INFORMATION NOTE
+   ============================================================ */
+
+.nil-checkout-note {
+  margin-top: 28px;
+  background: var(--nil-olive-light);
+  border: 1px solid var(--nil-border);
+  border-radius: 13px;
+  padding: 19px;
+}
+
+.nil-checkout-note strong {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--nil-olive-dark);
+}
+
+.nil-checkout-note p {
+  color: var(--nil-muted);
+  font-size: 12px;
+  line-height: 2;
+  margin: 10px 0 0;
+}
+
+/* ============================================================
+   PAYMENT STATUS
+   ============================================================ */
+
+.nil-checkout-success,
+.nil-checkout-warning {
+  padding: 15px 17px;
+  border-radius: 11px;
+  font-size: 13px;
+  line-height: 1.9;
+}
+
+.nil-checkout-success {
+  background: var(--nil-olive-light);
+  border: 1px solid var(--nil-olive);
+  color: var(--nil-olive-dark);
+}
+
+.nil-checkout-warning {
+  background: #f7f7f7;
+  border: 1px solid #d9d9d9;
+  color: var(--nil-black);
+}
+
+.nil-checkout-error {
+  margin-top: 15px;
+  padding: 12px 14px;
+  background: #f8f8f8;
+  border-inline-start: 3px solid var(--nil-black);
+  border-radius: 8px;
+  color: var(--nil-black);
+  font-size: 12px;
+  line-height: 1.8;
+}
+
+/* ============================================================
+   ERROR / EMPTY STATE
+   ============================================================ */
+
+.nil-checkout-state {
+  background: var(--nil-white);
+  border: 1px solid var(--nil-border);
+  border-radius: 22px;
+  padding: 60px 25px;
+  text-align: center;
+}
+
+.nil-checkout-state-icon {
+  margin: 0 auto 20px;
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  background: var(--nil-olive-light);
+  border: 1px solid var(--nil-border);
+  color: var(--nil-olive);
+  font-size: 27px;
+}
+
+.nil-checkout-state h2 {
+  font-size: 22px;
+  color: var(--nil-black);
+  margin-bottom: 12px;
+}
+
+.nil-checkout-state p {
+  color: var(--nil-muted);
+  line-height: 1.9;
+  font-size: 13px;
+}
+
+.nil-checkout-state .nil-checkout-button {
+  max-width: 200px;
+  margin: 25px auto 0;
+}
+
+/* ============================================================
+   LOADING
+   ============================================================ */
+
+.nil-checkout-loading {
+  padding: 70px 20px;
+  text-align: center;
+  color: var(--nil-muted);
+  font-size: 14px;
+}
+
+.nil-checkout-spinner {
+  width: 36px;
+  height: 36px;
+  border: 3px solid var(--nil-border);
+  border-top-color: var(--nil-olive);
+  border-radius: 50%;
+  animation: nil-checkout-spin .8s linear infinite;
+  margin: 0 auto 20px;
+}
+
+@keyframes nil-checkout-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* ============================================================
+   FOOTER
+   ============================================================ */
+
+.nil-checkout-footer {
+  display: flex;
+  justify-content: space-between;
+  gap: 15px;
+  margin-top: 55px;
+  padding-top: 25px;
+  border-top: 1px solid var(--nil-border);
+  color: var(--nil-muted);
+  font-size: 11px;
+  letter-spacing: 1px;
+}
+
+/* ============================================================
+   TABLET
+   ============================================================ */
+
+@media (max-width: 850px) {
+  .nil-checkout-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .nil-checkout-heading {
+    padding: 38px 0 30px;
+  }
+
+  .nil-checkout-payment {
+    max-width: 100%;
+  }
+}
+
+/* ============================================================
+   MOBILE
+   ============================================================ */
+
+@media (max-width: 520px) {
+  .nil-checkout {
+    padding: 15px 14px 40px;
+  }
+
+  .nil-checkout-header {
+    padding: 15px 0 20px;
+  }
+
+  .nil-checkout-brand {
+    font-size: 10px;
+    letter-spacing: 1px;
+    gap: 7px;
+  }
+
+  .nil-checkout-logo {
+    width: 33px;
+    height: 33px;
+    font-size: 20px;
+    border-radius: 10px;
+  }
+
+  .nil-checkout-back {
+    font-size: 11px;
+    gap: 6px;
+  }
+
+  .nil-checkout-heading {
+    padding: 32px 0 25px;
+  }
+
+  .nil-checkout-heading h1 {
+    font-size: 29px;
+  }
+
+  .nil-checkout-heading p {
+    font-size: 12px;
+  }
+
+  .nil-checkout-grid {
+    gap: 16px;
+  }
+
+  .nil-checkout-card {
+    padding: 22px 17px;
+    border-radius: 17px;
+  }
+
+  .nil-checkout-card-title {
+    margin-bottom: 24px;
+  }
+
+  .nil-checkout-card-title h2 {
+    font-size: 17px;
+  }
+
+  .nil-checkout-card-icon {
+    width: 43px;
+    height: 43px;
+    font-size: 22px;
+  }
+
+  .nil-checkout-info {
+    gap: 22px 12px;
+  }
+
+  .nil-checkout-info-item strong {
+    font-size: 12px;
+  }
+
+  .nil-checkout-booking-number {
+    padding: 14px;
+  }
+
+  .nil-checkout-service {
+    padding: 14px;
+    align-items: flex-start;
+  }
+
+  .nil-checkout-service > span {
+    white-space: normal;
+    text-align: end;
+  }
+
+  .nil-checkout-price-row {
+    font-size: 12px;
+  }
+
+  .nil-checkout-price-row strong {
+    font-size: 12px;
+  }
+
+  .nil-checkout-total strong {
+    font-size: 25px;
+  }
+
+  .nil-checkout-button {
+    min-height: 54px;
+  }
+
+  .nil-checkout-footer {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: 8px;
+    margin-top: 35px;
+  }
+}
+
+/* ============================================================
+   VERY SMALL PHONES
+   ============================================================ */
+
+@media (max-width: 360px) {
+  .nil-checkout-info {
+    grid-template-columns: 1fr;
+  }
+
+  .nil-checkout-brand {
+    letter-spacing: 0;
+  }
+
+  .nil-checkout-card {
+    padding: 18px 14px;
+  }
+}
+
+/* ============================================================
+   ACCESSIBILITY
+   ============================================================ */
+
+@media (prefers-reduced-motion: reduce) {
+  .nil-checkout-spinner {
+    animation: none;
+  }
+
+  .nil-checkout-button {
+    transition: none;
+  }
+}
+
+
+/* ============================================================
+   NIL BEAUTY — DASHBOARD
+   White / Black / Olive Green
+   Primary: #7d8566
+   Mobile First / RTL Support
+   ============================================================ */
+
+.nil-dashboard {
+  --nil-bg: #ffffff;
+  --nil-card: #ffffff;
+  --nil-dark: #111111;
+  --nil-muted: #666666;
+  --nil-border: #e2e5dc;
+  --nil-accent: #7d8566;
+  --nil-accent-dark: #626a4e;
+  --nil-soft: #f3f5ef;
+  --nil-light: #f8f9f6;
+
+  background: var(--nil-bg);
+  color: var(--nil-dark);
+  min-height: 100vh;
+  padding: 0 0 120px;
+  font-family: inherit;
+}
+
+.nil-dashboard *,
+.nil-dashboard *::before,
+.nil-dashboard *::after {
+  box-sizing: border-box;
+}
+
+.nil-dashboard button,
+.nil-dashboard input,
+.nil-dashboard textarea {
+  font: inherit;
+}
+
+.nil-dashboard button {
+  cursor: pointer;
+}
+
+.nil-dashboard button:disabled {
+  cursor: not-allowed;
+}
+
+.nil-dashboard [hidden] {
+  display: none !important;
+}
+
+.nil-dashboard button:focus-visible,
+.nil-dashboard input:focus-visible,
+.nil-dashboard textarea:focus-visible {
+  outline: 2px solid var(--nil-accent);
+  outline-offset: 3px;
+}
+
+.nil-shell {
+  width: min(100% - 32px, 1180px);
+  margin: auto;
+}
+
+/* ============================================================
+   HEADER
+   ============================================================ */
+
+.nil-topbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 24px 0;
+  gap: 16px;
+  border-bottom: 1px solid var(--nil-border);
+}
+
+.nil-brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.nil-brand-icon {
+  display: grid;
+  place-items: center;
+  width: 46px;
+  height: 46px;
+  background: var(--nil-dark);
+  color: #ffffff;
+  border-radius: 15px;
+  font-size: 27px;
+  font-family: Georgia, serif;
+}
+
+.nil-brand strong,
+.nil-brand small {
+  display: block;
+}
+
+.nil-brand strong {
+  font-size: 15px;
+  letter-spacing: 1.5px;
+  color: var(--nil-dark);
+}
+
+.nil-brand small {
+  margin-top: 3px;
+  color: var(--nil-muted);
+  font-size: 11px;
+}
+
+.nil-icon-btn {
+  display: grid;
+  place-items: center;
+  width: 43px;
+  height: 43px;
+  border-radius: 14px;
+  background: #ffffff;
+  border: 1px solid var(--nil-border);
+  color: var(--nil-dark);
+  font-size: 21px;
+  transition: .2s ease;
+}
+
+.nil-icon-btn:hover {
+  background: var(--nil-soft);
+  border-color: var(--nil-accent);
+  color: var(--nil-accent-dark);
+}
+
+/* ============================================================
+   WELCOME
+   ============================================================ */
+
+.nil-welcome {
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  min-height: 185px;
+  padding: 34px;
+  margin-top: 24px;
+  background: var(--nil-accent);
+  border-radius: 28px;
+  color: #ffffff;
+}
+
+.nil-eyebrow {
+  display: block;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  color: var(--nil-accent);
+  margin-bottom: 12px;
+}
+
+.nil-welcome .nil-eyebrow {
+  color: #ffffff;
+  opacity: .9;
+}
+
+.nil-welcome h1 {
+  font-size: clamp(23px, 4vw, 37px);
+  line-height: 1.5;
+  margin: 0 0 9px;
+  font-weight: 700;
+  color: #ffffff;
+}
+
+.nil-welcome h1 span {
+  color: #ffffff;
+}
+
+.nil-welcome p {
+  margin: 0;
+  color: #ffffff;
+  opacity: .92;
+  font-size: 14px;
+  line-height: 1.9;
+}
+
+.nil-welcome-mark {
+  font-size: 130px;
+  color: rgba(255, 255, 255, .35);
+  line-height: 1;
+  flex-shrink: 0;
+}
+
+/* ============================================================
+   NAVIGATION TABS
+   ============================================================ */
+
+.nil-tabs {
+  display: flex;
+  gap: 8px;
+  margin: 30px 0 34px;
+  padding: 6px;
+  background: var(--nil-soft);
+  border: 1px solid var(--nil-border);
+  border-radius: 19px;
+  width: fit-content;
+  max-width: 100%;
+}
+
+.nil-tabs button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 13px 24px;
+  border: none;
+  border-radius: 14px;
+  background: transparent;
+  color: var(--nil-muted);
+  font-size: 13px;
+  white-space: nowrap;
+  transition: .2s ease;
+}
+
+.nil-tabs button span {
+  font-size: 18px;
+}
+
+.nil-tabs button:hover {
+  color: var(--nil-accent-dark);
+}
+
+.nil-tabs button.active {
+  background: var(--nil-accent);
+  color: #ffffff;
+  font-weight: 700;
+  box-shadow: 0 3px 14px rgba(0, 0, 0, .06);
+}
+
+/* ============================================================
+   SECTION HEADINGS
+   ============================================================ */
+
+.nil-section-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: end;
+  gap: 12px;
+  margin-bottom: 24px;
+}
+
+.nil-section-head h2 {
+  font-size: 26px;
+  margin: 0 0 6px;
+  color: var(--nil-dark);
+}
+
+.nil-section-head p {
+  color: var(--nil-muted);
+  margin: 0;
+  font-size: 13px;
+}
+
+.nil-text-btn {
+  border: none;
+  background: transparent;
+  color: var(--nil-accent-dark);
+  font-weight: 700;
+}
+
+.nil-text-btn:hover {
+  color: var(--nil-dark);
+}
+
+/* ============================================================
+   SERVICES
+   ============================================================ */
+
+.nil-service-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 18px;
+}
+
+.nil-service {
+  min-width: 0;
+  text-align: start;
+  padding: 22px;
+  border: 1px solid var(--nil-border);
+  border-radius: 24px;
+  background: #ffffff;
+  color: var(--nil-dark);
+  transition:
+    transform .2s,
+    border-color .2s,
+    box-shadow .2s,
+    background .2s;
+}
+
+.nil-service:hover {
+  transform: translateY(-3px);
+  border-color: var(--nil-accent);
+  box-shadow: 0 12px 35px rgba(0, 0, 0, .06);
+}
+
+.nil-service.selected {
+  border: 2px solid var(--nil-accent);
+  background: var(--nil-soft);
+}
+
+.nil-service-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.nil-service-number {
+  color: var(--nil-accent);
+  font-size: 12px;
+  letter-spacing: 1px;
+  font-weight: 700;
+}
+
+.nil-service-check {
+  display: grid;
+  place-items: center;
+  width: 31px;
+  height: 31px;
+  border-radius: 50%;
+  border: 1px solid var(--nil-border);
+  font-size: 20px;
+  color: var(--nil-accent);
+  background: #ffffff;
+}
+
+.nil-service.selected .nil-service-check {
+  background: var(--nil-accent);
+  border-color: var(--nil-accent);
+  color: #ffffff;
+}
+
+.nil-service-symbol {
+  display: grid;
+  place-items: center;
+  width: 100%;
+  height: 115px;
+  margin: 8px 0 15px;
+  font-size: 76px;
+  color: var(--nil-accent);
+  background: var(--nil-soft);
+  border-radius: 18px;
+}
+
+.nil-service-info h3 {
+  font-size: 18px;
+  margin: 0 0 9px;
+  color: var(--nil-dark);
+}
+
+.nil-service-info p {
+  color: var(--nil-muted);
+  font-size: 12px;
+  line-height: 1.8;
+  min-height: 42px;
+  margin: 0 0 16px;
+}
+
+.nil-service-meta {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+  padding-top: 15px;
+  border-top: 1px solid var(--nil-border);
+  font-size: 12px;
+}
+
+.nil-service-meta span {
+  color: var(--nil-muted);
+}
+
+.nil-service-meta strong {
+  font-size: 13px;
+  color: var(--nil-accent-dark);
+}
+
+/* ============================================================
+   STICKY SELECTION BAR
+   ============================================================ */
+
+.nil-selection {
+  position: fixed;
+  bottom: 20px;
+  left: 16px;
+  right: 16px;
+  z-index: 60;
+  pointer-events: none;
+}
+
+.nil-selection-inner {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 18px;
+  max-width: 700px;
+  margin: auto;
+  padding: 15px 18px;
+  background: #ffffff;
+  border: 1px solid var(--nil-accent);
+  border-radius: 22px;
+  box-shadow: 0 15px 60px rgba(0, 0, 0, .12);
+  pointer-events: auto;
+}
+
+.nil-selection-inner small,
+.nil-selection-inner strong {
+  display: block;
+}
+
+.nil-selection-inner small {
+  color: var(--nil-muted);
+  margin-bottom: 5px;
+  font-size: 11px;
+}
+
+.nil-selection-inner strong {
+  font-size: 14px;
+  color: var(--nil-dark);
+}
+
+/* ============================================================
+   BUTTONS
+   ============================================================ */
+
+.nil-btn {
+  border: 0;
+  border-radius: 13px;
+  padding: 14px 22px;
+  font-size: 13px;
+  font-weight: 700;
+  transition: .2s ease;
+}
+
+.nil-btn-dark {
+  background: var(--nil-dark);
+  color: #ffffff;
+}
+
+.nil-btn-dark:hover:not(:disabled) {
+  background: var(--nil-accent);
+}
+
+.nil-btn-dark:disabled {
+  opacity: .4;
+}
+
+.nil-btn-light {
+  background: var(--nil-soft);
+  color: var(--nil-dark);
+  border: 1px solid var(--nil-border);
+}
+
+.nil-btn-light:hover {
+  background: var(--nil-border);
+}
+
+/* ============================================================
+   BOOKING MODAL
+   ============================================================ */
+
+.nil-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 2000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+}
+
+.nil-modal-shade {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, .65);
+  backdrop-filter: blur(5px);
+}
+
+.nil-dialog {
+  position: relative;
+  z-index: 1;
+  width: min(100%, 560px);
+  max-height: min(90dvh, 850px);
+  display: flex;
+  flex-direction: column;
+  background: #ffffff;
+  border-radius: 28px;
+  overflow: hidden;
+  box-shadow: 0 30px 90px rgba(0, 0, 0, .2);
+}
+
+.nil-dialog-header {
+  padding: 25px 28px 15px;
+  display: flex;
+  justify-content: space-between;
+  align-items: start;
+  gap: 16px;
+}
+
+.nil-dialog-header h2 {
+  margin: 0;
+  font-size: 24px;
+  color: var(--nil-dark);
+}
+
+.nil-progress {
+  display: flex;
+  gap: 6px;
+  padding: 0 28px 18px;
+}
+
+.nil-progress span {
+  flex: 1;
+  height: 4px;
+  background: var(--nil-border);
+  border-radius: 20px;
+}
+
+.nil-progress span.active {
+  background: var(--nil-accent);
+}
+
+.nil-dialog-body {
+  padding: 12px 28px 26px;
+  overflow-y: auto;
+  flex: 1;
+  min-height: 0;
+}
+
+.nil-dialog-body h3 {
+  font-size: 19px;
+  margin: 0 0 9px;
+  color: var(--nil-dark);
+}
+
+.nil-muted {
+  color: var(--nil-muted);
+  font-size: 12px;
+  margin-bottom: 22px;
+  line-height: 1.8;
+}
+
+.nil-dialog-footer {
+  padding: 18px 28px;
+  border-top: 1px solid var(--nil-border);
+  display: flex;
+  gap: 10px;
+  justify-content: flex-end;
+}
+
+.nil-dialog-footer .nil-btn-dark {
+  flex: 1;
+  background: var(--nil-accent);
+}
+
+.nil-dialog-footer .nil-btn-dark:hover:not(:disabled) {
+  background: var(--nil-accent-dark);
+}
+
+/* ============================================================
+   JALALI CALENDAR
+   ============================================================ */
+
+.nil-calendar {
+  direction: rtl;
+  width: 100%;
+}
+
+.nil-calendar-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  padding: 16px;
+  border-radius: 17px;
+  background: var(--nil-soft);
+  margin-bottom: 22px;
+}
+
+.nil-calendar-head button {
+  width: 37px;
+  height: 37px;
+  border-radius: 11px;
+  border: 1px solid var(--nil-border);
+  background: #ffffff;
+  font-size: 20px;
+  color: var(--nil-accent);
+}
+
+.nil-calendar-head button:hover:not(:disabled) {
+  background: var(--nil-accent);
+  color: #ffffff;
+}
+
+.nil-calendar-head button:disabled {
+  opacity: .25;
+}
+
+.nil-calendar-head strong,
+.nil-calendar-head small {
+  display: block;
+  text-align: center;
+}
+
+.nil-calendar-head strong {
+  font-size: 17px;
+  color: var(--nil-dark);
+}
+
+.nil-calendar-head small {
+  color: var(--nil-muted);
+  font-size: 10px;
+  margin-top: 5px;
+}
+
+.nil-weekdays,
+.nil-calendar-grid {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: 7px;
+  text-align: center;
+}
+
+.nil-weekdays {
+  margin-bottom: 12px;
+}
+
+.nil-weekdays span {
+  font-size: 12px;
+  color: var(--nil-muted);
+  padding: 8px 0;
+}
+
+.nil-calendar-grid button {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 1;
+  min-height: 37px;
+  border: 1px solid transparent;
+  border-radius: 12px;
+  background: var(--nil-light);
+  color: var(--nil-dark);
+  font-size: 14px;
+  transition: .2s ease;
+}
+
+.nil-calendar-grid button:hover:not(:disabled) {
+  border-color: var(--nil-accent);
+  background: var(--nil-soft);
+}
+
+.nil-calendar-grid button.active {
+  background: var(--nil-accent);
+  color: #ffffff;
+  border-color: var(--nil-accent);
+}
+
+.nil-calendar-grid button:disabled {
+  opacity: .23;
+}
+
+.nil-calendar-grid button.today {
+  border-color: var(--nil-accent);
+}
+
+.nil-calendar-grid button.today.active {
+  background: var(--nil-accent);
+  color: #ffffff;
+}
+
+.nil-calendar-grid button i {
+  position: absolute;
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: var(--nil-accent);
+  bottom: 4px;
+  left: calc(50% - 2px);
+}
+
+.nil-calendar-grid button.active i {
+  background: #ffffff;
+}
+
+.nil-calendar-note {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 18px;
+  font-size: 11px;
+  color: var(--nil-muted);
+}
+
+.nil-calendar-dot {
+  width: 7px;
+  height: 7px;
+  background: var(--nil-accent);
+  border-radius: 50%;
+}
+
+/* ============================================================
+   AVAILABLE TIMES
+   ============================================================ */
+
+.nil-time-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.nil-time {
+  border: 1px solid var(--nil-border);
+  border-radius: 13px;
+  padding: 15px 8px;
+  background: var(--nil-light);
+  color: var(--nil-dark);
+  transition: .2s ease;
+}
+
+.nil-time:hover {
+  border-color: var(--nil-accent);
+  background: var(--nil-soft);
+}
+
+.nil-time.active,
+.nil-time.active:hover {
+  background: var(--nil-accent);
+  color: #ffffff;
+  border-color: var(--nil-accent);
+}
+
+.nil-time.active small {
+  color: #ffffff;
+}
+
+/* ============================================================
+   BOOKING SUMMARY
+   ============================================================ */
+
+.nil-summary {
+  background: var(--nil-soft);
+  border: 1px solid var(--nil-border);
+  border-radius: 17px;
+  padding: 18px;
+  margin-bottom: 24px;
+}
+
+.nil-summary-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 12px 0;
+  border-bottom: 1px solid var(--nil-border);
+  font-size: 13px;
+}
+
+.nil-summary-row:last-child {
+  border-bottom: none;
+}
+
+.nil-summary-row.total {
+  font-size: 16px;
+  color: var(--nil-accent-dark);
+  font-weight: 700;
+}
+
+.nil-field-label {
+  display: block;
+  font-size: 13px;
+  font-weight: 700;
+  margin: 14px 0 9px;
+  color: var(--nil-dark);
+}
+
+.nil-input {
+  width: 100%;
+  padding: 14px;
+  border: 1px solid var(--nil-border);
+  border-radius: 12px;
+  background: #ffffff;
+  outline: none;
+  color: var(--nil-dark);
+  resize: vertical;
+}
+
+.nil-input:focus {
+  border-color: var(--nil-accent);
+  box-shadow: 0 0 0 3px rgba(125, 133, 102, .12);
+}
+
+/* ============================================================
+   APPOINTMENTS
+   ============================================================ */
+
+.nil-bookings {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.nil-booking-card {
+  background: #ffffff;
+  border: 1px solid var(--nil-border);
+  border-radius: 20px;
+  padding: 22px;
+  min-width: 0;
+  transition: .2s ease;
+}
+
+.nil-booking-card:hover {
+  border-color: var(--nil-accent);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, .04);
+}
+
+.nil-booking-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: start;
+  gap: 10px;
+}
+
+.nil-booking-top small {
+  color: var(--nil-accent-dark);
+}
+
+.nil-booking-top h3 {
+  margin: 9px 0 22px;
+  font-size: 17px;
+  color: var(--nil-dark);
+}
+
+.nil-status {
+  background: var(--nil-soft);
+  color: var(--nil-accent-dark);
+  border: 1px solid var(--nil-border);
+  padding: 7px 11px;
+  border-radius: 30px;
+  font-size: 10px;
+  white-space: nowrap;
+}
+
+.nil-booking-bottom {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  border-top: 1px solid var(--nil-border);
+  padding-top: 16px;
+  font-size: 12px;
+}
+
+.nil-booking-bottom strong {
+  color: var(--nil-accent-dark);
+}
+
+.nil-booking-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 16px;
+}
+
+.nil-booking-actions button {
+  border: 1px solid var(--nil-border);
+  border-radius: 10px;
+  background: #ffffff;
+  color: var(--nil-dark);
+  padding: 10px 13px;
+  font-size: 12px;
+  transition: .2s ease;
+}
+
+.nil-booking-actions button:hover:not(:disabled) {
+  background: var(--nil-accent);
+  border-color: var(--nil-accent);
+  color: #ffffff;
+}
+
+/* ============================================================
+   PROFILE
+   ============================================================ */
+
+.nil-profile-card {
+  max-width: 650px;
+  background: #ffffff;
+  padding: 26px;
+  border: 1px solid var(--nil-border);
+  border-radius: 24px;
+}
+
+.nil-profile-head {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  margin-bottom: 25px;
+}
+
+.nil-avatar {
+  display: grid;
+  place-items: center;
+  width: 65px;
+  height: 65px;
+  border-radius: 20px;
+  background: var(--nil-soft);
+  color: var(--nil-accent);
+  font-size: 29px;
+  font-weight: 700;
+}
+
+.nil-profile-head h3 {
+  margin: 0 0 6px;
+  color: var(--nil-dark);
+}
+
+.nil-profile-head p {
+  margin: 0;
+  color: var(--nil-muted);
+}
+
+.nil-profile-field {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  padding: 17px 0;
+  border-bottom: 1px solid var(--nil-border);
+  font-size: 13px;
+}
+
+.nil-profile-field span {
+  color: var(--nil-muted);
+}
+
+.nil-profile-field strong {
+  color: var(--nil-dark);
+}
+
+.nil-profile-card > .nil-btn {
+  margin-top: 24px;
+}
+
+/* ============================================================
+   FEEDBACK / LOADING / EMPTY
+   ============================================================ */
+
+.nil-feedback {
+  margin: 12px 0;
+  color: var(--nil-accent-dark);
+  font-size: 12px;
+  line-height: 1.8;
+}
+
+.nil-feedback.error {
+  color: var(--nil-dark);
+  border-inline-start: 3px solid var(--nil-accent);
+  padding-inline-start: 10px;
+}
+
+.nil-loading,
+.nil-empty {
+  grid-column: 1 / -1;
+  padding: 45px 18px;
+  text-align: center;
+  border-radius: 20px;
+  background: var(--nil-soft);
+  border: 1px solid var(--nil-border);
+  color: var(--nil-muted);
+  font-size: 13px;
+  line-height: 2;
+}
+
+/* ============================================================
+   TABLET
+   ============================================================ */
+
+@media (max-width: 900px) {
+  .nil-service-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+/* ============================================================
+   MOBILE
+   ============================================================ */
+
+@media (max-width: 600px) {
+  .nil-shell {
+    width: calc(100% - 28px);
+  }
+
+  .nil-topbar {
+    padding: 18px 0;
+  }
+
+  .nil-welcome {
+    min-height: 160px;
+    padding: 23px;
+    border-radius: 22px;
+    margin-top: 18px;
+  }
+
+  .nil-welcome h1 {
+    font-size: 24px;
+  }
+
+  .nil-welcome p {
+    font-size: 12px;
+  }
+
+  .nil-welcome-mark {
+    font-size: 72px;
+  }
+
+  .nil-tabs {
+    width: 100%;
+    gap: 3px;
+    padding: 5px;
+    margin: 22px 0 28px;
+  }
+
+  .nil-tabs button {
+    flex: 1;
+    min-width: 0;
+    padding: 12px 5px;
+    font-size: 11px;
+    gap: 4px;
+  }
+
+  .nil-tabs button span {
+    font-size: 15px;
+  }
+
+  .nil-section-head h2 {
+    font-size: 22px;
+  }
+
+  .nil-service-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+  }
+
+  .nil-service {
+    padding: 13px;
+    border-radius: 18px;
+  }
+
+  .nil-service-symbol {
+    height: 85px;
+    font-size: 53px;
+    margin: 10px 0;
+  }
+
+  .nil-service-info h3 {
+    font-size: 14px;
+  }
+
+  .nil-service-info p {
+    font-size: 11px;
+    min-height: 40px;
+  }
+
+  .nil-service-meta {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 7px;
+  }
+
+  .nil-service-meta strong {
+    font-size: 12px;
+  }
+
+  .nil-selection {
+    bottom: max(12px, env(safe-area-inset-bottom));
+    left: 10px;
+    right: 10px;
+  }
+
+  .nil-selection-inner {
+    padding: 12px;
+    border-radius: 18px;
+  }
+
+  .nil-selection-inner .nil-btn {
+    padding: 13px 16px;
+    white-space: nowrap;
+  }
+
+  .nil-modal {
+    padding: 0;
+    align-items: flex-end;
+  }
+
+  .nil-dialog {
+    width: 100%;
+    max-height: 94dvh;
+    border-radius: 24px 24px 0 0;
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+
+  .nil-dialog-header {
+    padding: 22px 20px 14px;
+  }
+
+  .nil-dialog-header h2 {
+    font-size: 21px;
+  }
+
+  .nil-progress {
+    padding: 0 20px 16px;
+  }
+
+  .nil-dialog-body {
+    padding: 10px 18px 20px;
+  }
+
+  .nil-dialog-footer {
+    padding: 14px 18px;
+  }
+
+  .nil-calendar-head {
+    padding: 12px;
+  }
+
+  .nil-calendar-head strong {
+    font-size: 15px;
+  }
+
+  .nil-weekdays,
+  .nil-calendar-grid {
+    gap: 4px;
+  }
+
+  .nil-calendar-grid button {
+    border-radius: 9px;
+    font-size: 12px;
+    min-height: 36px;
+  }
+
+  .nil-time-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .nil-bookings {
+    grid-template-columns: 1fr;
+  }
+
+  .nil-booking-card {
+    padding: 18px;
+  }
+
+  .nil-profile-card {
+    padding: 18px;
+  }
+}
+
+/* ============================================================
+   VERY SMALL PHONES
+   ============================================================ */
+
+@media (max-width: 360px) {
+  .nil-service-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .nil-welcome-mark {
+    display: none;
+  }
+
+  .nil-tabs button {
+    font-size: 10px;
+  }
+}
+
+/* ============================================================
+   ACCESSIBILITY
+   ============================================================ */
+
+@media (prefers-reduced-motion: reduce) {
+  .nil-dashboard *,
+  .nil-dashboard *::before,
+  .nil-dashboard *::after {
+    transition: none !important;
+    animation: none !important;
+  }
+}
+
+
+
+
+
+/* ==========================================
+   NIL BEAUTY — SINGLE COLUMN AUTH
+   Login / Register / OTP
+   ========================================== */
+
+.auth-page {
+  --nil-olive: #7d8566;
+  --nil-olive-dark: #626a4e;
+  --nil-black: #111111;
+  --nil-white: #ffffff;
+  --nil-muted: #777777;
+  --nil-border: #e4e7df;
+  --nil-soft: #f5f6f2;
+
+  width: 100%;
+  min-height: 100vh;
+  min-height: 100dvh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 36px 18px;
+  background: #ffffff;
+  color: var(--nil-black);
+  direction: rtl;
+  font-family: inherit;
+}
+
+.auth-page *,
+.auth-page *::before,
+.auth-page *::after {
+  box-sizing: border-box;
+}
+
+/* Hide previous desktop brand panel */
+
+.auth-page .auth-brand-panel {
+  display: none !important;
+}
+
+/* Main card */
+
+.auth-page .auth-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  width: 100%;
+  max-width: 440px;
+  min-width: 0;
+  min-height: auto;
+  margin: 0 auto;
+  padding: 40px 36px;
+  background: #ffffff;
+  border: 1px solid var(--nil-border);
+  border-radius: 22px;
+  box-shadow: 0 16px 55px rgba(0, 0, 0, .055);
+  animation: nilAuthEnter .3s ease;
+}
+
+/* Brand */
+
+.auth-page .auth-mobile-brand {
+  display: flex !important;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  margin: 0 0 32px;
+}
+
+.auth-page .auth-mobile-logo {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 48px;
+  width: 48px;
+  height: 48px;
+  border-radius: 13px;
+  background: var(--nil-black);
+  color: #ffffff;
+  font-family: Georgia, serif;
+  font-size: 28px;
+  font-weight: 700;
+}
+
+.auth-page .auth-mobile-brand strong {
+  display: block;
+  color: var(--nil-black);
+  font-family: Georgia, serif;
+  font-size: 26px;
+  line-height: 1.1;
+}
+
+.auth-page .auth-mobile-brand small {
+  display: block;
+  margin-top: 5px;
+  color: var(--nil-olive);
+  font-size: 9px;
+  letter-spacing: 2px;
+}
+
+/* Heading */
+
+.auth-page .auth-header {
+  margin-bottom: 28px;
+  text-align: center;
+}
+
+.auth-page .auth-header h2 {
+  margin: 0 0 10px;
+  color: var(--nil-black);
+  font-size: 27px;
+  font-weight: 800;
+  line-height: 1.5;
+}
+
+.auth-page .auth-header p {
+  margin: 0;
+  color: var(--nil-muted);
+  font-size: 13px;
+  line-height: 2;
+}
+
+.auth-page .auth-header strong {
+  color: var(--nil-olive-dark);
+  unicode-bidi: isolate;
+}
+
+/* Tabs */
+
+.auth-page .auth-tabs {
+  display: flex;
+  gap: 5px;
+  width: 100%;
+  margin-bottom: 25px;
+  padding: 5px;
+  background: var(--nil-soft);
+  border: 1px solid var(--nil-border);
+  border-radius: 13px;
+}
+
+.auth-page .auth-tab {
+  flex: 1;
+  min-width: 0;
+  min-height: 44px;
+  padding: 10px;
+  border: 0;
+  border-radius: 9px;
+  background: transparent;
+  color: var(--nil-muted);
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: .2s ease;
+}
+
+.auth-page .auth-tab.active {
+  background: var(--nil-olive);
+  color: #ffffff;
+}
+
+.auth-page .auth-tab:hover:not(.active) {
+  background: #ffffff;
+  color: var(--nil-black);
+}
+
+/* Form */
+
+.auth-page .auth-form {
+  display: flex;
+  flex-direction: column;
+  gap: 19px;
+}
+
+.auth-page .auth-field {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 0;
+}
+
+.auth-page .auth-field label {
+  color: var(--nil-black);
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.auth-page .auth-field label span {
+  color: var(--nil-muted);
+  font-size: 11px;
+  font-weight: 400;
+}
+
+.auth-page .auth-input {
+  display: block;
+  width: 100%;
+  min-width: 0;
+  min-height: 52px;
+  padding: 12px 15px;
+  background: #ffffff;
+  border: 1px solid var(--nil-border);
+  border-radius: 11px;
+  outline: none;
+  color: var(--nil-black);
+  font-family: inherit;
+  font-size: 15px;
+  transition: border-color .2s, box-shadow .2s;
+}
+
+.auth-page .auth-input::placeholder {
+  color: #a0a0a0;
+  font-size: 12px;
+}
+
+.auth-page .auth-input:hover {
+  border-color: var(--nil-olive);
+}
+
+.auth-page .auth-input:focus {
+  border-color: var(--nil-olive);
+  box-shadow: 0 0 0 4px rgba(125, 133, 102, .12);
+}
+
+.auth-page .auth-input[dir="ltr"] {
+  direction: ltr;
+  text-align: left;
+}
+
+/* Primary button */
+
+.auth-page .primary-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  min-height: 52px;
+  margin-top: 5px;
+  padding: 13px 18px;
+  border: 1px solid var(--nil-olive);
+  border-radius: 11px;
+  background: var(--nil-olive);
+  color: #ffffff;
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 700;
+  text-align: center;
+  text-decoration: none;
+  cursor: pointer;
+  transition: .2s ease;
+}
+
+.auth-page .primary-button:hover:not(:disabled) {
+  background: var(--nil-olive-dark);
+  border-color: var(--nil-olive-dark);
+}
+
+.auth-page .primary-button:disabled {
+  opacity: .55;
+  cursor: wait;
+}
+
+/* OTP */
+
+.auth-page .otp-input {
+  direction: ltr;
+  text-align: center !important;
+  font-size: 25px;
+  font-weight: 800;
+  letter-spacing: 8px;
+  font-variant-numeric: tabular-nums;
+}
+
+.auth-page .otp-input::placeholder {
+  font-size: 13px;
+  letter-spacing: 3px;
+}
+
+.auth-page .auth-resend {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 20px;
+  padding: 12px;
+  background: var(--nil-soft);
+  border-radius: 11px;
+}
+
+.auth-page .auth-link-btn {
+  display: inline-block;
+  padding: 5px;
+  border: none;
+  background: transparent;
+  color: var(--nil-olive-dark);
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 700;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.auth-page .auth-link-btn:hover {
+  color: var(--nil-black);
+}
+
+.auth-page .auth-link-btn:disabled {
+  opacity: .45;
+  cursor: not-allowed;
+}
+
+.auth-page .auth-timer {
+  color: var(--nil-muted);
+  font-size: 12px;
+  direction: ltr;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Feedback */
+
+.auth-page .form-message {
+  display: none;
+  margin-top: 19px;
+  padding: 12px 14px;
+  background: var(--nil-soft);
+  border-right: 3px solid var(--nil-olive);
+  border-radius: 9px;
+  font-size: 12px;
+  line-height: 1.9;
+  overflow-wrap: anywhere;
+}
+
+/* Footer */
+
+.auth-page .auth-footer {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 7px;
+  margin-top: 28px;
+  padding-top: 23px;
+  border-top: 1px solid var(--nil-border);
+  text-align: center;
+  font-size: 12px;
+}
+
+.auth-page .auth-footer span {
+  color: var(--nil-muted);
+}
+
+.auth-page .auth-footer a {
+  color: var(--nil-olive-dark);
+  font-weight: 800;
+  text-decoration: none;
+}
+
+.auth-page .auth-footer a:hover {
+  color: var(--nil-black);
+}
+
+/* Accessibility */
+
+.auth-page button:focus-visible,
+.auth-page a:focus-visible {
+  outline: 3px solid var(--nil-olive);
+  outline-offset: 3px;
+}
+
+/* Animation */
+
+@keyframes nilAuthEnter {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Tablet */
+
+@media (max-width: 768px) {
+  .auth-page {
+    padding: 28px 16px;
+  }
+
+  .auth-page .auth-container {
+    max-width: 440px;
+    padding: 34px 29px;
+  }
+}
+
+/* Mobile */
+
+@media (max-width: 480px) {
+  .auth-page {
+    align-items: center;
+    padding: 22px 15px;
+  }
+
+  .auth-page .auth-container {
+    max-width: 100%;
+    padding: 28px 20px;
+    border-radius: 18px;
+    box-shadow: 0 8px 30px rgba(0, 0, 0, .035);
+  }
+
+  .auth-page .auth-mobile-brand {
+    margin-bottom: 27px;
+  }
+
+  .auth-page .auth-header {
+    margin-bottom: 24px;
+  }
+
+  .auth-page .auth-header h2 {
+    font-size: 24px;
+  }
+
+  .auth-page .auth-header p {
+    font-size: 12px;
+  }
+
+  .auth-page .auth-form {
+    gap: 17px;
+  }
+
+  .auth-page .auth-input {
+    min-height: 52px;
+    font-size: 16px;
+  }
+
+  .auth-page .auth-footer {
+    margin-top: 24px;
+  }
+}
+
+/* Small mobile */
+
+@media (max-width: 360px) {
+  .auth-page {
+    padding: 15px 10px;
+  }
+
+  .auth-page .auth-container {
+    padding: 25px 15px;
+  }
+
+  .auth-page .auth-tab {
+    font-size: 12px;
+  }
+
+  .auth-page .otp-input {
+    font-size: 22px;
+    letter-spacing: 5px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .auth-page *,
+  .auth-page *::before,
+  .auth-page *::after {
+    animation: none !important;
+    transition: none !important;
+  }
+}
+
+
+/* ==========================================
+   NIL — FORGOT PASSWORD
+   ========================================== */
+
+.auth-page [data-forgot-step] {
+  width: 100%;
+  animation: nilForgotFade .25s ease;
+}
+
+.auth-page .forgot-success-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 70px;
+  height: 70px;
+  margin: 0 auto 24px;
+  border-radius: 50%;
+  background: #f0f2eb;
+  border: 1px solid #dce2d3;
+  color: #7d8566;
+  font-size: 36px;
+  font-weight: 800;
+}
+
+.auth-page [data-forgot-step="success"] .auth-header {
+  margin-bottom: 26px;
+}
+
+.auth-page [data-forgot-step="success"] .primary-button {
+  margin-top: 0;
+}
+
+.auth-page [data-forgot-step="reset"] .auth-form {
+  gap: 19px;
+}
+
+.auth-page [data-forgot-step="otp"] .auth-resend {
+  margin-top: 22px;
+}
+
+@keyframes nilForgotFade {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (max-width: 480px) {
+  .auth-page .forgot-success-icon {
+    width: 62px;
+    height: 62px;
+    font-size: 31px;
+  }
+
+  .auth-page [data-forgot-step] {
+    min-width: 0;
+  }
+}
+
+
+
+.menu-button {
+  appearance: none;
+  background: transparent;
+  border: 0;
+  padding: 0;
+  cursor: pointer;
+  font: inherit;
+}
+
+.menu-button:focus-visible,
+.lang-switch:focus-visible {
+  outline: 2px solid #7d8566;
+  outline-offset: 4px;
+}
+
+
+
+

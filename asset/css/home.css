@@ -1,0 +1,428 @@
+
+/* ============================================
+   NIL HOME - BLACK / WHITE / GREEN
+   ============================================ */
+
+.nil-home {
+  --home-black: #111111;
+  --home-white: #ffffff;
+  --home-green: var(--nil-green, #7d8566);
+
+  color: var(--home-black);
+  background: var(--home-white);
+}
+
+.nil-home *,
+.nil-home *::before,
+.nil-home *::after {
+  box-sizing: border-box;
+}
+
+.nil-home img {
+  max-width: 100%;
+}
+
+.nil-home a:focus-visible,
+.nil-home button:focus-visible,
+.nil-home input:focus-visible {
+  outline: 2px solid var(--home-green);
+  outline-offset: 3px;
+}
+
+/* ============================================
+   HERO - SAME ORIGINAL LAYOUT
+   ============================================ */
+
+.nil-home .hero-wrap {
+  position: relative;
+}
+
+.nil-home .hero-left,
+.nil-home .hero-right,
+.nil-home .hero-content {
+  min-width: 0;
+}
+
+.nil-home .hero-middle,
+.nil-home .hero-image,
+.nil-home .hero-img {
+  overflow: hidden;
+}
+
+.nil-home .hero-middle .cover-image,
+.nil-home .hero-image .cover-image,
+.nil-home .hero-img .cover-image {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform .65s ease;
+}
+
+.nil-home .hero-middle:hover .cover-image,
+.nil-home .hero-image:hover .cover-image,
+.nil-home .hero-img:hover .cover-image {
+  transform: scale(1.035);
+}
+
+.nil-home .hero-info h2 {
+  overflow-wrap: anywhere;
+}
+
+.nil-home .hero-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  text-decoration: none;
+  transition:
+    transform .25s ease,
+    background-color .25s ease;
+}
+
+.nil-home .hero-btn:hover {
+  transform: translateY(-3px);
+}
+
+.nil-home .hero-btn span {
+  font-size: 19px;
+}
+
+/* ============================================
+   SECTION HEADINGS
+   ============================================ */
+
+.nil-home .section-title-wrap {
+  display: flex;
+  justify-content: space-between;
+  align-items: end;
+  gap: 24px;
+}
+
+.nil-home .section-title-wrap h2 {
+  color: var(--home-black);
+}
+
+.nil-home .section-title-wrap .subtitle {
+  letter-spacing: .08em;
+}
+
+.nil-home-more {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  flex-shrink: 0;
+  color: var(--home-black);
+  text-decoration: none;
+  font-size: 14px;
+  font-weight: 500;
+  transition: color .25s ease;
+}
+
+.nil-home-more:hover {
+  color: var(--home-green);
+}
+
+.nil-home-more span {
+  font-size: 20px;
+}
+
+/* ============================================
+   CATEGORIES - 1 BIG + SMALL CARDS
+   ============================================ */
+
+.nil-home .category-wrap {
+  min-height: 240px;
+}
+
+.nil-home .category-left,
+.nil-home .category-right {
+  min-width: 0;
+}
+
+.nil-home .feature-category,
+.nil-home .category-card {
+  position: relative;
+  display: block;
+  overflow: hidden;
+  text-decoration: none;
+}
+
+.nil-home .feature-category .cover-image,
+.nil-home .category-card .cover-image {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform .6s ease;
+}
+
+.nil-home .feature-category:hover .cover-image,
+.nil-home .category-card:hover .cover-image {
+  transform: scale(1.05);
+}
+
+.nil-home .category-text {
+  z-index: 2;
+  overflow-wrap: anywhere;
+}
+
+/* ============================================
+   ABOUT
+   ============================================ */
+
+.nil-home .about-block {
+  position: relative;
+}
+
+.nil-home .about-img,
+.nil-home .about-right {
+  overflow: hidden;
+}
+
+.nil-home .about-img .cover-image,
+.nil-home .about-right .cover-image {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.nil-home .about-data {
+  min-width: 0;
+}
+
+.nil-home .about-title {
+  overflow-wrap: anywhere;
+}
+
+.nil-home .about-btn .primary-button {
+  transition: transform .25s ease;
+}
+
+.nil-home .about-btn .primary-button:hover {
+  transform: translateY(-3px);
+}
+
+/* ============================================
+   BLOG - ORIGINAL THREE CARDS
+   ============================================ */
+
+.nil-home .blog-list {
+  align-items: stretch;
+}
+
+.nil-home .blog-list > .w-dyn-item {
+  min-width: 0;
+}
+
+.nil-home .blog-card {
+  display: block;
+  width: 100%;
+  height: 100%;
+  text-decoration: none;
+}
+
+.nil-home .blog-thumb {
+  overflow: hidden;
+  background: #f5f5f5;
+}
+
+.nil-home .blog-thumb .cover-image {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform .55s ease;
+}
+
+.nil-home .blog-card:hover .blog-thumb .cover-image {
+  transform: scale(1.05);
+}
+
+.nil-home .blog-title {
+  overflow-wrap: anywhere;
+  transition: color .25s ease;
+}
+
+.nil-home .blog-card:hover .blog-title {
+  color: var(--home-green);
+}
+
+/* ============================================
+   CTA - ORIGINAL TWO-COLUMN LAYOUT
+   ============================================ */
+
+.nil-home .cta {
+  overflow: hidden;
+}
+
+.nil-home .cta .fill-block {
+  min-width: 0;
+}
+
+.nil-home .cta-img {
+  overflow: hidden;
+}
+
+.nil-home .cta-img .cover-image {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.nil-home .cta-title {
+  overflow-wrap: anywhere;
+}
+
+.nil-home .cta-form {
+  display: flex;
+  align-items: stretch;
+  gap: 8px;
+}
+
+.nil-home .cta-field {
+  flex: 1;
+  min-width: 0;
+}
+
+.nil-home .cta-btn {
+  flex-shrink: 0;
+  cursor: pointer;
+  transition: opacity .2s ease;
+}
+
+.nil-home .cta-btn:disabled {
+  opacity: .6;
+  cursor: not-allowed;
+}
+
+.nil-cta-message {
+  margin-top: 12px;
+  padding: 10px 14px;
+  font-size: 13px;
+  line-height: 1.7;
+}
+
+.nil-cta-message[hidden] {
+  display: none;
+}
+
+.nil-cta-message[data-state="success"] {
+  color: var(--home-green);
+}
+
+.nil-cta-message[data-state="error"] {
+  color: #c62828;
+}
+
+.nil-cta-message[data-state="info"] {
+  color: var(--home-black);
+}
+
+/* ============================================
+   PLACEHOLDERS
+   ============================================ */
+
+.nil-image-placeholder {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  min-height: 160px;
+  background: #f3f3f3;
+  color: var(--home-green);
+  font-family: Georgia, serif;
+  font-size: 28px;
+  font-weight: 700;
+  letter-spacing: 5px;
+}
+
+.nil-home-empty,
+.nil-home-error {
+  padding: 28px 12px;
+  text-align: center;
+  font-size: 14px;
+}
+
+.nil-home-error {
+  color: #c62828;
+}
+
+/* ============================================
+   TABLET
+   ============================================ */
+
+@media (max-width: 991px) {
+  .nil-home .section-title-wrap {
+    gap: 16px;
+  }
+
+  .nil-home .hero-info h2 {
+    line-height: 1.25;
+  }
+}
+
+/* ============================================
+   MOBILE
+   ============================================ */
+
+@media (max-width: 767px) {
+  .nil-home .section-title-wrap {
+    align-items: flex-start;
+    gap: 14px;
+  }
+
+  .nil-home-more {
+    font-size: 12px;
+  }
+
+  .nil-home .hero-left,
+  .nil-home .hero-right,
+  .nil-home .about-data {
+    min-width: 0;
+  }
+
+  .nil-home .cta-form {
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .nil-home .cta-field,
+  .nil-home .cta-btn {
+    width: 100%;
+  }
+
+  .nil-home .cta-btn {
+    min-height: 46px;
+  }
+}
+
+@media (max-width: 479px) {
+  .nil-home .section-title-wrap {
+    flex-wrap: wrap;
+  }
+
+  .nil-home .section-title-wrap .title-wrap {
+    width: 100%;
+  }
+
+  .nil-home .hero-btn {
+    width: 100%;
+  }
+}
+
+/* ============================================
+   ACCESSIBILITY
+   ============================================ */
+
+@media (prefers-reduced-motion: reduce) {
+  .nil-home *,
+  .nil-home *::before,
+  .nil-home *::after {
+    transition-duration: .01ms !important;
+    animation-duration: .01ms !important;
+  }
+}

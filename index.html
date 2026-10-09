@@ -1,6 +1,99 @@
 <!doctype html>
 <html lang="en" dir="ltr">
   <head>
+    
+<script>
+(function () {
+    const path = window.location.pathname;
+
+    // NIL short payment URL: /p/{16-character token}
+    const match = path.match(/^\/p\/([A-Za-z0-9]{16})\/?$/);
+
+    if (!match) {
+        return;
+    }
+
+    const token = match[1];
+
+    // Prevent the normal homepage from loading.
+    document.addEventListener('DOMContentLoaded', () => {
+        document.body.innerHTML = `
+            <main style="
+                min-height:100vh;
+                display:flex;
+                flex-direction:column;
+                justify-content:center;
+                align-items:center;
+                text-align:center;
+                font-family:Tahoma,Arial,sans-serif;
+                padding:20px;
+                direction:rtl;
+            ">
+                <h2 id="payment-status">
+                    در حال اتصال به درگاه پرداخت...
+                </h2>
+                <p>لطفاً چند لحظه صبر کنید.</p>
+            </main>
+        `;
+    });
+
+    async function redirectToPayment() {
+        try {
+            const apiBaseUrl = import.meta.env.VITE_API_BASE_URL;
+
+const response = await fetch(
+    `${apiBaseUrl}/api/v1/payments/resolve/${encodeURIComponent(token)}`,
+                {
+                    method: 'GET',
+                    headers: {
+                        'Accept': 'application/json'
+                    },
+                    cache: 'no-store'
+                }
+            );
+
+            const result = await response.json();
+
+            if (
+                !response.ok ||
+                !result.success ||
+                !result.data?.payment_url
+            ) {
+                throw new Error('Invalid payment link');
+            }
+
+            const paymentUrl = new URL(result.data.payment_url);
+
+            // Redirect only to the trusted gateway.
+            if (
+                paymentUrl.protocol !== 'https:' ||
+                ![
+                    'payment.zarinpal.com',
+                    'www.zarinpal.com',
+                    'sandbox.zarinpal.com'
+                ].includes(paymentUrl.hostname)
+            ) {
+                throw new Error('Untrusted payment gateway');
+            }
+
+            window.location.replace(paymentUrl.href);
+
+        } catch (error) {
+            console.error('Payment redirect failed:', error);
+
+            const status = document.getElementById('payment-status');
+
+            if (status) {
+                status.textContent =
+                    'لینک پرداخت نامعتبر است یا در حال حاضر در دسترس نیست.';
+            }
+        }
+    }
+
+    window.addEventListener('DOMContentLoaded', redirectToPayment);
+})();
+</script>
+
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Nil Beauty</title>

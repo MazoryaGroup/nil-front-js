@@ -1,75 +1,210 @@
-// ============================================
-// Register Page (با کد معرف)
-// ============================================
+
 import { Layout, initLayout } from '../components/Layout.js';
 import { t } from '../code/i18n.js';
 import { authApi } from '../code/api.js';
 import { setAuth } from '../code/auth.js';
+import '../asset/css/custom.css';
+
+const tr = (key, fallback) => {
+  const value = t(key);
+  return value && value !== key ? value : fallback;
+};
+
+const normalizeDigits = (value = '') => {
+  const fa = '۰۱۲۳۴۵۶۷۸۹';
+  const ar = '٠١٢٣٤٥٦٧٨٩';
+
+  return String(value)
+    .replace(/[۰-۹]/g, char => String(fa.indexOf(char)))
+    .replace(/[٠-٩]/g, char => String(ar.indexOf(char)));
+};
+
+const normalizePhone = value =>
+  normalizeDigits(value).replace(/\D/g, '');
+
+const validPhone = value =>
+  /^(09\d{9}|989\d{9})$/.test(value);
+
+const getToken = res =>
+  res?.token ||
+  res?.access_token ||
+  res?.data?.token ||
+  res?.data?.access_token;
+
+const setLoading = (button, loading) => {
+  if (!button) return;
+
+  if (loading) {
+    button.dataset.originalText = button.textContent;
+    button.disabled = true;
+    button.textContent = tr('auth.loading', 'لطفاً صبر کنید...');
+  } else {
+    button.disabled = false;
+    button.textContent =
+      button.dataset.originalText || button.textContent;
+  }
+};
 
 export async function RegisterPage() {
-  console.log('🟢 RegisterPage started');
-
   const html = Layout(`
     <div class="auth-page">
+
+
       <div class="auth-container">
 
-        <div class="auth-header">
-          <h2>${t('auth.register_title')}</h2>
-          <p>${t('auth.register_subtitle')}</p>
+        <div class="auth-mobile-brand">
+          <div class="auth-mobile-logo">N</div>
+          <div>
+            <strong>NIL.</strong>
+            <small>BEAUTY STUDIO</small>
+          </div>
         </div>
 
-        <!-- STEP 1: نام + شماره + کد معرف -->
+        <div class="auth-header">
+          <h2>${tr('auth.register_title', 'ساخت حساب کاربری')}</h2>
+          <p>${tr(
+            'auth.register_subtitle',
+            'برای شروع، اطلاعاتت رو وارد کن.'
+          )}</p>
+        </div>
+
         <div data-step="phone">
           <form class="auth-form" data-phone-form>
+
             <div class="auth-field">
-              <label>${t('auth.name_label')}</label>
-              <input type="text" name="name" placeholder="${t('auth.name_placeholder')}" class="auth-input" required />
+              <label for="register-name">
+                ${tr('auth.name_label', 'نام و نام خانوادگی')}
+              </label>
+              <input
+                id="register-name"
+                type="text"
+                name="name"
+                class="auth-input"
+                placeholder="${tr('auth.name_placeholder', 'نام و نام خانوادگی')}"
+                autocomplete="name"
+                required
+              />
             </div>
+
             <div class="auth-field">
-              <label>${t('auth.phone_label')}</label>
-              <input type="tel" name="phone" placeholder="${t('auth.phone_placeholder')}" class="auth-input" required dir="ltr" />
+              <label for="register-phone">
+                ${tr('auth.phone_label', 'شماره موبایل')}
+              </label>
+              <input
+                id="register-phone"
+                type="tel"
+                name="phone"
+                class="auth-input"
+                placeholder="09123456789"
+                autocomplete="tel"
+                inputmode="tel"
+                dir="ltr"
+                required
+              />
             </div>
+
             <div class="auth-field">
-              <label>${t('auth.referral_label') || 'کد معرف'} <span style="font-size:12px;color:#999;font-weight:400">(${t('common.optional') || 'اختیاری'})</span></label>
-              <input type="text" name="referral_code" placeholder="${t('auth.referral_placeholder') || 'مثلاً: ABC123'}" class="auth-input" dir="ltr" />
+              <label for="register-referral">
+                ${tr('auth.referral_label', 'کد معرف')}
+                <span>(${tr('common.optional', 'اختیاری')})</span>
+              </label>
+              <input
+                id="register-referral"
+                type="text"
+                name="referral_code"
+                class="auth-input"
+                placeholder="${tr('auth.referral_placeholder', 'مثلاً ABC123')}"
+                dir="ltr"
+                autocomplete="off"
+              />
             </div>
-            <button type="submit" class="primary-button w-button" data-submit-btn>
-              ${t('auth.btn_send_otp_register')}
+
+            <button
+              type="submit"
+              class="primary-button w-button"
+              data-submit-btn
+            >
+              ${tr('auth.btn_send_otp_register', 'ارسال کد تأیید')}
             </button>
+
           </form>
         </div>
 
-        <!-- STEP 2: کد OTP -->
         <div data-step="otp" style="display:none">
-          <div class="auth-header" style="margin-bottom:20px">
-            <p>${t('auth.otp_subtitle').replace('{phone}', '<strong data-phone-display></strong>')}</p>
+
+          <div class="auth-header">
+            <h2>تأیید شماره موبایل</h2>
+            <p>
+              کد ارسال‌شده به شماره
+              <strong data-phone-display dir="ltr"></strong>
+              را وارد کن.
+            </p>
           </div>
 
           <form class="auth-form" data-otp-form>
             <div class="auth-field">
-              <label>${t('auth.otp_label')}</label>
-              <input type="text" name="code" placeholder="${t('auth.otp_placeholder')}" class="auth-input otp-input" maxlength="6" inputmode="numeric" pattern="[0-9]*" required dir="ltr" />
+              <label for="register-otp">
+                ${tr('auth.otp_label', 'کد تأیید')}
+              </label>
+              <input
+                id="register-otp"
+                type="text"
+                name="code"
+                class="auth-input otp-input"
+                placeholder="------"
+                maxlength="6"
+                inputmode="numeric"
+                autocomplete="one-time-code"
+                pattern="[0-9]{6}"
+                dir="ltr"
+                required
+              />
             </div>
-            <button type="submit" class="primary-button w-button" data-otp-submit>
-              ${t('auth.btn_verify_register')}
+
+            <button
+              type="submit"
+              class="primary-button w-button"
+              data-otp-submit
+            >
+              ${tr('auth.btn_verify_register', 'تأیید و ثبت‌نام')}
             </button>
           </form>
 
           <div class="auth-resend">
-            <button type="button" class="auth-link-btn" data-resend-btn>${t('auth.btn_resend')}</button>
+            <button
+              type="button"
+              class="auth-link-btn"
+              data-resend-btn
+            >
+              ${tr('auth.btn_resend', 'ارسال مجدد کد')}
+            </button>
             <span class="auth-timer" data-timer></span>
           </div>
 
-          <div style="text-align:center;margin-top:12px">
-            <button type="button" class="auth-link-btn" data-back-btn>${t('auth.btn_back')}</button>
+          <div style="text-align:center;margin-top:16px">
+            <button
+              type="button"
+              class="auth-link-btn"
+              data-back-btn
+            >
+              ${tr('auth.btn_back', 'بازگشت و ویرایش اطلاعات')}
+            </button>
           </div>
+
         </div>
 
-        <div class="form-message" data-msg></div>
+        <div
+          class="form-message"
+          data-msg
+          role="status"
+          aria-live="polite"
+        ></div>
 
         <div class="auth-footer" data-main-footer>
-          <span>${t('auth.have_account')}</span>
-          <a href="/login" data-nav-link>${t('auth.link_login')}</a>
+          <span>${tr('auth.have_account', 'قبلاً ثبت‌نام کردی؟')}</span>
+          <a href="/login" data-nav-link>
+            ${tr('auth.link_login', 'ورود به حساب')}
+          </a>
         </div>
 
       </div>
@@ -84,203 +219,225 @@ export async function RegisterPage() {
   return html;
 }
 
-// ============================================
-// Register Logic
-// ============================================
 function initRegister() {
-  console.log('🔧 initRegister started');
+  const root = document.querySelector('.auth-page');
+  if (!root) return;
+
+  const $ = selector => root.querySelector(selector);
+
+  const phoneStep = $('[data-step="phone"]');
+  const otpStep = $('[data-step="otp"]');
+  const phoneForm = $('[data-phone-form]');
+  const otpForm = $('[data-otp-form]');
+  const footer = $('[data-main-footer]');
+  const msg = $('[data-msg]');
+  const phoneDisplay = $('[data-phone-display]');
+  const resendBtn = $('[data-resend-btn]');
+  const timerEl = $('[data-timer]');
+  const backBtn = $('[data-back-btn]');
 
   let currentPhone = '';
   let currentName = '';
   let currentReferral = '';
   let resendTimer = null;
 
-  const phoneStep = document.querySelector('[data-step="phone"]');
-  const otpStep = document.querySelector('[data-step="otp"]');
-  const phoneForm = document.querySelector('[data-phone-form]');
-  const otpForm = document.querySelector('[data-otp-form]');
-  const phoneDisplay = document.querySelector('[data-phone-display]');
-  const msg = document.querySelector('[data-msg]');
-  const resendBtn = document.querySelector('[data-resend-btn]');
-  const timerEl = document.querySelector('[data-timer]');
-  const backBtn = document.querySelector('[data-back-btn]');
-  const mainFooter = document.querySelector('[data-main-footer]');
+  function showMsg(message = '', type = 'info') {
+    if (!msg) return;
 
-  // ============================================
-  // STEP 1
-  // ============================================
-  phoneForm?.addEventListener('submit', async (e) => {
-    e.preventDefault();
-    console.log('📝 Register form submitted');
+    msg.textContent = message;
+    msg.style.display = message ? 'block' : 'none';
+    msg.style.color =
+      type === 'error' ? '#b42318' :
+      type === 'success' ? '#626a4e' : '#111111';
+  }
 
-    const data = Object.fromEntries(new FormData(phoneForm));
-    const name = (data.name || '').trim();
-    const phone = normalizePhone(data.phone);
-    const referral = (data.referral_code || '').trim().toUpperCase();
-
-    if (!name) {
-      showMsg(t('auth.name_required') || 'نام را وارد کنید', 'error');
-      return;
-    }
-
-    if (!isValidPhone(phone)) {
-      showMsg(t('auth.msg_invalid_phone'), 'error');
-      return;
-    }
-
-    currentPhone = phone;
-    currentName = name;
-    currentReferral = referral;
-
-    const btn = phoneForm.querySelector('[data-submit-btn]');
-    setLoading(btn, true);
-
-    try {
-      const res = await authApi.registerSendCode(name, phone, referral);
-      console.log('📱 Register send code response:', res);
-
-      if (phoneDisplay) phoneDisplay.textContent = phone;
-
-      if (phoneStep) phoneStep.style.display = 'none';
-      if (otpStep) otpStep.style.display = 'block';
-      if (mainFooter) mainFooter.style.display = 'none';
-
-      startResendTimer(60);
-      showMsg('');
-
-      setTimeout(() => otpStep?.querySelector('input[name="code"]')?.focus(), 100);
-    } catch (err) {
-      console.error('❌ Register send code error:', err);
-      showMsg(err.message || t('auth.msg_error_send'), 'error');
-    } finally {
-      setLoading(btn, false);
-    }
-  });
-
-  // ============================================
-  // STEP 2
-  // ============================================
-  otpForm?.addEventListener('submit', async (e) => {
-    e.preventDefault();
-    console.log('🔐 Register OTP submitted');
-
-    const data = Object.fromEntries(new FormData(otpForm));
-
-    if (!data.code || data.code.length < 5) {
-      showMsg(t('auth.msg_otp_incomplete'), 'error');
-      return;
-    }
-
-    const btn = otpForm.querySelector('[data-otp-submit]');
-    setLoading(btn, true);
-
-    try {
-      const res = await authApi.registerVerify(currentPhone, data.code);
-      console.log('✅ Register verify response:', res);
-
-      const token = res?.token || res?.access_token || res?.data?.token || res?.data?.access_token;
-      const user = res?.user || res?.data?.user || { phone: currentPhone, name: currentName };
-
-      if (!token) throw new Error(t('auth.msg_error_verify'));
-
-      setAuth(token, user);
-      showMsg(t('auth.msg_register_success'), 'success');
-
-      setTimeout(() => window.__app?.router?.navigate('/dashboard'), 800);
-    } catch (err) {
-      console.error('❌ Register verify error:', err);
-      showMsg(err.message || t('auth.msg_error_verify'), 'error');
-    } finally {
-      setLoading(btn, false);
-    }
-  });
-
-  // ============================================
-  // ارسال مجدد
-  // ============================================
-  resendBtn?.addEventListener('click', async () => {
-    if (resendBtn.disabled) return;
-    try {
-      await authApi.registerSendCode(currentName, currentPhone, currentReferral);
-      showMsg(t('auth.msg_otp_resent'), 'success');
-      startResendTimer(60);
-    } catch (err) {
-      showMsg(err.message, 'error');
-    }
-  });
-
-  // ============================================
-  // بازگشت
-  // ============================================
-  backBtn?.addEventListener('click', () => {
-    if (otpStep) otpStep.style.display = 'none';
-    if (phoneStep) phoneStep.style.display = 'block';
-    if (mainFooter) mainFooter.style.display = 'flex';
-    if (otpForm) otpForm.reset();
+  function startResendTimer(seconds = 60) {
     if (resendTimer) clearInterval(resendTimer);
-    showMsg('');
-  });
 
-  // ============================================
-  // Helpers
-  // ============================================
-  function startResendTimer(seconds) {
-    if (resendTimer) clearInterval(resendTimer);
     let remaining = seconds;
-    if (resendBtn) {
-      resendBtn.disabled = true;
-      resendBtn.style.opacity = '0.5';
-    }
+
+    resendBtn.disabled = true;
 
     const update = () => {
       if (remaining <= 0) {
         clearInterval(resendTimer);
-        if (resendBtn) {
-          resendBtn.disabled = false;
-          resendBtn.style.opacity = '1';
-        }
-        if (timerEl) timerEl.textContent = '';
+        resendTimer = null;
+        resendBtn.disabled = false;
+        timerEl.textContent = '';
         return;
       }
-      if (timerEl) timerEl.textContent = `(${remaining}s)`;
+
+      timerEl.textContent = `(${remaining}s)`;
       remaining--;
     };
+
     update();
     resendTimer = setInterval(update, 1000);
   }
 
-  function showMsg(text, type = 'info') {
-    if (!msg) return;
-    msg.textContent = text;
-    msg.style.display = text ? 'block' : 'none';
-    msg.style.color = type === 'error' ? '#e74c3c' : type === 'success' ? '#27ae60' : '#666';
+  function showOtpStep() {
+    phoneStep.style.display = 'none';
+    otpStep.style.display = 'block';
+    footer.style.display = 'none';
+
+    phoneDisplay.textContent = currentPhone;
+
+    startResendTimer(60);
+    showMsg();
+
+    setTimeout(() => {
+      otpForm.querySelector('[name="code"]')?.focus();
+    }, 100);
   }
 
-  function setLoading(btn, loading) {
-    if (!btn) return;
-    btn.disabled = loading;
-    if (loading) {
-      btn.dataset.originalText = btn.textContent;
-      btn.textContent = t('auth.loading');
-    } else {
-      btn.textContent = btn.dataset.originalText || btn.textContent;
+  phoneForm?.addEventListener('submit', async event => {
+    event.preventDefault();
+
+    const data = Object.fromEntries(new FormData(phoneForm));
+
+    const name = String(data.name || '').trim();
+    const phone = normalizePhone(data.phone || '');
+    const referral = String(data.referral_code || '')
+      .trim()
+      .toUpperCase();
+
+    if (!name) {
+      showMsg('لطفاً نام خودت رو وارد کن.', 'error');
+      return;
     }
-  }
 
-  function normalizePhone(phone) {
-    const persianDigits = '۰۱۲۳۴۵۶۷۸۹';
-    const arabicDigits = '٠١٢٣٤٥٦٧٨٩';
-    let result = phone.toString();
-    for (let i = 0; i < 10; i++) {
-      result = result.replace(new RegExp(persianDigits[i], 'g'), i);
-      result = result.replace(new RegExp(arabicDigits[i], 'g'), i);
+    if (!validPhone(phone)) {
+      showMsg(
+        tr('auth.msg_invalid_phone', 'شماره موبایل معتبر نیست.'),
+        'error'
+      );
+      return;
     }
-    return result.replace(/\D/g, '');
-  }
 
-  function isValidPhone(phone) {
-    return /^09\d{9}$/.test(phone) || /^989\d{9}$/.test(phone);
-  }
+    const button = $('[data-submit-btn]');
+    setLoading(button, true);
 
-  console.log('✅ initRegister completed');
+    try {
+      await authApi.registerSendCode(
+        name,
+        phone,
+        referral
+      );
+
+      currentName = name;
+      currentPhone = phone;
+      currentReferral = referral;
+
+      showOtpStep();
+    } catch (error) {
+      showMsg(
+        error.message ||
+        tr('auth.msg_error_send', 'ارسال کد با خطا مواجه شد.'),
+        'error'
+      );
+    } finally {
+      setLoading(button, false);
+    }
+  });
+
+  otpForm?.addEventListener('submit', async event => {
+    event.preventDefault();
+
+    const code = normalizeDigits(
+      new FormData(otpForm).get('code') || ''
+    ).trim();
+
+    if (!/^\d{6}$/.test(code)) {
+      showMsg(
+        tr('auth.msg_otp_incomplete', 'کد شش‌رقمی را وارد کن.'),
+        'error'
+      );
+      return;
+    }
+
+    const button = $('[data-otp-submit]');
+    setLoading(button, true);
+
+    try {
+      const res = await authApi.registerVerify(
+        currentPhone,
+        code
+      );
+
+      const token = getToken(res);
+      const user =
+        res?.user || res?.data?.user || {
+          name: currentName,
+          phone: currentPhone
+        };
+
+      if (!token) {
+        throw new Error(
+          tr('auth.msg_error_verify', 'تأیید کد ناموفق بود.')
+        );
+      }
+
+      setAuth(token, user);
+
+      showMsg(
+        tr('auth.msg_register_success', 'ثبت‌نام با موفقیت انجام شد.'),
+        'success'
+      );
+
+      setTimeout(() => {
+        window.__app?.router?.navigate('/dashboard');
+      }, 800);
+    } catch (error) {
+      showMsg(
+        error.message ||
+        tr('auth.msg_error_verify', 'کد تأیید نامعتبر است.'),
+        'error'
+      );
+    } finally {
+      setLoading(button, false);
+    }
+  });
+
+  resendBtn?.addEventListener('click', async () => {
+    if (resendBtn.disabled || !currentPhone) return;
+
+    resendBtn.disabled = true;
+
+    try {
+      await authApi.registerSendCode(
+        currentName,
+        currentPhone,
+        currentReferral
+      );
+
+      showMsg(
+        tr('auth.msg_otp_resent', 'کد جدید ارسال شد.'),
+        'success'
+      );
+
+      startResendTimer(60);
+    } catch (error) {
+      resendBtn.disabled = false;
+      showMsg(error.message || 'خطا در ارسال مجدد کد.', 'error');
+    }
+  });
+
+  backBtn?.addEventListener('click', () => {
+    if (resendTimer) clearInterval(resendTimer);
+    resendTimer = null;
+
+    otpStep.style.display = 'none';
+    phoneStep.style.display = 'block';
+    footer.style.display = 'flex';
+
+    otpForm.reset();
+    showMsg();
+  });
+
+  otpForm?.querySelector('[name="code"]')
+    ?.addEventListener('input', event => {
+      event.target.value = normalizeDigits(
+        event.target.value
+      ).replace(/\D/g, '').slice(0, 6);
+    });
 }

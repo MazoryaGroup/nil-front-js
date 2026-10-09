@@ -1,9 +1,33 @@
+
+import { Layout, initLayout } from '../components/Layout.js';
+import { t, getCurrentLang } from '../code/i18n.js';
+import { messagesApi } from '../code/api.js';
+
+// ============================================
+// Helpers
+// ============================================
+
+function normalizeDigits(value = '') {
+  const fa = '۰۱۲۳۴۵۶۷۸۹';
+  const ar = '٠١٢٣٤٥٦٧٨٩';
+
+  return String(value)
+    .replace(/[۰-۹]/g, char => String(fa.indexOf(char)))
+    .replace(/[٠-٩]/g, char => String(ar.indexOf(char)));
+}
+
+function escapeHtml(value = '') {
+  return String(value ?? '')
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
+
 // ============================================
 // Contact Page
 // ============================================
-import { Layout, initLayout } from '../components/Layout.js';
-import { t, getCurrentLang } from '../code/i18n.js';
-import { apiPost } from '../code/api.js';
 
 export async function ContactPage() {
   const isFa = getCurrentLang() === 'fa';
@@ -13,8 +37,13 @@ export async function ContactPage() {
     <section class="title-section">
       <div class="w-layout-blockcontainer container w-container">
         <div class="title-wrap">
-          <div class="subtitle">${isFa ? 'با ما در تماس باشید' : 'GET IN TOUCH'}</div>
-          <h1>${t('nav.contact')}</h1>
+
+          <div class="subtitle">
+            ${isFa ? 'با ما در تماس باشید' : 'GET IN TOUCH'}
+          </div>
+
+          <h1>${escapeHtml(t('nav.contact'))}</h1>
+
         </div>
       </div>
     </section>
@@ -22,43 +51,55 @@ export async function ContactPage() {
     <!-- CONTACT -->
     <section>
       <div class="w-layout-blockcontainer container w-container">
+
         <div class="contact-wrap">
 
-          <!-- فرم تماس -->
+          <!-- CONTACT FORM -->
           <div class="contact-form-block w-form">
+
             <form class="contact-form" data-contact-form>
+
               <input
                 class="text-field w-input"
-                maxlength="256"
+                maxlength="255"
                 name="first_name"
-                placeholder="${isFa ? 'نام' : 'First name'}*"
+                placeholder="${isFa ? 'نام *' : 'First name *'}"
                 type="text"
+                autocomplete="given-name"
                 required
               />
+
               <input
                 class="text-field w-input"
-                maxlength="256"
+                maxlength="255"
                 name="last_name"
                 placeholder="${isFa ? 'نام خانوادگی' : 'Last name'}"
                 type="text"
+                autocomplete="family-name"
               />
+
               <input
                 class="text-field w-input"
-                maxlength="256"
+                maxlength="255"
                 name="email"
-                placeholder="${isFa ? 'ایمیل' : 'Email'}*"
+                placeholder="${isFa ? 'ایمیل *' : 'Email *'}"
                 type="email"
-                required
+                autocomplete="email"
                 dir="ltr"
+                required
               />
+
               <input
                 class="text-field w-input"
-                maxlength="256"
+                maxlength="20"
                 name="phone"
                 placeholder="${isFa ? 'شماره تلفن' : 'Phone'}"
                 type="tel"
+                autocomplete="tel"
+                inputmode="tel"
                 dir="ltr"
               />
+
               <textarea
                 required
                 placeholder="${isFa ? 'پیام شما *' : 'Your message *'}"
@@ -68,6 +109,7 @@ export async function ContactPage() {
               ></textarea>
 
               <div class="div-block">
+
                 <label class="w-checkbox">
                   <input
                     type="checkbox"
@@ -75,31 +117,51 @@ export async function ContactPage() {
                     required
                     class="w-checkbox-input"
                   />
+
                   <span class="w-form-label">
-                    ${isFa ? 'با' : 'I agree to the'}
-                    <a href="/terms-conditions" class="contact-link" data-nav-link>${isFa ? 'شرایط و قوانین' : 'Terms & Conditions'}</a>
-                    ${isFa ? 'موافقم' : 'of Glomin'}
+                    ${isFa
+                      ? 'با ارسال این فرم، موافقت خود را با بررسی پیام توسط مجموعه NIL اعلام می‌کنم.'
+                      : 'I agree to NIL processing my message to respond to my inquiry.'}
                   </span>
                 </label>
+
                 <input
                   type="submit"
                   class="primary-button w-button"
-                  value="${t('buttons.submit')}"
+                  value="${escapeHtml(t('buttons.submit'))}"
                   data-submit-btn
                 />
+
               </div>
             </form>
 
-            <div class="form-message" data-form-message></div>
+            <div
+              class="contact-form-message"
+              data-form-message
+              role="status"
+              aria-live="polite"
+            ></div>
+
           </div>
 
-          <!-- اطلاعات تماس -->
+          <!-- CONTACT INFORMATION -->
           <div class="contat-content">
-            <p>${isFa ? 'اگه سوالی داری، یا می‌خوای بازخورد بدی، خوشحال می‌شیم بشنویم.' : 'Whether you need support, have inquiries, or want to provide feedback.'}</p>
+
+            <p>
+              ${isFa
+                ? 'سؤال، پیشنهاد یا انتقادی داری؟ پیام خودت رو برامون ارسال کن. خوشحال می‌شیم باهات در ارتباط باشیم.'
+                : 'Have a question or feedback? Send us a message. We would love to hear from you.'}
+            </p>
 
             <div class="contact-inner">
+
               <div class="contact-img">
-                <img src="/img/contact-image.jpg" loading="eager" alt="Contact" class="cover-image" />
+                <img
+                  src="/img/contact-image.jpg"
+                  loading="lazy"
+                  alt="NIL Beauty Contact"
+                  class="cover-image"
+                />
               </div>
 
               <div class="contact-info">
@@ -107,44 +169,45 @@ export async function ContactPage() {
 
                   <div class="contact-block">
                     <div class="contact-icon">
-                      <img src="/img/mail-icon.svg" loading="lazy" alt="Mail" />
+                      <img
+                        src="/img/mail-icon.svg"
+                        loading="lazy"
+                        alt=""
+                      />
                     </div>
+
                     <div>
                       <h6>${isFa ? 'ایمیل' : 'Email'}</h6>
                       <div class="body-small">
-                        ${isFa ? 'برای تماس ایمیل بزنید' : 'To get in touch, email'}
-                        <a href="mailto:info@example.com" class="contact-link">info@example.com</a>
+                        ${isFa
+                          ? 'برای ارتباط با مجموعه از فرم تماس استفاده کنید.'
+                          : 'Use the contact form to reach our team.'}
                       </div>
                     </div>
                   </div>
 
                   <div class="contact-block">
                     <div class="contact-icon">
-                      <img src="/img/phone-icon.svg" loading="lazy" alt="Call" />
+                      <img
+                        src="/img/phone-icon.svg"
+                        loading="lazy"
+                        alt=""
+                      />
                     </div>
-                    <div>
-                      <h6>${isFa ? 'تماس' : 'Contact'}</h6>
-                      <div class="body-small">
-                        ${isFa ? 'ما اینجا هستیم' : "We're here to help"} –
-                        <a href="tel:+(123)456-7890" class="contact-link">+(123) 456-7890</a>
-                      </div>
-                    </div>
-                  </div>
 
-                  <div class="contact-block">
-                    <div class="contact-icon">
-                      <img src="/img/location-icon.svg" loading="lazy" alt="Location" />
-                    </div>
                     <div>
-                      <h6>${isFa ? 'آدرس' : 'Location'}</h6>
+                      <h6>${isFa ? 'پشتیبانی' : 'Support'}</h6>
                       <div class="body-small">
-                        3891 Ranchview Dr. Richardson, California
+                        ${isFa
+                          ? 'پیام خود را ثبت کنید تا تیم مجموعه با شما ارتباط بگیرد.'
+                          : 'Submit your message and our team will get back to you.'}
                       </div>
                     </div>
                   </div>
 
                 </div>
               </div>
+
             </div>
           </div>
 
@@ -154,74 +217,141 @@ export async function ContactPage() {
   `);
 
   setTimeout(() => {
+    const form = document.querySelector('[data-contact-form]');
+
+    if (!form) return;
+
     initLayout();
-    initContactForm(isFa);
+    initContactForm(form, isFa);
   }, 100);
 
   return html;
 }
 
 // ============================================
-// فرم تماس
+// Contact Form
 // ============================================
-function initContactForm(isFa) {
-  const form = document.querySelector('[data-contact-form]');
-  const msg = document.querySelector('[data-form-message]');
-  if (!form) return;
 
-  const submitBtn = form.querySelector('[data-submit-btn]');
+function initContactForm(form, isFa) {
+  const msg = form.parentElement.querySelector(
+    '[data-form-message]'
+  );
 
-  form.addEventListener('submit', async (e) => {
-    e.preventDefault();
+  const submitBtn = form.querySelector(
+    '[data-submit-btn]'
+  );
 
-    // جلوگیری از ارسال دوباره
-    if (submitBtn.disabled) return;
+  let submitting = false;
 
-    const data = Object.fromEntries(new FormData(form));
+  function showMsg(text = '', type = 'info') {
+    if (!msg) return;
 
-    // حذف agree از payload
-    delete data.agree;
+    msg.textContent = text;
+    msg.style.display = text ? 'block' : 'none';
 
-    setLoading(submitBtn, true);
-    showMsg(msg, isFa ? 'در حال ارسال...' : 'Sending...', 'info');
+    msg.classList.remove(
+      'is-success',
+      'is-error',
+      'is-info'
+    );
+
+    msg.classList.add(`is-${type}`);
+  }
+
+  function setLoading(loading) {
+    submitBtn.disabled = loading;
+
+    if (loading) {
+      submitBtn.dataset.originalText = submitBtn.value;
+      submitBtn.value = isFa
+        ? 'لطفاً صبر کنید...'
+        : 'Please wait...';
+    } else {
+      submitBtn.value =
+        submitBtn.dataset.originalText ||
+        (isFa ? 'ارسال پیام' : 'Submit');
+    }
+  }
+
+  form.addEventListener('submit', async event => {
+    event.preventDefault();
+
+    if (submitting) return;
+
+    if (!form.reportValidity()) return;
+
+    const formData = new FormData(form);
+
+    const data = {
+      first_name: String(
+        formData.get('first_name') || ''
+      ).trim(),
+
+      last_name: String(
+        formData.get('last_name') || ''
+      ).trim(),
+
+      email: String(
+        formData.get('email') || ''
+      ).trim(),
+
+      phone: normalizeDigits(
+        String(formData.get('phone') || '').trim()
+      ),
+
+      message: String(
+        formData.get('message') || ''
+      ).trim()
+    };
+
+    if (!data.first_name || !data.email || !data.message) {
+      showMsg(
+        isFa
+          ? 'لطفاً فیلدهای ضروری را تکمیل کنید.'
+          : 'Please complete the required fields.',
+        'error'
+      );
+      return;
+    }
+
+    submitting = true;
+    setLoading(true);
+
+    showMsg(
+      isFa ? 'در حال ارسال پیام...' : 'Sending message...',
+      'info'
+    );
 
     try {
-      const res = await apiPost('/messages', data);
-      console.log('📩 Contact response:', res);
+      await messagesApi.send(data);
+
+      if (!form.isConnected) return;
 
       showMsg(
-        msg,
-        isFa ? 'پیام شما با موفقیت ارسال شد ✓' : 'Your message has been sent ✓',
+        isFa
+          ? 'پیام شما با موفقیت ارسال شد ✓'
+          : 'Your message has been sent successfully ✓',
         'success'
       );
 
       form.reset();
-    } catch (err) {
-      console.error('❌ Contact error:', err);
-      showMsg(msg, err.message || (isFa ? 'خطا در ارسال پیام' : 'Error sending message'), 'error');
+
+    } catch (error) {
+      if (!form.isConnected) return;
+
+      console.error('❌ Contact error:', error);
+
+      showMsg(
+        error.message ||
+          (isFa
+            ? 'خطا در ارسال پیام'
+            : 'Failed to send message'),
+        'error'
+      );
+
     } finally {
-      setLoading(submitBtn, false);
+      submitting = false;
+      setLoading(false);
     }
   });
-
-  // ============================================
-  // Helpers
-  // ============================================
-  function showMsg(el, text, type = 'info') {
-    if (!el) return;
-    el.textContent = text;
-    el.style.display = text ? 'block' : 'none';
-    el.style.color = type === 'error' ? '#e74c3c' : type === 'success' ? '#27ae60' : '#666';
-  }
-
-  function setLoading(btn, loading) {
-    if (!btn) return;
-    btn.disabled = loading;
-    if (loading) {
-      btn.dataset.originalText = btn.value || btn.textContent;
-      btn.value = isFa ? 'لطفاً صبر کنید...' : 'Please wait...';
-    } else {
-      btn.value = btn.dataset.originalText || 'SUBMIT';
-    }
-  }
 }

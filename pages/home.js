@@ -1,401 +1,666 @@
-// ============================================
-// Home Page
-// ============================================
+
 import { Layout, initLayout } from '../components/Layout.js';
 import { t, getCurrentLang } from '../code/i18n.js';
 import { waitingListApi, blogsApi, galleryApi } from '../code/api.js';
 import { formatDate } from '../code/utils.js';
+import '../asset/css/home.css';
 
-// ✅ حذف localhost از URL عکس‌ها
-function fixImageUrl(url) {
-  if (!url) return '';
-  if (url.startsWith('http://localhost')) {
-    return url
-      .replace(/^http:\/\/localhost\/nil-back\/public/, '')
-      .replace(/^http:\/\/localhost/, '');
-  }
-  if (url.startsWith('/')) return url;
-  return '/' + url;
+// ============================================
+// Helpers
+// ============================================
+
+const esc = (value = '') => String(value ?? '')
+  .replace(/&/g, '&amp;')
+  .replace(/</g, '&lt;')
+  .replace(/>/g, '&gt;')
+  .replace(/"/g, '&quot;')
+  .replace(/'/g, '&#39;');
+
+function getItems(response) {
+  if (Array.isArray(response)) return response;
+  if (Array.isArray(response?.data)) return response.data;
+  if (Array.isArray(response?.data?.data)) return response.data.data;
+  return [];
 }
+
+function fixImageUrl(value) {
+  if (typeof value !== 'string' || !value.trim()) return '';
+
+  const raw = value.trim();
+
+  try {
+    if (/^https?:\/\//i.test(raw)) {
+      const url = new URL(raw);
+
+      if (
+        ['localhost', '127.0.0.1'].includes(url.hostname) &&
+        !['localhost', '127.0.0.1'].includes(location.hostname)
+      ) {
+        return '';
+      }
+
+      return url.href;
+    }
+
+    if (raw.startsWith('//') || /^[a-z][a-z0-9+.-]*:/i.test(raw)) {
+      return '';
+    }
+
+    const path = '/' + raw.replace(/^\/+/, '');
+    const apiOrigin = new URL(
+      import.meta.env.VITE_API_URL || '/api',
+      location.origin
+    ).origin;
+
+    const origin = /^\/(storage|uploads)\//.test(path)
+      ? apiOrigin
+      : location.origin;
+
+    return new URL(path, origin).href;
+  } catch {
+    return '';
+  }
+}
+
+function imageMarkup(value, alt = '', eager = false) {
+  const src = fixImageUrl(value);
+
+  if (!src) {
+    return '<div class="nil-image-placeholder">NIL</div>';
+  }
+
+  return `
+    <img
+      src="${esc(src)}"
+      alt="${esc(alt)}"
+      loading="${eager ? 'eager' : 'lazy'}"
+      class="cover-image"
+      data-home-image
+    />
+  `;
+}
+
+function bindImageFallbacks(container) {
+  container.querySelectorAll('[data-home-image]').forEach(img => {
+    const fallback = () => {
+      if (!img.isConnected) return;
+
+      const placeholder = document.createElement('div');
+      placeholder.className = 'nil-image-placeholder';
+      placeholder.textContent = 'NIL';
+      img.replaceWith(placeholder);
+    };
+
+    img.addEventListener('error', fallback, { once: true });
+
+    if (img.complete && !img.naturalWidth) fallback();
+  });
+}
+
+function dateLabel(value, isFa) {
+  if (!value) return '';
+
+  try {
+    return esc(formatDate(value, isFa));
+  } catch {
+    return '';
+  }
+}
+
+// ============================================
+// Home Page
+// ============================================
 
 export async function HomePage() {
   const isFa = getCurrentLang() === 'fa';
 
   const html = Layout(`
-    <!-- HERO -->
-    <div class="hero">
-      <section class="hero-section">
-        <div class="w-layout-blockcontainer container w-container">
-          <div class="hero-wrap">
-            <div class="hero-left">
-              <div class="hero-avatar"></div>
-              <div class="hero-middle">
-                <img src="/img/Hero Left.jpg" loading="eager" alt="Hero Left" class="cover-image" />
+    <main class="nil-home">
+
+      <!-- HERO -->
+      <div class="hero">
+        <section class="hero-section">
+          <div class="w-layout-blockcontainer container w-container">
+            <div class="hero-wrap">
+
+              <div class="hero-left">
+                <div class="hero-avatar"></div>
+
+                <div class="hero-middle">
+                  <img
+                    src="/img/Hero Left.jpg"
+                    loading="eager"
+                    alt="NIL Beauty"
+                    class="cover-image"
+                  />
+                </div>
+
+                <p class="line-height-150 capitalize">
+                  ${esc(t('hero.tagline'))}
+                </p>
               </div>
-              <p class="line-height-150 capitalize">${t('hero.tagline')}</p>
-            </div>
-            <div class="hero-right">
-              <div class="hero-image">
-                <img src="/img/Hero Center.jpg" loading="eager" alt="Hero Center" class="cover-image" />
-              </div>
-              <div class="hero-content">
-                <div class="hero-top">
-                  <div class="hero-info">
-                    <h2 class="color-white">${t('hero.title')}</h2>
-                    <p class="line-height-150">${t('hero.description')}</p>
+
+              <div class="hero-right">
+
+                <div class="hero-image">
+                  <img
+                    src="/img/Hero Center.jpg"
+                    loading="eager"
+                    fetchpriority="high"
+                    alt="NIL Beauty Salon"
+                    class="cover-image"
+                  />
+                </div>
+
+                <div class="hero-content">
+                  <div class="hero-top">
+
+                    <div class="hero-info">
+                      <h2 class="color-white">
+                        ${esc(t('hero.title'))}
+                      </h2>
+
+                      <p class="line-height-150">
+                        ${esc(t('hero.description'))}
+                      </p>
+                    </div>
+
+                    <a
+                      href="/login"
+                      data-nav-link
+                      class="hero-btn w-button"
+                    >
+                      ${isFa ? 'رزرو نوبت' : 'Book Now'}
+                      <span aria-hidden="true">↗</span>
+                    </a>
+
                   </div>
-                  <a href="/login" class="hero-btn w-button">${t('hero.shop_now')}</a>
+
+                  <div class="hero-img">
+                    <img
+                      src="/img/Hero Right.jpg"
+                      loading="eager"
+                      alt="NIL Beauty Services"
+                      class="cover-image"
+                    />
+                  </div>
                 </div>
-                <div class="hero-img">
-                  <img src="/img/Hero Right.jpg" loading="eager" alt="Hero Right" class="cover-image" />
-                </div>
+
               </div>
             </div>
+          </div>
+        </section>
+      </div>
+
+      <!-- CATEGORIES -->
+      <section class="section nil-home-categories">
+        <div class="w-layout-blockcontainer container w-container">
+
+          <div class="section-title-wrap">
+            <div class="title-wrap">
+              <div class="subtitle">
+                ${esc(t('sections.explore'))}
+              </div>
+
+              <h2>${esc(t('sections.categories'))}</h2>
+            </div>
+          </div>
+
+          <div class="category-wrap" data-categories-wrap>
+            <div class="loading-placeholder">
+              ${esc(t('common.loading'))}
+            </div>
+          </div>
+
+        </div>
+      </section>
+
+      <!-- ABOUT -->
+      <section class="nil-home-about">
+        <div class="w-layout-blockcontainer container w-container">
+
+          <div class="about-block">
+
+            <div class="about-img">
+              <img
+                src="/img/about-img.jpg"
+                loading="lazy"
+                alt="About NIL"
+                class="cover-image"
+              />
+            </div>
+
+            <div class="about-data">
+              <div class="about-top">
+
+                <h2 class="about-title">
+                  ${esc(t('about.title'))}
+                  <br>
+                  ${esc(t('about.title_secondary'))}
+                </h2>
+
+                <p class="mx-medium">
+                  ${esc(t('about.description'))}
+                </p>
+
+                <div class="about-btn">
+                  <a
+                    href="/about"
+                    data-nav-link
+                    class="primary-button large w-button"
+                  >
+                    ${isFa ? 'درباره نیل' : 'About NIL'}
+                  </a>
+                </div>
+
+              </div>
+            </div>
+
+            <div class="about-right">
+              <img
+                src="/img/about-right.jpg"
+                loading="lazy"
+                alt="NIL Salon"
+                class="cover-image"
+              />
+            </div>
+
           </div>
         </div>
       </section>
-    </div>
 
-    <!-- CATEGORIES — از Gallery API -->
-    <section class="section">
-      <div class="w-layout-blockcontainer container w-container">
-        <div class="section-title-wrap">
-          <div class="title-wrap">
-            <div class="subtitle">${t('sections.explore')}</div>
-            <h2>${t('sections.categories')}</h2>
-          </div>
-        </div>
-        <div class="category-wrap" data-categories-wrap>
-          <div class="loading-placeholder">${t('common.loading')}</div>
-        </div>
-      </div>
-    </section>
+      <!-- BLOG -->
+      <section class="section nil-home-blogs">
+        <div class="w-layout-blockcontainer container w-container">
 
-    <!-- ABOUT BLOCK -->
-    <section>
-      <div class="w-layout-blockcontainer container w-container">
-        <div class="about-block">
-          <div class="about-img">
-            <img src="/img/about-img.jpg" loading="lazy" alt="About" class="cover-image" />
-          </div>
-          <div class="about-data">
-            <div class="about-top">
-              <h1 class="about-title">Your ultimate destination for premium beauty <br>products</h1>
-              <p class="mx-medium">Where your beauty journey begins. At Beauty Bliss, we believe that every individual deserves to feel confident and radiant.</p>
-              <div class="about-btn">
-                <a href="/about" class="primary-button large w-button" data-nav-link>${t('buttons.about_glomin')}</a>
-              </div>
-            </div>
-          </div>
-          <div class="about-right">
-            <img src="/img/about-right.jpg" loading="lazy" alt="About Right" class="cover-image" />
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- BLOG — از API -->
-    <section class="section">
-      <div class="w-layout-blockcontainer container w-container">
-        <div>
           <div class="section-title-wrap">
             <div class="title-wrap">
-              <div class="subtitle">${t('sections.news')}</div>
-              <h2>${t('sections.latest_articles')}</h2>
+              <div class="subtitle">
+                ${esc(t('sections.news'))}
+              </div>
+
+              <h2>
+                ${esc(t('sections.latest_articles'))}
+              </h2>
             </div>
+
+            <a
+              href="/blog"
+              data-nav-link
+              class="nil-home-more"
+            >
+              ${isFa ? 'همه مقالات' : 'All Articles'}
+              <span aria-hidden="true">↗</span>
+            </a>
           </div>
+
           <div class="w-dyn-list">
-            <div role="list" class="blog-list w-dyn-items" data-blog-list>
-              <div class="loading-placeholder">${t('common.loading')}</div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- CTA -->
-    <section class="section to-top">
-      <div class="w-layout-blockcontainer container w-container">
-        <div class="cta">
-          <div class="fill-block">
-            <div class="cta-img">
-              <img src="/img/cta-image.jpg" loading="lazy" alt="CTA" class="cover-image" />
-            </div>
-          </div>
-          <div class="fill-block">
-            <div class="cta-content">
-              <div>
-                <h3 class="cta-title">${t('cta.title')}</h3>
-                <p class="body-small">${t('cta.free_shipping')}</p>
+            <div
+              role="list"
+              class="blog-list w-dyn-items"
+              data-blog-list
+            >
+              <div class="loading-placeholder">
+                ${esc(t('common.loading'))}
               </div>
-              <div class="cta-form-block w-form">
-                <div class="cta-form" data-cta-form>
-                  <input
-                    class="cta-field w-input"
-                    name="email"
-                    placeholder="${t('forms.email')}"
-                    type="email"
-                    dir="ltr"
-                    data-cta-email
-                  />
-                  <button
-                    type="button"
-                    class="cta-btn w-button"
-                    data-cta-submit
-                  >${t('buttons.subscribe')}</button>
+            </div>
+          </div>
+
+        </div>
+      </section>
+
+      <!-- CTA -->
+      <section class="section to-top nil-home-cta">
+        <div class="w-layout-blockcontainer container w-container">
+
+          <div class="cta">
+
+            <div class="fill-block">
+              <div class="cta-img">
+                <img
+                  src="/img/cta-image.jpg"
+                  loading="lazy"
+                  alt="NIL Beauty"
+                  class="cover-image"
+                />
+              </div>
+            </div>
+
+            <div class="fill-block">
+              <div class="cta-content">
+
+                <div>
+                  <h3 class="cta-title">
+                    ${esc(t('cta.title'))}
+                  </h3>
+
+                  <p class="body-small">
+                    ${isFa
+                      ? 'از تازه‌ترین اخبار و پیشنهادهای نیل باخبر شو.'
+                      : 'Discover the latest NIL news and offers.'}
+                  </p>
                 </div>
-                <div class="form-message" data-cta-msg></div>
+
+                <div class="cta-form-block w-form">
+
+                  <form class="cta-form" data-cta-form>
+
+                    <input
+                      class="cta-field w-input"
+                      type="email"
+                      name="email"
+                      dir="ltr"
+                      maxlength="255"
+                      autocomplete="email"
+                      placeholder="${esc(t('forms.email'))}"
+                      aria-label="Email"
+                      required
+                      data-cta-email
+                    />
+
+                    <button
+                      type="submit"
+                      class="cta-btn w-button"
+                      data-cta-submit
+                    >
+                      ${esc(t('buttons.subscribe'))}
+                    </button>
+
+                  </form>
+
+                  <div
+                    class="form-message nil-cta-message"
+                    data-cta-msg
+                    role="status"
+                    aria-live="polite"
+                    hidden
+                  ></div>
+
+                </div>
+
               </div>
             </div>
+
           </div>
         </div>
-      </div>
-    </section>
+      </section>
 
-   
+    </main>
   `);
 
   setTimeout(() => {
+    const root = document.querySelector('.nil-home');
+    if (!root) return;
+
     initLayout();
-    loadCategories(isFa);
-    loadBlogs(isFa);
-    loadGallery();
-    initCtaForm(isFa);
+    loadCategories(root, isFa);
+    loadBlogs(root, isFa);
+    initCtaForm(root, isFa);
   }, 100);
 
   return html;
 }
 
 // ============================================
-// دسته‌بندی‌ها — از Gallery API
+// Categories
 // ============================================
-async function loadCategories(isFa) {
-  const container = document.querySelector('[data-categories-wrap]');
+
+async function loadCategories(root, isFa) {
+  const container = root.querySelector('[data-categories-wrap]');
   if (!container) return;
 
   try {
-    const res = await galleryApi.categories();
-    console.log('📁 Categories response:', res);
+    const response = await galleryApi.categories();
 
-    const categories = res.data || [];
+    if (!container.isConnected) return;
 
-    if (categories.length === 0) {
-      container.innerHTML = `<p>${isFa ? 'دسته‌ای موجود نیست' : 'No categories'}</p>`;
+    const categories = getItems(response);
+
+    if (!categories.length) {
+      container.innerHTML = `
+        <p class="nil-home-empty">
+          ${isFa ? 'دسته‌بندی موجود نیست' : 'No categories available'}
+        </p>
+      `;
       return;
     }
 
     const feature = categories[0];
     const others = categories.slice(1);
-    const featureImage = fixImageUrl(feature.image);
+
+    const cardHref = category =>
+      `/gallery?category=${encodeURIComponent(category.id)}`;
 
     container.innerHTML = `
       <div class="category-left w-dyn-list">
         <div role="list" class="categories-wrap w-dyn-items">
+
           <div role="listitem" class="w-dyn-item">
-            <a href="/gallery?category=${feature.id}" class="feature-category w-inline-block" data-nav-link>
-              <div class="category-text">${feature.name}</div>
-              ${featureImage ? `
-                <img src="${featureImage}" loading="eager" alt="${feature.name}" class="cover-image" />
-              ` : `
-                <div class="category-placeholder feature-placeholder">${isFa ? 'مشاهده' : 'View'}</div>
-              `}
+            <a
+              href="${cardHref(feature)}"
+              class="feature-category w-inline-block"
+              data-nav-link
+            >
+              <div class="category-text">
+                ${esc(feature.name)}
+              </div>
+
+              ${imageMarkup(feature.image, feature.name, true)}
             </a>
           </div>
+
         </div>
       </div>
+
       <div class="category-right w-dyn-list">
         <div role="list" class="categories-wrap w-dyn-items">
-          ${others.map(cat => {
-            const img = fixImageUrl(cat.image);
-            return `
-              <div role="listitem" class="d-flex w-dyn-item">
-                <a href="/gallery?category=${cat.id}" class="category-card w-inline-block" data-nav-link>
-                  ${img ? `
-                    <img src="${img}" loading="eager" alt="${cat.name}" class="cover-image" />
-                  ` : `
-                    <div class="category-placeholder">${isFa ? 'مشاهده' : 'View'}</div>
-                  `}
-                  <div class="category-text">${cat.name}</div>
-                </a>
-              </div>
-            `;
-          }).join('')}
+
+          ${others.map(category => `
+            <div role="listitem" class="d-flex w-dyn-item">
+              <a
+                href="${cardHref(category)}"
+                class="category-card w-inline-block"
+                data-nav-link
+              >
+                ${imageMarkup(category.image, category.name)}
+
+                <div class="category-text">
+                  ${esc(category.name)}
+                </div>
+              </a>
+            </div>
+          `).join('')}
+
         </div>
       </div>
     `;
 
-  } catch (err) {
-    console.error('❌ Categories error:', err);
-    container.innerHTML = `<p class="text-danger">${isFa ? 'خطا در بارگذاری دسته‌ها' : 'Failed to load categories'}</p>`;
+    bindImageFallbacks(container);
+
+  } catch (error) {
+    if (!container.isConnected) return;
+
+    console.error('Home categories:', error);
+
+    container.innerHTML = `
+      <p class="nil-home-error">
+        ${isFa
+          ? 'خطا در بارگذاری دسته‌بندی‌ها'
+          : 'Failed to load categories'}
+      </p>
+    `;
   }
 }
 
 // ============================================
-// بلاگ‌ها — از API
+// Latest Blogs
 // ============================================
-async function loadBlogs(isFa) {
-  const container = document.querySelector('[data-blog-list]');
+
+async function loadBlogs(root, isFa) {
+  const container = root.querySelector('[data-blog-list]');
   if (!container) return;
 
   try {
-    const res = await blogsApi.list({ lang: isFa ? 'fa' : 'en' });
-    console.log('📝 Blogs response:', res);
+    const response = await blogsApi.list({
+      lang: isFa ? 'fa' : 'en'
+    });
 
-    const blogs = (res.data || []).slice(0, 3);
+    if (!container.isConnected) return;
 
-    if (blogs.length === 0) {
-      container.innerHTML = `<p>${isFa ? 'مقاله‌ای موجود نیست' : 'No blogs'}</p>`;
+    const blogs = getItems(response).slice(0, 3);
+
+    if (!blogs.length) {
+      container.innerHTML = `
+        <p class="nil-home-empty">
+          ${isFa ? 'مقاله‌ای موجود نیست' : 'No articles available'}
+        </p>
+      `;
       return;
     }
 
-    container.innerHTML = blogs.map(b => {
-      const image = fixImageUrl(b.image_1);
-      const title = b.title_1 || 'Untitled';
+    container.innerHTML = blogs.map(blog => {
+      const title = blog.title_1 ||
+        (isFa ? 'بدون عنوان' : 'Untitled');
+
+      const author = typeof blog.author === 'string'
+        ? blog.author
+        : blog.author?.name || 'NIL';
+
+      const date = dateLabel(blog.date, isFa);
 
       return `
         <div role="listitem" class="d-flex w-dyn-item">
-          <a href="/blog/${b.id}" class="blog-card w-inline-block" data-nav-link>
+
+          <a
+            href="/blog/${encodeURIComponent(blog.id)}"
+            class="blog-card w-inline-block"
+            data-nav-link
+          >
             <div class="blog-thumb">
-              <img src="${image}" loading="lazy" alt="${title}" class="cover-image" />
+              ${imageMarkup(blog.image_1, title)}
             </div>
+
             <div class="blog-content">
+
               <div class="blog-data">
-                <div class="blog-category">${b.author || 'Glomin'}</div>
-                <div class="body-small">${formatDate(b.date, isFa)}</div>
+                <div class="blog-category">
+                  ${esc(author)}
+                </div>
+
+                <div class="body-small">
+                  ${date}
+                </div>
               </div>
-              <h3 class="blog-title">${title}</h3>
+
+              <h3 class="blog-title">
+                ${esc(title)}
+              </h3>
+
             </div>
           </a>
+
         </div>
       `;
     }).join('');
 
-  } catch (err) {
-    console.error('❌ Blogs error:', err);
-    container.innerHTML = `<p class="text-danger">${isFa ? 'خطا در بارگذاری مقالات' : 'Failed to load blogs'}</p>`;
+    bindImageFallbacks(container);
+
+  } catch (error) {
+    if (!container.isConnected) return;
+
+    console.error('Home blogs:', error);
+
+    container.innerHTML = `
+      <p class="nil-home-error">
+        ${isFa
+          ? 'خطا در بارگذاری مقالات'
+          : 'Failed to load articles'}
+      </p>
+    `;
   }
 }
 
 // ============================================
-// گالری — از API (فقط ۵ تای آخر)
+// Newsletter
 // ============================================
-async function loadGallery() {
-  const container = document.querySelector('[data-gallery]');
-  if (!container) return;
 
-  try {
-    const res = await galleryApi.list();
-    console.log('🖼️ Gallery response:', res);
+function initCtaForm(root, isFa) {
+  const form = root.querySelector('[data-cta-form]');
+  const emailInput = root.querySelector('[data-cta-email]');
+  const submitBtn = root.querySelector('[data-cta-submit]');
+  const message = root.querySelector('[data-cta-msg]');
 
-    const items = res.data || [];
+  if (!form || !emailInput || !submitBtn) return;
+  if (form.dataset.initialized === 'true') return;
 
-    if (items.length === 0) {
-      container.innerHTML = '';
-      return;
-    }
+  form.dataset.initialized = 'true';
 
-    // ✅ فقط ۵ تای آخر
-    const lastFive = items.slice(-5);
+  let submitting = false;
 
-    const imagesHTML = lastFive.map(item => {
-      const image = fixImageUrl(item.image);
-      return `
-        <a href="/gallery" class="gallery-link w-inline-block" data-nav-link>
-          <img src="${image}" loading="lazy" alt="${item.title || ''}" class="cover-image" />
-          <div class="gallery-overlay">
-            <div class="social-link">
-              <img src="/img/ic-insta.svg" loading="lazy" alt="Instagram" />
-            </div>
-          </div>
-        </a>
-      `;
-    }).join('');
+  function showMessage(text, state = 'info') {
+    if (!message) return;
 
-    const wrapHTML = `<div class="gallery-wrap">${imagesHTML}</div>`;
-    container.innerHTML = wrapHTML.repeat(4);
-
-  } catch (err) {
-    console.error('❌ Gallery error:', err);
-    container.innerHTML = '';
+    message.textContent = text;
+    message.hidden = !text;
+    message.dataset.state = state;
   }
-}
 
-// ============================================
-// CTA — فرم newsletter
-// ============================================
-function initCtaForm(isFa) {
-  const wrapper = document.querySelector('[data-cta-form]');
-  if (!wrapper || wrapper.dataset.initialized === 'true') return;
+  form.addEventListener('submit', async event => {
+    event.preventDefault();
 
-  wrapper.dataset.initialized = 'true';
+    if (submitting || !form.reportValidity()) return;
 
-  const submitBtn = wrapper.querySelector('[data-cta-submit]');
-  const emailInput = wrapper.querySelector('[data-cta-email]');
-  const msg = document.querySelector('[data-cta-msg]');
+    const email = emailInput.value.trim();
 
-  if (!submitBtn || !emailInput) return;
-
-  submitBtn.addEventListener('click', async (e) => {
-    e.preventDefault();
-    e.stopPropagation();
-
-    if (submitBtn.disabled) return;
-
-    const email = (emailInput.value || '').trim();
-
-    if (!email || !isValidEmail(email)) {
-      showMsg(msg, isFa ? 'ایمیل معتبر وارد کنید' : 'Please enter a valid email', 'error');
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      showMessage(
+        isFa ? 'ایمیل معتبر وارد کنید' : 'Enter a valid email',
+        'error'
+      );
       return;
     }
 
-    setLoading(submitBtn, true);
-    showMsg(msg, isFa ? 'در حال ارسال...' : 'Sending...', 'info');
+    submitting = true;
+    submitBtn.disabled = true;
+
+    const originalText = submitBtn.textContent;
+
+    submitBtn.textContent = isFa
+      ? 'در حال ثبت...'
+      : 'Submitting...';
+
+    showMessage(
+      isFa ? 'در حال ارسال...' : 'Sending...',
+      'info'
+    );
 
     try {
-      const res = await waitingListApi.subscribe(email);
-      console.log('📧 CTA subscribe response:', res);
+      await waitingListApi.subscribe(email);
 
-      showMsg(
-        msg,
-        isFa ? 'ایمیل شما ثبت شد ✓' : 'Your email has been registered ✓',
+      if (!form.isConnected) return;
+
+      showMessage(
+        isFa ? 'ایمیل شما ثبت شد ✓' : 'Email registered ✓',
         'success'
       );
 
-      emailInput.value = '';
-    } catch (err) {
-      console.error('❌ CTA subscribe error:', err);
-      showMsg(msg, err.message || (isFa ? 'خطا در ثبت ایمیل' : 'Failed to subscribe'), 'error');
+      form.reset();
+
+    } catch (error) {
+      if (!form.isConnected) return;
+
+      console.error('Newsletter:', error);
+
+      showMessage(
+        error.message ||
+          (isFa ? 'خطا در ثبت ایمیل' : 'Subscription failed'),
+        'error'
+      );
+
     } finally {
-      setLoading(submitBtn, false);
+      submitting = false;
+      submitBtn.disabled = false;
+      submitBtn.textContent = originalText;
     }
   });
-
-  emailInput.addEventListener('keydown', (e) => {
-    if (e.key === 'Enter') {
-      e.preventDefault();
-      submitBtn.click();
-    }
-  });
-
-  function isValidEmail(email) {
-    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
-  }
-
-  function showMsg(el, text, type = 'info') {
-    if (!el) return;
-    el.textContent = text;
-    el.style.display = text ? 'block' : 'none';
-    el.style.color = type === 'error' ? '#e74c3c' : type === 'success' ? '#27ae60' : '#666';
-  }
-
-  function setLoading(btn, loading) {
-    if (!btn) return;
-    btn.disabled = loading;
-    if (loading) {
-      btn.dataset.originalText = btn.textContent;
-      btn.textContent = '...';
-    } else {
-      btn.textContent = btn.dataset.originalText || 'SUBSCRIBE';
-    }
-  }
 }

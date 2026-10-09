@@ -28,8 +28,8 @@ export async function AboutPage() {
           </div>
           <div class="about-content">
             <div class="about-top">
-              <h3>Welcome to glomin – your ultimate destination for premium beauty products</h3>
-              <p>At Glomin, we are passionate about helping you look and feel your best. Founded with a mission to deliver high-quality beauty products that cater to all your skincare, makeup, and fragrance needs, we pride ourselves on offering a curated selection of the finest products in the beauty industry.</p>
+              <h3>${t('about_us.title')}</h3>
+              <p>${t('about_us.description')}</p>
             </div>
             <div class="about-bottom">
               <div class="about-image">
@@ -39,24 +39,24 @@ export async function AboutPage() {
                 <div class="about-inner">
                   <img src="/img/ic-satisfaction.svg" loading="lazy" alt="Satisfaction" class="about-icon" />
                   <div>
-                    <div class="about-head">Customer Satisfaction</div>
-                    <div>Trusted by over 92% satisfied customers</div>
+                    <div class="about-head">${t('about_us.customers')}</div>
+                    <div>${t('about_us.customers_description')}</div>
                   </div>
                 </div>
                 <div class="about-line"></div>
                 <div class="about-inner">
                   <img src="/img/ic-awards.svg" loading="lazy" alt="Awards" class="about-icon" />
                   <div>
-                    <div class="about-head">Awards and Recognitions</div>
-                    <div>Recipient of 30+ industry award</div>
+                    <div class="about-head">${t('about_us.awards')}</div>
+                    <div>${t('about_us.awards_description')}</div>
                   </div>
                 </div>
                 <div class="about-line"></div>
                 <div class="about-inner">
                   <img src="/img/ic-global.svg" loading="lazy" alt="Global" class="about-icon" />
                   <div>
-                    <div class="about-head">Global Reach</div>
-                    <div>Available in 20+ countries</div>
+                    <div class="about-head">${t('about_us.global_reach')}</div>
+                    <div>${t('about_us.global_reach_description')}</div>
                   </div>
                 </div>
               </div>
@@ -82,21 +82,21 @@ export async function AboutPage() {
           <div class="vision-content green">
             <div class="vision-text">
               <div class="vision-dot"></div>
-              <div>Innovation</div>
+              <div>${t('about_us.Innovation')}</div>
             </div>
             <div class="vision-bottom">
               <div class="vision-divider"></div>
-              <p>At Glomin, innovation is at the core of everything we do. we continuously strive to push the boundaries of beauty and skincare through cutting-edge research and advanced technology.</p>
+              <p>${t('about_us.Innovation_description')}</p>
             </div>
           </div>
           <div class="vision-content brown">
             <div class="vision-text">
               <div class="vision-dot"></div>
-              <div>Empowering Beauty</div>
+              <div>${t('about_us.Empowering Beauty')}</div>
             </div>
             <div class="vision-bottom">
               <div class="vision-divider"></div>
-              <p>We believe that beauty is about more than just appearance; it's about confidence, self-care, and embracing your unique beauty. Our mission is to empower you to feel beautiful.</p>
+              <p>${t('about_us.Empowering Beauty_description')}</p>
             </div>
           </div>
         </div>
@@ -109,10 +109,10 @@ export async function AboutPage() {
         <div class="data-block">
           <div class="fill-block">
             <div class="data-content">
-              <h3>Glomin's commitment to quality and confidence</h3>
+              <h3>${t('about_us.commitment')}</h3>
               <div class="data-paragraph">
-                <p>At Glomin, our mission is to empower individuals to embrace their unique beauty with confidence. We are dedicated to delivering premium beauty products that combine luxury with performance, ensuring that every product.</p>
-                <p>Our commitment to using the finest ingredients and innovative formulas reflects our passion for quality and effectiveness.</p>
+                <p>${t('about_us.commitment_description')}</p>
+                <p>${t('about_us.commitment_description2')}</p>
               </div>
             </div>
           </div>

@@ -2,54 +2,55 @@
   "nav": {
     "home": "خانه",
     "about": "درباره ما",
-    "blogs": "بلاگ",
+    "blogs": "وبلاگ‌ها",
     "contact": "تماس",
     "search_placeholder": "اینجا جستجو کنید...",
-    "dashboard": "داشبورد"
+    "dashboard": "داشبورد",
+    "gallery": "گالری"
   },
   "hero": {
     "tagline": "زیبایی شما، اشتیاق ما",
     "title": "آرامش زیبایی",
-    "description": "پوست خود را با نهایت لذت زیبایی نوازش دهید.",
-    "shop_now": "همین حالا بخرید"
+    "description": "پوست خود را با نهایت لذت زیبایی پرورش دهید.",
+    "shop_now": "تخصیص زمان"
   },
   "sections": {
-    "explore": "کاوش",
-    "categories": "دسته‌بندی‌ها",
+    "explore": "کاوش کنید",
+    "categories": "دسته‌بندی‌های ما",
     "news": "اخبار",
     "latest_articles": "آخرین مقالات",
     "our_story": "داستان ما",
     "about_us": "درباره ما",
     "our_purpose": "هدف ما",
-    "vision_mission": "چشم‌انداز و ماموریت",
+    "vision_mission": "چشم‌انداز و ماموریت ما",
     "experts": "متخصصان",
-    "meet_team": "تیم ما را بشناسید",
+    "meet_team": "با تیم ما آشنا شوید",
     "faqs": "سوالات متداول",
     "testimonials": "نظرات",
-    "clients_review": "نظر مشتریان",
+    "clients_review": "نظرات مشتریان",
     "related": "مرتبط",
-    "similar_posts": "مقالات مشابه"
+    "similar_posts": "مطالب مشابه"
   },
   "categories": {
-    "skin_care": "مراقبت پوست",
-    "hair_care": "مراقبت مو",
-    "makeup": "آرایشی",
-    "fragrances": "عطر",
-    "beauty_tools": "ابزار زیبایی"
+    "skin_care": "مراقبت از پوست",
+    "hair_care": "مراقبت از مو",
+    "makeup": "آرایش",
+    "fragrances": "عطرها",
+    "beauty_tools": "ابزارهای زیبایی"
   },
   "buttons": {
-    "shop_now": "خرید کنید",
+    "shop_now": "همین حالا خرید کنید",
     "read_more": "بیشتر بخوانید",
     "subscribe": "عضویت",
-    "submit_now": "ارسال کنید",
+    "submit_now": "الان ارسال کنید",
     "about_glomin": "درباره گلومین",
     "sign_up": "ثبت‌نام",
     "log_in": "ورود",
     "place_order": "ثبت سفارش"
   },
   "cta": {
-    "title": "روتین پوستی خود را با گلومین متحول کنید. همین حالا برای پیشنهادات ویژه خرید کنید!",
-    "free_shipping": "*ارسال رایگان"
+    "title": "روتین مراقبت از پوست خود را با گلومین متحول کنید. همین حالا برای پیشنهادات ویژه خرید کنید!",
+    "free_shipping": "*ارسال رایگان دریافت کنید"
   },
   "footer": {
     "pages": "صفحات",
@@ -57,11 +58,11 @@
     "utility": "ابزارها",
     "home": "خانه",
     "about": "درباره ما",
-    "blogs": "بلاگ",
+    "blogs": "وبلاگ‌ها",
     "faq": "سوالات متداول",
     "contact": "تماس با ما",
     "login": "ورود",
-    "newsletter_text": "برای دریافت به‌روزرسانی‌های ویژه با ما در ارتباط باشید!",
+    "newsletter_text": "برای دریافت به‌روزرسانی‌های اختصاصی با ما در ارتباط باشید!",
     "email_placeholder": "آدرس ایمیل",
     "rights": "تمامی حقوق محفوظ است"
   },
@@ -69,51 +70,69 @@
     "email": "آدرس ایمیل",
     "first_name": "نام",
     "last_name": "نام خانوادگی",
-    "phone": "شماره تماس",
+    "phone": "شماره تلفن",
     "message": "پیام خود را اینجا بنویسید",
     "password": "رمز عبور",
     "submit": "ارسال"
+  },
+  "common": {
+    "optional": "اختیاری",
+    "loading": "در حال بارگذاری..."
+   
   },
   "auth": {
     "login_title": "ورود",
     "login_subtitle": "با شماره تلفن یا ایمیل وارد شوید",
     "register_title": "ثبت‌نام",
-    "register_subtitle": "شماره تلفن خود را وارد کنید تا کد تایید برایتان ارسال شود",
-    "tab_phone": "شماره تلفن",
+    "register_subtitle": "شماره تلفن خود را وارد کنید تا کد تأیید دریافت کنید",
+    "tab_phone": "تلفن",
     "tab_email": "ایمیل",
     "phone_label": "شماره تلفن",
-    "phone_placeholder": "0912 345 6789",
+    "phone_placeholder": "۰۹۱۲ ۳۴۵ ۶۷۸۹",
     "email_label": "ایمیل",
     "email_placeholder": "you@example.com",
     "password_label": "رمز عبور",
     "password_placeholder": "••••••••",
-    "name_label": "نام و نام خانوادگی",
+    "name_label": "نام کامل",
     "name_placeholder": "نام کامل",
-    "otp_label": "کد تایید",
+    "otp_label": "کد تأیید",
     "otp_placeholder": "- - - - -",
     "otp_title_login": "کد ورود",
-    "otp_title_register": "کد تایید",
+    "otp_title_register": "کد تأیید",
     "otp_subtitle": "کد ارسال شده به {phone} را وارد کنید",
     "btn_send_otp_login": "دریافت کد ورود",
-    "btn_send_otp_register": "دریافت کد تایید",
+    "btn_send_otp_register": "دریافت کد تأیید",
     "btn_verify_login": "ورود",
-    "btn_verify_register": "تایید و ثبت‌نام",
+    "btn_verify_register": "تأیید و ثبت‌نام",
     "btn_login": "ورود",
     "btn_resend": "ارسال مجدد کد",
-    "btn_back": "← بازگشت",
-    "no_account": "حساب ندارید؟",
-    "have_account": "قبلاً ثبت‌نام کرده‌اید؟",
+    "btn_back": "→ بازگشت",
+    "no_account": "حساب کاربری ندارید؟",
+    "have_account": "قبلاً حساب کاربری دارید؟",
     "link_register": "ثبت‌نام",
     "link_login": "ورود",
-    "msg_invalid_phone": "شماره تلفن معتبر نیست",
-    "msg_otp_sent": "کد تایید ارسال شد",
+    "msg_invalid_phone": "شماره تلفن نامعتبر است",
+    "msg_otp_sent": "کد تأیید ارسال شد",
     "msg_otp_resent": "کد مجدداً ارسال شد",
-    "msg_otp_incomplete": "کد ۵ رقمی را کامل وارد کنید",
-    "msg_login_success": "ورود موفق!",
-    "msg_register_success": "ثبت‌نام با موفقیت انجام شد!",
+    "msg_otp_incomplete": "لطفاً کد ۵ رقمی کامل را وارد کنید",
+    "msg_login_success": "ورود موفقیت‌آمیز بود!",
+    "msg_register_success": "ثبت‌نام موفقیت‌آمیز بود!",
     "msg_error_send": "خطا در ارسال کد",
-    "msg_error_verify": "کد تایید اشتباه است",
-    "msg_error_login": "ایمیل یا رمز عبور اشتباه است",
-    "loading": "لطفاً صبر کنید..."
-}
+    "msg_error_verify": "کد تأیید نامعتبر است",
+    "msg_error_login": "ایمیل یا رمز عبور نامعتبر است",
+    "loading": "لطفاً صبر کنید...",
+    "optional": "اختیاری",
+    "referral_label": "کد معرف",
+    "referral_placeholder": "کد معرف را وارد کنید (اختیاری)"
+  },
+  "about": {
+    "description": "جایی که سفر زیبایی شما آغاز می‌شود. در نیل، ما معتقدیم که هر فرد شایسته احساس اعتماد به نفس و درخشش است.  ",
+  "title_secondary": "محصولات",
+  "title": "مقصد نهایی شما برای محصولات زیبایی با کیفیت"
+  },
+  "about_us": {
+    "title": "به گلومین خوش آمدید – مقصد نهایی شما برای محصولات زیبایی با کیفیت",
+    "description": "در گلومین، ما با شور و هیجان به کمک شما در دیدن و احساس بهترین نسخه از خود می‌پردازیم. با اهدافی برای تحویل محصولات زیبایی با کیفیت بالا که نیازهای شما را در مورد مراقبت از پوست، آرایش و عطر پوشش می‌دهند، ما در ارائه گزینه‌های متمایز و منحصر به فرد در صنعت زیبایی قرار داریم."
+  },
+  "name_required": "لطفاً نام خود را وارد کنید"
 }
