@@ -25,6 +25,8 @@ import { DashboardPage } from './pages/dashboard.js';
 import { GalleryPage } from './pages/gallery.js';
 import { NotFoundPage } from './pages/not-found.js';
 import { ForgotPasswordPage } from './pages/forgot-password.js';
+import { PaymentSuccessPage } from './pages/payment-success.js';
+import { PaymentFailedPage } from './pages/payment-failed.js';
 
 // ============================================
 // مسیرها
@@ -42,6 +44,8 @@ const routes = [
   { path: '/forgot-password', component: ForgotPasswordPage, title: 'بازیابی رمز عبور' },
   { path: '/register',      component: RegisterPage,   title: 'ثبت‌نام' },
   { path: '/dashboard',     component: DashboardPage,  title: 'داشبورد' },
+  { path: '/payment/success', component: PaymentSuccessPage, title: 'پرداخت موفق' },
+  { path: '/payment/failed', component: PaymentFailedPage, title: 'پرداخت ناموفق' },
   { path: '*',              component: NotFoundPage,   title: '404' }
 ];
 

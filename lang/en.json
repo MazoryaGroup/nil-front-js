@@ -77,7 +77,9 @@
   },
   "common": {
     "optional": "Optional", 
-    "loading": "Loading..."
+    "loading": "Loading...",
+    "submit" :"SUBMIT"
+
     
   },
   "auth": {

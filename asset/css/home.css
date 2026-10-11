@@ -426,3 +426,185 @@
     animation-duration: .01ms !important;
   }
 }
+
+/* ============================================
+   NIL BEAUTY - HOME CATEGORIES
+   1 Large Card + 4 Small Cards
+============================================ */
+
+.nil-home-categories .category-wrap {
+  display: grid !important;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+  width: 100%;
+  align-items: stretch;
+}
+
+/* Reset Webflow layout */
+
+.nil-home-categories .category-left,
+.nil-home-categories .category-right {
+  width: 100% !important;
+  min-width: 0;
+  max-width: none !important;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+/* Large card side */
+
+.nil-home-categories .category-left > .categories-wrap {
+  display: grid !important;
+  grid-template-columns: minmax(0, 1fr);
+  height: 100%;
+}
+
+.nil-home-categories .category-left .w-dyn-item {
+  width: 100% !important;
+  height: 100%;
+  min-width: 0;
+}
+
+.nil-home-categories .feature-category {
+  display: block;
+  position: relative;
+  width: 100%;
+  height: 100%;
+  min-height: 430px;
+  overflow: hidden;
+  border-radius: 12px;
+}
+
+/* Four cards side */
+
+.nil-home-categories .category-right > .categories-wrap {
+  display: grid !important;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-rows: repeat(2, minmax(0, 1fr));
+  gap: 20px;
+  height: 100%;
+}
+
+.nil-home-categories .category-right .w-dyn-item {
+  display: block !important;
+  width: 100% !important;
+  min-width: 0;
+  min-height: 0;
+}
+
+.nil-home-categories .category-card {
+  display: block;
+  position: relative;
+  width: 100%;
+  height: 100%;
+  min-height: 205px;
+  overflow: hidden;
+  border-radius: 12px;
+}
+
+/* Images */
+
+.nil-home-categories .feature-category > .cover-image,
+.nil-home-categories .category-card > .cover-image,
+.nil-home-categories .feature-category > .nil-image-placeholder,
+.nil-home-categories .category-card > .nil-image-placeholder {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.4s ease;
+}
+
+.nil-home-categories .feature-category:hover > .cover-image,
+.nil-home-categories .category-card:hover > .cover-image {
+  transform: scale(1.04);
+}
+
+/* Text overlay */
+
+.nil-home-categories .category-text {
+  position: absolute;
+  z-index: 2;
+  left: 18px;
+  bottom: 18px;
+  right: 18px;
+  width: auto;
+  color: #ffffff;
+  font-size: 18px;
+  font-weight: 500;
+  line-height: 1.4;
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
+  pointer-events: none;
+}
+
+.nil-home-categories .feature-category .category-text {
+  font-size: 26px;
+  left: 25px;
+  bottom: 25px;
+}
+
+/* Tablet */
+
+@media (max-width: 991px) {
+  .nil-home-categories .category-wrap {
+    gap: 14px;
+  }
+
+  .nil-home-categories .category-right > .categories-wrap {
+    gap: 14px;
+  }
+
+  .nil-home-categories .feature-category {
+    min-height: 350px;
+  }
+
+  .nil-home-categories .category-card {
+    min-height: 168px;
+  }
+
+  .nil-home-categories .category-text {
+    font-size: 15px;
+  }
+}
+
+/* Mobile */
+
+@media (max-width: 767px) {
+  .nil-home-categories .category-wrap {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+
+  .nil-home-categories .feature-category {
+    height: 260px;
+    min-height: 0;
+  }
+
+  .nil-home-categories .category-right > .categories-wrap {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-rows: auto;
+    gap: 12px;
+  }
+
+  .nil-home-categories .category-card {
+    height: 170px;
+    min-height: 0;
+  }
+
+  .nil-home-categories .feature-category .category-text {
+    font-size: 22px;
+  }
+
+  .nil-home-categories .category-card .category-text {
+    font-size: 14px;
+    left: 12px;
+    right: 12px;
+    bottom: 12px;
+  }
+}
+
+@media (max-width: 380px) {
+  .nil-home-categories .category-card {
+    height: 145px;
+  }
+}

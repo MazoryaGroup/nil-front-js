@@ -426,7 +426,7 @@ async function loadCategories(root, isFa) {
     }
 
     const feature = categories[0];
-    const others = categories.slice(1);
+    const others = categories.slice(1, 5);
 
     const cardHref = category =>
       `/gallery?category=${encodeURIComponent(category.id)}`;

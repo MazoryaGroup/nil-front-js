@@ -59,10 +59,7 @@ export function Header() {
       path: '/about',
       label: t('nav.about')
     },
-    {
-      path: '/gallery',
-      label: isFa ? 'گالری' : 'Gallery'
-    },
+    
     {
       path: '/blog',
       label: t('nav.blogs')
@@ -83,16 +80,21 @@ export function Header() {
   return `
     <div class="container w-container">
       <div class="nav-wrapper">
-
-        <!-- BRAND -->
-        <a
-          href="/"
-          class="brand w-nav-brand"
-          data-nav-link
-          aria-label="NIL Beauty"
-        >
-          <div>NIL</div>
-        </a>
+<!-- BRAND -->
+<a
+  href="/"
+  class="brand w-nav-brand"
+  data-nav-link
+  aria-label="NIL Beauty"
+>
+  <img
+    src="/img/logo.png"
+    alt="NIL Beauty"
+    class="nil-brand-logo"
+    width="110"
+    height="55"
+  />
+</a>
 
         <!-- NAVIGATION -->
         <nav

@@ -128,7 +128,7 @@ export async function ContactPage() {
                 <input
                   type="submit"
                   class="primary-button w-button"
-                  value="${escapeHtml(t('buttons.submit'))}"
+                  value="${escapeHtml(t('common.submit'))}"
                   data-submit-btn
                 />
 

@@ -12,10 +12,9 @@ import {
   availabilityApi
 } from '../code/api.js';
 
-// =====================================================
-// NIL DASHBOARD V3
-// Responsive | Persian Calendar | Optional Staff
-// =====================================================
+// ============================================================
+// NIL BEAUTY — CUSTOMER DASHBOARD
+// ============================================================
 
 const escapeHtml = (value) =>
   String(value ?? '').replace(/[&<>"']/g, (char) => ({
@@ -27,7 +26,7 @@ const escapeHtml = (value) =>
   }[char]));
 
 const faNumber = (value) =>
-  String(value).replace(/\d/g, (digit) => '۰۱۲۳۴۵۶۷۸۹'[digit]);
+  String(value).replace(/\d/g, (d) => '۰۱۲۳۴۵۶۷۸۹'[d]);
 
 const priceFormat = (value) =>
   new Intl.NumberFormat('fa-IR').format(Number(value || 0));
@@ -59,15 +58,15 @@ const tehranFormatter = new Intl.DateTimeFormat(
   }
 );
 
-// =====================================================
-// Date Helpers
-// =====================================================
+// ============================================================
+// DATE HELPERS
+// ============================================================
 
-function getDateParts(formatter, date) {
+function dateParts(formatter, date) {
   const parts = formatter.formatToParts(date);
 
   const get = (type) =>
-    Number(parts.find((item) => item.type === type)?.value);
+    Number(parts.find((p) => p.type === type)?.value);
 
   return {
     year: get('year'),
@@ -85,11 +84,11 @@ function toISO({ year, month, day }) {
 }
 
 function todayISO() {
-  return toISO(getDateParts(tehranFormatter, new Date()));
+  return toISO(dateParts(tehranFormatter, new Date()));
 }
 
 function isoToDate(iso) {
-  return new Date(`${iso}T12:00:00Z`);
+  return new Date(`${String(iso).slice(0, 10)}T12:00:00Z`);
 }
 
 function addDays(iso, days) {
@@ -99,16 +98,14 @@ function addDays(iso, days) {
 }
 
 function getJalali(iso) {
-  return getDateParts(persianFormatter, isoToDate(iso));
+  return dateParts(persianFormatter, isoToDate(iso));
 }
 
 function formatJalali(iso) {
   if (!iso) return '—';
 
   try {
-    const { year, month, day } = getJalali(
-      String(iso).slice(0, 10)
-    );
+    const { year, month, day } = getJalali(iso);
 
     return `${faNumber(day)} ${persianMonths[month - 1]} ${faNumber(year)}`;
   } catch {
@@ -125,7 +122,6 @@ function getMonthData(offset = 0) {
   const year = Math.floor(absoluteMonth / 12);
   const month = ((absoluteMonth % 12) + 12) % 12 + 1;
 
-  // Persian new year falls around March 20/21.
   let cursor = `${year + 621}-03-15`;
   let firstDay = null;
 
@@ -149,14 +145,16 @@ function getMonthData(offset = 0) {
   }
 
   const days = [];
+
   cursor = firstDay;
 
   while (days.length < 31) {
     const parts = getJalali(cursor);
 
-    if (parts.year !== year || parts.month !== month) {
-      break;
-    }
+    if (
+      parts.year !== year ||
+      parts.month !== month
+    ) break;
 
     days.push({
       iso: cursor,
@@ -170,28 +168,16 @@ function getMonthData(offset = 0) {
   return { year, month, days };
 }
 
-// =====================================================
-// API Response Helpers
-// =====================================================
+// ============================================================
+// API HELPERS
+// ============================================================
 
 function extractList(response, key) {
   if (Array.isArray(response)) return response;
-
-  if (Array.isArray(response?.data)) {
-    return response.data;
-  }
-
-  if (Array.isArray(response?.data?.[key])) {
-    return response.data[key];
-  }
-
-  if (Array.isArray(response?.data?.data)) {
-    return response.data.data;
-  }
-
-  if (Array.isArray(response?.[key])) {
-    return response[key];
-  }
+  if (Array.isArray(response?.data)) return response.data;
+  if (Array.isArray(response?.data?.[key])) return response.data[key];
+  if (Array.isArray(response?.data?.data)) return response.data.data;
+  if (Array.isArray(response?.[key])) return response[key];
 
   return [];
 }
@@ -207,16 +193,12 @@ function extractBookingId(response) {
 }
 
 function normalizeSlots(response) {
-  const items = extractList(response, 'slots');
-
-  return items
+  return extractList(response, 'slots')
     .filter((slot) =>
       slot &&
-      typeof slot === 'object' &&
       slot.start_time &&
       slot.end_time &&
-      Array.isArray(slot.staff_ids) &&
-      slot.staff_ids.length > 0
+      Array.isArray(slot.staff_ids)
     )
     .map((slot) => ({
       ...slot,
@@ -235,9 +217,36 @@ function normalizeSlots(response) {
     );
 }
 
-// =====================================================
-// Main Page
-// =====================================================
+function canModifyBooking(booking) {
+  const allowedStatuses = [
+    'confirmed',
+    'pending',
+    'awaiting_payment'
+  ];
+
+  if (!allowedStatuses.includes(booking.status)) {
+    return false;
+  }
+
+  const date = String(booking.booking_date || '').slice(0, 10);
+  const time = String(booking.start_time || '').slice(0, 5);
+
+  if (
+    !/^\d{4}-\d{2}-\d{2}$/.test(date) ||
+    !/^\d{2}:\d{2}$/.test(time)
+  ) return false;
+
+  const appointment = new Date(`${date}T${time}:00+03:30`);
+
+  return (
+    Number.isFinite(appointment.getTime()) &&
+    appointment.getTime() - Date.now() >= 24 * 60 * 60 * 1000
+  );
+}
+
+// ============================================================
+// MAIN PAGE
+// ============================================================
 
 export async function DashboardPage() {
   if (!isLoggedIn()) {
@@ -246,20 +255,22 @@ export async function DashboardPage() {
     });
 
     return Layout(`
-      <div class="nil-loading">در حال انتقال به ورود...</div>
+      <div class="nil-loading">
+        در حال انتقال به ورود...
+      </div>
     `);
   }
 
   const user = getUser();
   const isFa = getCurrentLang() === 'fa';
-
   const t = (fa, en) => isFa ? fa : en;
 
   const html = Layout(`
-    <main class="nil-dashboard"
+    <main
+      class="nil-dashboard"
       data-nil-dashboard
-      dir="${isFa ? 'rtl' : 'ltr'}">
-
+      dir="${isFa ? 'rtl' : 'ltr'}"
+    >
       <div class="nil-shell">
 
         <!-- HEADER -->
@@ -273,11 +284,11 @@ export async function DashboardPage() {
           </div>
 
           <button
+            type="button"
             class="nil-icon-btn"
             data-nil-logout
-            title="${t('خروج', 'Logout')}">
-            ↪
-          </button>
+            title="${t('خروج', 'Logout')}"
+          >↪</button>
         </header>
 
         <!-- WELCOME -->
@@ -306,28 +317,47 @@ export async function DashboardPage() {
 
         <!-- TABS -->
         <nav class="nil-tabs">
-          <button class="active" data-nil-tab="services">
+          <button
+            type="button"
+            class="active"
+            data-nil-tab="services"
+          >
             <span>✦</span>
             ${t('رزرو خدمات', 'Book services')}
           </button>
 
-          <button data-nil-tab="bookings">
+          <button
+            type="button"
+            data-nil-tab="bookings"
+          >
             <span>◷</span>
             ${t('نوبت‌های من', 'Appointments')}
           </button>
 
-          <button data-nil-tab="profile">
+          <button
+            type="button"
+            data-nil-tab="profile"
+          >
             <span>♙</span>
             ${t('پروفایل', 'Profile')}
           </button>
         </nav>
 
         <!-- SERVICES -->
-        <section class="nil-panel" data-nil-panel="services">
+        <section
+          class="nil-panel"
+          data-nil-panel="services"
+        >
           <div class="nil-section-head">
             <div>
-              <span class="nil-eyebrow">EXPLORE SERVICES</span>
-              <h2>${t('خدمات زیبایی', 'Beauty services')}</h2>
+              <span class="nil-eyebrow">
+                EXPLORE SERVICES
+              </span>
+
+              <h2>
+                ${t('خدمات زیبایی', 'Beauty services')}
+              </h2>
+
               <p>
                 ${t(
                   'خدمات دلخواهت رو انتخاب کن',
@@ -337,7 +367,10 @@ export async function DashboardPage() {
             </div>
           </div>
 
-          <div class="nil-service-grid" data-nil-services>
+          <div
+            class="nil-service-grid"
+            data-nil-services
+          >
             <div class="nil-loading">
               ${t('در حال دریافت خدمات...', 'Loading services...')}
             </div>
@@ -348,42 +381,62 @@ export async function DashboardPage() {
         <section
           class="nil-panel"
           data-nil-panel="bookings"
-          hidden>
-
+          hidden
+        >
           <div class="nil-section-head">
             <div>
-              <span class="nil-eyebrow">MY APPOINTMENTS</span>
-              <h2>${t('نوبت‌های من', 'My appointments')}</h2>
+              <span class="nil-eyebrow">
+                MY APPOINTMENTS
+              </span>
+
+              <h2>
+                ${t('نوبت‌های من', 'My appointments')}
+              </h2>
             </div>
 
-            <button class="nil-text-btn" data-nil-refresh>
+            <button
+              type="button"
+              class="nil-text-btn"
+              data-nil-refresh
+            >
               ${t('بروزرسانی ↻', 'Refresh ↻')}
             </button>
           </div>
 
-          <div class="nil-bookings" data-nil-bookings></div>
+          <div
+            class="nil-bookings"
+            data-nil-bookings
+          ></div>
         </section>
 
         <!-- PROFILE -->
         <section
           class="nil-panel"
           data-nil-panel="profile"
-          hidden>
-
+          hidden
+        >
           <div class="nil-section-head">
             <div>
-              <span class="nil-eyebrow">MY ACCOUNT</span>
-              <h2>${t('حساب کاربری', 'My account')}</h2>
+              <span class="nil-eyebrow">
+                MY ACCOUNT
+              </span>
+
+              <h2>
+                ${t('حساب کاربری', 'My account')}
+              </h2>
             </div>
           </div>
 
           <div data-nil-profile></div>
         </section>
-
       </div>
 
       <!-- SELECTED SERVICES BAR -->
-      <div class="nil-selection" data-nil-selection hidden>
+      <div
+        class="nil-selection"
+        data-nil-selection
+        hidden
+      >
         <div class="nil-selection-inner">
           <div>
             <small data-nil-selection-count></small>
@@ -391,34 +444,47 @@ export async function DashboardPage() {
           </div>
 
           <button
+            type="button"
             class="nil-btn nil-btn-dark"
-            data-nil-continue>
+            data-nil-continue
+          >
             ${t('ادامه رزرو', 'Continue')} ←
           </button>
         </div>
       </div>
 
       <!-- BOOKING MODAL -->
-      <div class="nil-modal" data-nil-modal hidden>
-        <div class="nil-modal-shade" data-nil-close></div>
+      <div
+        class="nil-modal"
+        data-nil-modal
+        hidden
+      >
+        <div
+          class="nil-modal-shade"
+          data-nil-close
+        ></div>
 
         <section
           class="nil-dialog"
           role="dialog"
-          aria-modal="true">
-
+          aria-modal="true"
+        >
           <div class="nil-dialog-header">
             <div>
               <span class="nil-eyebrow">
                 BOOK YOUR APPOINTMENT
               </span>
 
-              <h2>${t('رزرو نوبت', 'Book appointment')}</h2>
+              <h2>
+                ${t('رزرو نوبت', 'Book appointment')}
+              </h2>
             </div>
 
-            <button class="nil-icon-btn" data-nil-close>
-              ✕
-            </button>
+            <button
+              type="button"
+              class="nil-icon-btn"
+              data-nil-close
+            >✕</button>
           </div>
 
           <div class="nil-progress">
@@ -431,7 +497,9 @@ export async function DashboardPage() {
 
             <!-- STEP 1 -->
             <div data-nil-step="1">
-              <h3>${t('چه روزی برات مناسبه؟', 'Choose a date')}</h3>
+              <h3>
+                ${t('چه روزی برات مناسبه؟', 'Choose a date')}
+              </h3>
 
               <p class="nil-muted">
                 ${t(
@@ -445,20 +513,33 @@ export async function DashboardPage() {
 
             <!-- STEP 2 -->
             <div data-nil-step="2" hidden>
-              <h3>${t('انتخاب ساعت', 'Choose a time')}</h3>
+              <h3>
+                ${t('انتخاب ساعت', 'Choose a time')}
+              </h3>
 
-              <p class="nil-muted" data-nil-date-label></p>
+              <p
+                class="nil-muted"
+                data-nil-date-label
+              ></p>
 
-              <div class="nil-time-grid" data-nil-times></div>
+              <div
+                class="nil-time-grid"
+                data-nil-times
+              ></div>
             </div>
 
             <!-- STEP 3 -->
             <div data-nil-step="3" hidden>
-              <h3>${t('تأیید اطلاعات', 'Confirm booking')}</h3>
+              <h3>
+                ${t('تأیید اطلاعات', 'Confirm booking')}
+              </h3>
 
               <div data-nil-summary></div>
 
-              <label class="nil-field-label" for="nil-notes">
+              <label
+                class="nil-field-label"
+                for="nil-notes"
+              >
                 ${t('توضیحات (اختیاری)', 'Notes (optional)')}
               </label>
 
@@ -467,29 +548,36 @@ export async function DashboardPage() {
                 class="nil-input"
                 data-nil-notes
                 rows="3"
-                placeholder="${t('توضیحات شما...', 'Your notes...')}">
-              </textarea>
+                placeholder="${t(
+                  'توضیحات شما...',
+                  'Your notes...'
+                )}"
+              ></textarea>
             </div>
 
             <p
               class="nil-feedback"
               data-nil-message
-              hidden>
-            </p>
+              hidden
+            ></p>
           </div>
 
           <div class="nil-dialog-footer">
             <button
+              type="button"
               class="nil-btn nil-btn-light"
               data-nil-back
-              hidden>
+              hidden
+            >
               ${t('بازگشت', 'Back')}
             </button>
 
             <button
+              type="button"
               class="nil-btn nil-btn-dark"
               data-nil-next
-              disabled>
+              disabled
+            >
               ${t('ادامه', 'Continue')}
             </button>
           </div>
@@ -510,9 +598,9 @@ export async function DashboardPage() {
   return html;
 }
 
-// =====================================================
-// Dashboard Logic
-// =====================================================
+// ============================================================
+// DASHBOARD LOGIC
+// ============================================================
 
 function initDashboard(root, isFa) {
   if (root.dataset.initialized === '1') return;
@@ -520,11 +608,11 @@ function initDashboard(root, isFa) {
 
   const $ = (selector) => root.querySelector(selector);
   const $$ = (selector) => [...root.querySelectorAll(selector)];
-
   const t = (fa, en) => isFa ? fa : en;
 
   let services = [];
   let selectedServices = [];
+  let previousSelectedServices = null;
 
   let selectedDate = null;
   let selectedSlot = null;
@@ -535,47 +623,23 @@ function initDashboard(root, isFa) {
   let loadingAvailability = false;
   let submitting = false;
 
+  let rescheduleBooking = null;
   let availabilityRequestId = 0;
 
   const modal = $('[data-nil-modal]');
   const nextButton = $('[data-nil-next]');
   const backButton = $('[data-nil-back]');
 
-  // ===================================================
-  // General
-  // ===================================================
+  // ============================================================
+  // GENERAL
+  // ============================================================
 
-  function showMessage(text = '', error = true) {
+  function showMessage(message = '', error = true) {
     const element = $('[data-nil-message]');
 
-    element.textContent = text;
-    element.hidden = !text;
+    element.textContent = message;
+    element.hidden = !message;
     element.classList.toggle('error', error);
-  }
-
-  function setStep(step) {
-    currentStep = step;
-
-    showMessage();
-
-    $$('[data-nil-step]').forEach((element) => {
-      element.hidden = Number(element.dataset.nilStep) !== step;
-    });
-
-    $$('[data-nil-progress]').forEach((element) => {
-      element.classList.toggle(
-        'active',
-        Number(element.dataset.nilProgress) <= step
-      );
-    });
-
-    backButton.hidden = step === 1;
-
-    nextButton.textContent = step === 3
-      ? t('ثبت نوبت', 'Book now')
-      : t('ادامه', 'Continue');
-
-    updateNextButton();
   }
 
   function updateNextButton() {
@@ -590,10 +654,39 @@ function initDashboard(root, isFa) {
     }
 
     if (currentStep === 3) {
-      disabled ||= !selectedSlot || !selectedDate;
+      disabled ||= !selectedDate || !selectedSlot;
     }
 
     nextButton.disabled = disabled;
+  }
+
+  function setStep(step) {
+    currentStep = step;
+    showMessage();
+
+    $$('[data-nil-step]').forEach((element) => {
+      element.hidden =
+        Number(element.dataset.nilStep) !== step;
+    });
+
+    $$('[data-nil-progress]').forEach((element) => {
+      element.classList.toggle(
+        'active',
+        Number(element.dataset.nilProgress) <= step
+      );
+    });
+
+    backButton.hidden = step === 1;
+
+    nextButton.textContent = step === 3
+      ? (
+          rescheduleBooking
+            ? t('تأیید جابجایی', 'Confirm reschedule')
+            : t('ثبت نوبت', 'Book now')
+        )
+      : t('ادامه', 'Continue');
+
+    updateNextButton();
   }
 
   function switchTab(tab) {
@@ -631,16 +724,16 @@ function initDashboard(root, isFa) {
       try {
         await logout();
       } catch (error) {
-        console.error('Logout:', error);
+        console.error('Logout error:', error);
       }
 
       window.__app?.router?.navigate('/login');
     }
   );
 
-  // ===================================================
-  // Services
-  // ===================================================
+  // ============================================================
+  // SERVICES
+  // ============================================================
 
   async function loadServices() {
     const container = $('[data-nil-services]');
@@ -685,8 +778,8 @@ function initDashboard(root, isFa) {
           type="button"
           class="nil-service ${active ? 'selected' : ''}"
           data-service-id="${escapeHtml(service.id)}"
-          aria-pressed="${active}">
-
+          aria-pressed="${active}"
+        >
           <div class="nil-service-top">
             <span class="nil-service-number">
               ${String(index + 1).padStart(2, '0')}
@@ -758,11 +851,10 @@ function initDashboard(root, isFa) {
 
     $('[data-nil-selection]').hidden = count === 0;
 
-    $('[data-nil-selection-count]').textContent =
-      t(
-        `${faNumber(count)} خدمت انتخاب شده`,
-        `${count} selected services`
-      );
+    $('[data-nil-selection-count]').textContent = t(
+      `${faNumber(count)} خدمت انتخاب شده`,
+      `${count} selected services`
+    );
 
     const total = selectedServices.reduce(
       (sum, service) => sum + Number(service.price || 0),
@@ -773,20 +865,110 @@ function initDashboard(root, isFa) {
       `${priceFormat(total)} ${t('تومان', 'Toman')}`;
   }
 
-  // ===================================================
-  // Modal
-  // ===================================================
+  $('[data-nil-continue]').addEventListener(
+    'click',
+    openModal
+  );
+
+  // ============================================================
+  // MODAL
+  // ============================================================
 
   function openModal() {
     if (!selectedServices.length) return;
 
+    rescheduleBooking = null;
+    previousSelectedServices = null;
+
     selectedDate = null;
     selectedSlot = null;
-
     monthOffset = 0;
+
     availabilityRequestId++;
+    loadingAvailability = false;
 
     $('[data-nil-notes]').value = '';
+
+    const heading = modal.querySelector(
+      '.nil-dialog-header h2'
+    );
+
+    if (heading) {
+      heading.textContent = t(
+        'رزرو نوبت',
+        'Book appointment'
+      );
+    }
+
+    modal.hidden = false;
+    document.body.style.overflow = 'hidden';
+
+    setStep(1);
+    renderCalendar();
+  }
+
+  function openRescheduleModal(booking) {
+    if (!canModifyBooking(booking)) {
+      alert(t(
+        'جابجایی نوبت فقط تا ۲۴ ساعت قبل امکان‌پذیر است.',
+        'Rescheduling requires at least 24 hours notice.'
+      ));
+      return;
+    }
+
+    const items =
+      booking.booking_services ||
+      booking.services ||
+      [];
+
+    if (items.length !== 1) {
+      alert(t(
+        'جابجایی نوبت چندخدمتی فعلاً پشتیبانی نمی‌شود.',
+        'Multi-service rescheduling is not supported yet.'
+      ));
+      return;
+    }
+
+    const serviceId =
+      items[0].service_id ||
+      items[0].service?.id;
+
+    const service = services.find(
+      (item) => String(item.id) === String(serviceId)
+    );
+
+    if (!service) {
+      alert(t(
+        'اطلاعات خدمت این نوبت پیدا نشد.',
+        'Booking service could not be found.'
+      ));
+      return;
+    }
+
+    previousSelectedServices = [...selectedServices];
+
+    rescheduleBooking = booking;
+    selectedServices = [service];
+
+    selectedDate = null;
+    selectedSlot = null;
+    monthOffset = 0;
+
+    availabilityRequestId++;
+    loadingAvailability = false;
+
+    $('[data-nil-notes]').value = booking.notes || '';
+
+    const heading = modal.querySelector(
+      '.nil-dialog-header h2'
+    );
+
+    if (heading) {
+      heading.textContent = t(
+        'جابجایی نوبت',
+        'Reschedule appointment'
+      );
+    }
 
     modal.hidden = false;
     document.body.style.overflow = 'hidden';
@@ -799,23 +981,45 @@ function initDashboard(root, isFa) {
     if (submitting) return;
 
     availabilityRequestId++;
+    loadingAvailability = false;
+
+    if (rescheduleBooking) {
+      selectedServices = previousSelectedServices || [];
+
+      renderServices();
+      updateSelectionBar();
+    }
+
+    rescheduleBooking = null;
+    previousSelectedServices = null;
+
+    selectedDate = null;
+    selectedSlot = null;
 
     modal.hidden = true;
     document.body.style.overflow = '';
-  }
 
-  $('[data-nil-continue]').addEventListener(
-    'click',
-    openModal
-  );
+    const heading = modal.querySelector(
+      '.nil-dialog-header h2'
+    );
+
+    if (heading) {
+      heading.textContent = t(
+        'رزرو نوبت',
+        'Book appointment'
+      );
+    }
+
+    setStep(1);
+  }
 
   $$('[data-nil-close]').forEach((button) => {
     button.addEventListener('click', closeModal);
   });
 
-  // ===================================================
-  // Jalali Calendar
-  // ===================================================
+  // ============================================================
+  // PERSIAN CALENDAR
+  // ============================================================
 
   function renderCalendar() {
     const container = $('[data-nil-calendar]');
@@ -835,9 +1039,8 @@ function initDashboard(root, isFa) {
       ? ['ش', 'ی', 'د', 'س', 'چ', 'پ', 'ج']
       : ['Sa', 'Su', 'Mo', 'Tu', 'We', 'Th', 'Fr'];
 
-    // JS: Sunday=0, Saturday=6.
-    // Calendar: Saturday first.
-    const emptyDays = (month.days[0].weekday + 1) % 7;
+    const emptyDays =
+      (month.days[0].weekday + 1) % 7;
 
     container.innerHTML = `
       <div class="nil-calendar">
@@ -846,9 +1049,8 @@ function initDashboard(root, isFa) {
           <button
             type="button"
             data-month-prev
-            ${monthOffset === 0 ? 'disabled' : ''}>
-            →
-          </button>
+            ${monthOffset === 0 ? 'disabled' : ''}
+          >→</button>
 
           <div>
             <strong>
@@ -861,20 +1063,20 @@ function initDashboard(root, isFa) {
             </small>
           </div>
 
-          <button type="button" data-month-next>
-            ←
-          </button>
+          <button
+            type="button"
+            data-month-next
+          >←</button>
         </div>
 
         <div class="nil-weekdays">
-          ${weekdays.map((day) => `<span>${day}</span>`).join('')}
+          ${weekdays.map((day) => `
+            <span>${day}</span>
+          `).join('')}
         </div>
 
         <div class="nil-calendar-grid">
-
-          ${Array(emptyDays)
-            .fill('<span></span>')
-            .join('')}
+          ${Array(emptyDays).fill('<span></span>').join('')}
 
           ${month.days.map((day) => {
             const isPast = day.iso < today;
@@ -889,19 +1091,21 @@ function initDashboard(root, isFa) {
                   ${isToday ? 'today' : ''}
                   ${isSelected ? 'active' : ''}
                 "
-                ${isPast ? 'disabled' : ''}>
-
+                ${isPast ? 'disabled' : ''}
+              >
                 ${faNumber(day.day)}
                 ${isToday ? '<i></i>' : ''}
               </button>
             `;
           }).join('')}
-
         </div>
 
         <div class="nil-calendar-note">
           <span class="nil-calendar-dot"></span>
-          ${t('تاریخ امروز مشخص شده است', 'Today is marked')}
+          ${t(
+            'تاریخ امروز مشخص شده است',
+            'Today is marked'
+          )}
         </div>
 
       </div>
@@ -934,13 +1138,12 @@ function initDashboard(root, isFa) {
     });
   }
 
-  // ===================================================
-  // Available Times
-  // ===================================================
+  // ============================================================
+  // AVAILABLE TIMES
+  // ============================================================
 
   async function loadAvailableTimes() {
     const container = $('[data-nil-times]');
-
     const requestId = ++availabilityRequestId;
 
     selectedSlot = null;
@@ -960,8 +1163,6 @@ function initDashboard(root, isFa) {
       </div>
     `;
 
-    // Current backend controller supports one service.
-    // Multi-service availability must be checked as a group.
     if (selectedServices.length !== 1) {
       loadingAvailability = false;
       updateNextButton();
@@ -969,19 +1170,18 @@ function initDashboard(root, isFa) {
       container.innerHTML = `
         <div class="nil-empty">
           ${t(
-            'برای رزرو همزمان چند خدمت، باید API ظرفیت ترکیبی تکمیل شود. فعلاً یک خدمت انتخاب کن.',
+            'رزرو همزمان چند خدمت نیاز به API ظرفیت ترکیبی دارد. فعلاً یک خدمت انتخاب کن.',
             'Combined availability is required for multiple services. Please select one service.'
           )}
         </div>
       `;
+
       return;
     }
 
     const service = selectedServices[0];
 
     try {
-      // Staff is optional.
-      // The new Laravel controller finds eligible staff.
       const response = await availabilityApi.check(
         null,
         service.id,
@@ -1005,14 +1205,12 @@ function initDashboard(root, isFa) {
         return;
       }
 
-      // Keep every interval separate, including intervals
-      // that have the same start but different end times.
       container.innerHTML = slots.map((slot, index) => `
         <button
           type="button"
           class="nil-time"
-          data-slot-index="${index}">
-
+          data-slot-index="${index}"
+        >
           <span>
             ◷ ${escapeHtml(slot.start_time)}
           </span>
@@ -1032,13 +1230,10 @@ function initDashboard(root, isFa) {
       container.querySelectorAll('[data-slot-index]')
         .forEach((button) => {
           button.addEventListener('click', () => {
-            const index = Number(button.dataset.slotIndex);
-            const slot = slots[index];
+            const slot = slots[Number(button.dataset.slotIndex)];
 
-            if (!slot || !slot.staff_ids.length) return;
+            if (!slot?.staff_ids?.length) return;
 
-            // Choose an eligible staff member for this slot.
-            // Backend must re-check availability on creation.
             selectedSlot = {
               start_time: slot.start_time,
               end_time: slot.end_time,
@@ -1068,10 +1263,14 @@ function initDashboard(root, isFa) {
         <div class="nil-empty">
           ${escapeHtml(
             error.message ||
-            t('خطا در دریافت ساعت‌ها', 'Failed to load times')
+            t(
+              'خطا در دریافت ساعت‌ها',
+              'Failed to load times'
+            )
           )}
         </div>
       `;
+
     } finally {
       if (requestId === availabilityRequestId) {
         loadingAvailability = false;
@@ -1080,9 +1279,9 @@ function initDashboard(root, isFa) {
     }
   }
 
-  // ===================================================
-  // Booking Summary
-  // ===================================================
+  // ============================================================
+  // BOOKING SUMMARY
+  // ============================================================
 
   function renderSummary() {
     const total = selectedServices.reduce(
@@ -1145,13 +1344,14 @@ function initDashboard(root, isFa) {
             ${t('تومان', 'Toman')}
           </strong>
         </div>
+
       </div>
     `;
   }
 
-  // ===================================================
-  // Steps
-  // ===================================================
+  // ============================================================
+  // STEP NAVIGATION
+  // ============================================================
 
   nextButton.addEventListener('click', async () => {
     if (submitting) return;
@@ -1173,7 +1373,11 @@ function initDashboard(root, isFa) {
     }
 
     if (currentStep === 3) {
-      await submitBooking();
+      if (rescheduleBooking) {
+        await submitReschedule();
+      } else {
+        await submitBooking();
+      }
     }
   });
 
@@ -1189,22 +1393,22 @@ function initDashboard(root, isFa) {
     setStep(currentStep - 1);
   });
 
-  // ===================================================
-  // Create Booking
-  // ===================================================
+  // ============================================================
+  // CREATE BOOKING
+  // ============================================================
 
   async function submitBooking() {
     if (submitting) return;
 
     if (
       !selectedDate ||
-      !selectedSlot ||
-      !selectedSlot.staff_id ||
+      !selectedSlot?.staff_id ||
       selectedServices.length !== 1
     ) {
-      showMessage(
-        t('اطلاعات رزرو کامل نیست.', 'Booking details are incomplete.')
-      );
+      showMessage(t(
+        'اطلاعات رزرو کامل نیست.',
+        'Booking details are incomplete.'
+      ));
       return;
     }
 
@@ -1227,20 +1431,19 @@ function initDashboard(root, isFa) {
 
     try {
       const response = await bookingsApi.create(payload);
-
       const bookingId = extractBookingId(response);
 
       if (!bookingId) {
-        showMessage(
-          t(
-            'پاسخ سرور شناسه رزرو ندارد. قبل از تلاش مجدد، نوبت‌های من را بررسی کن.',
-            'Booking ID is missing. Check your appointments before retrying.'
-          )
-        );
+        showMessage(t(
+          'پاسخ سرور شناسه رزرو ندارد. قبل از تلاش مجدد، نوبت‌های من را بررسی کن.',
+          'Booking ID is missing. Check appointments before retrying.'
+        ));
         return;
       }
 
       selectedServices = [];
+      selectedDate = null;
+      selectedSlot = null;
 
       renderServices();
       updateSelectionBar();
@@ -1259,22 +1462,120 @@ function initDashboard(root, isFa) {
         error.message ||
         t('خطا در ثبت رزرو', 'Booking failed')
       );
+
     } finally {
       submitting = false;
       updateNextButton();
     }
   }
 
-  // ===================================================
-  // My Bookings
-  // ===================================================
+  // ============================================================
+  // RESCHEDULE BOOKING
+  // ============================================================
+
+  async function submitReschedule() {
+    if (
+      submitting ||
+      !rescheduleBooking ||
+      !selectedDate ||
+      !selectedSlot?.staff_id
+    ) return;
+
+    if (!canModifyBooking(rescheduleBooking)) {
+      showMessage(t(
+        'مهلت جابجایی این نوبت تمام شده است.',
+        'The rescheduling deadline has passed.'
+      ));
+      return;
+    }
+
+    submitting = true;
+    updateNextButton();
+
+    try {
+      const response = await bookingsApi.reschedule(
+        rescheduleBooking.id,
+        {
+          booking_date: selectedDate,
+          start_time: selectedSlot.start_time,
+          staff_id: selectedSlot.staff_id
+        }
+      );
+
+      if (
+        response?.success === false ||
+        response?.is_status === false
+      ) {
+        throw new Error(
+          response.message || 'Reschedule failed'
+        );
+      }
+
+      selectedServices = previousSelectedServices || [];
+
+      rescheduleBooking = null;
+      previousSelectedServices = null;
+
+      selectedDate = null;
+      selectedSlot = null;
+
+      availabilityRequestId++;
+      loadingAvailability = false;
+
+      renderServices();
+      updateSelectionBar();
+
+      modal.hidden = true;
+      document.body.style.overflow = '';
+
+      const heading = modal.querySelector(
+        '.nil-dialog-header h2'
+      );
+
+      if (heading) {
+        heading.textContent = t(
+          'رزرو نوبت',
+          'Book appointment'
+        );
+      }
+
+      switchTab('bookings');
+
+      alert(t(
+        'نوبت شما با موفقیت جابجا شد.',
+        'Your appointment was successfully rescheduled.'
+      ));
+
+    } catch (error) {
+      console.error('Reschedule error:', error);
+
+      showMessage(
+        error.message ||
+        t(
+          'خطا در جابجایی نوبت',
+          'Unable to reschedule appointment'
+        )
+      );
+
+    } finally {
+      submitting = false;
+      updateNextButton();
+    }
+  }
+
+  // ============================================================
+  // MY BOOKINGS
+  // ============================================================
 
   async function loadBookings() {
     const container = $('[data-nil-bookings]');
 
     container.innerHTML = `
       <div class="nil-loading">
-        ${t('در حال دریافت نوبت‌ها...', 'Loading appointments...')}
+        ${t(
+          'در حال دریافت نوبت‌ها...',
+          'Loading appointments...'
+        )}
       </div>
     `;
 
@@ -1285,7 +1586,10 @@ function initDashboard(root, isFa) {
       if (!bookings.length) {
         container.innerHTML = `
           <div class="nil-empty">
-            ${t('هنوز نوبتی ثبت نکردی.', 'No appointments yet.')}
+            ${t(
+              'هنوز نوبتی ثبت نکردی.',
+              'No appointments yet.'
+            )}
           </div>
         `;
         return;
@@ -1293,7 +1597,10 @@ function initDashboard(root, isFa) {
 
       const statusLabels = {
         confirmed: t('تأیید شده', 'Confirmed'),
-        awaiting_payment: t('در انتظار پرداخت', 'Awaiting payment'),
+        awaiting_payment: t(
+          'در انتظار پرداخت',
+          'Awaiting payment'
+        ),
         pending: t('در انتظار', 'Pending'),
         cancelled: t('لغو شده', 'Cancelled'),
         completed: t('انجام شده', 'Completed')
@@ -1317,6 +1624,8 @@ function initDashboard(root, isFa) {
         const title =
           serviceNames ||
           t('نوبت زیبایی', 'Beauty appointment');
+
+        const canModify = canModifyBooking(booking);
 
         return `
           <article class="nil-booking-card">
@@ -1359,13 +1668,27 @@ function initDashboard(root, isFa) {
             <div class="nil-booking-actions">
 
               ${booking.status === 'awaiting_payment' ? `
-                <button data-booking-pay="${escapeHtml(booking.id)}">
+                <button
+                  type="button"
+                  data-booking-pay="${escapeHtml(booking.id)}"
+                >
                   ${t('ادامه پرداخت', 'Continue payment')}
                 </button>
               ` : ''}
 
-              ${!['cancelled', 'completed'].includes(booking.status) ? `
-                <button data-booking-cancel="${escapeHtml(booking.id)}">
+              ${canModify ? `
+                <button
+                  type="button"
+                  class="nil-reschedule-btn"
+                  data-booking-reschedule="${escapeHtml(booking.id)}"
+                >
+                  ◷ ${t('تغییر تاریخ و ساعت', 'Reschedule')}
+                </button>
+
+                <button
+                  type="button"
+                  data-booking-cancel="${escapeHtml(booking.id)}"
+                >
                   ${t('لغو نوبت', 'Cancel')}
                 </button>
               ` : ''}
@@ -1375,6 +1698,23 @@ function initDashboard(root, isFa) {
         `;
       }).join('');
 
+      // RESCHEDULE BUTTONS
+      container.querySelectorAll('[data-booking-reschedule]')
+        .forEach((button) => {
+          button.addEventListener('click', () => {
+            const booking = bookings.find(
+              (item) =>
+                String(item.id) ===
+                button.dataset.bookingReschedule
+            );
+
+            if (!booking) return;
+
+            openRescheduleModal(booking);
+          });
+        });
+
+      // PAYMENT BUTTONS
       container.querySelectorAll('[data-booking-pay]')
         .forEach((button) => {
           button.addEventListener('click', () => {
@@ -1386,46 +1726,30 @@ function initDashboard(root, isFa) {
           });
         });
 
+      // CANCEL BUTTONS
       container.querySelectorAll('[data-booking-cancel]')
         .forEach((button) => {
           button.addEventListener('click', async () => {
             const booking = bookings.find(
               (item) =>
-                String(item.id) === button.dataset.bookingCancel
+                String(item.id) ===
+                button.dataset.bookingCancel
             );
 
             if (!booking) return;
 
-            const time = String(
-              booking.start_time || '00:00'
-            ).slice(0, 5);
-
-            // Tehran currently uses UTC+03:30.
-            const appointmentDate = new Date(
-              `${booking.booking_date}T${time}:00+03:30`
-            );
-
-            if (!Number.isFinite(appointmentDate.getTime())) {
-              alert(t('تاریخ نوبت نامعتبر است', 'Invalid date'));
+            if (!canModifyBooking(booking)) {
+              alert(t(
+                'لغو نوبت فقط تا ۲۴ ساعت قبل امکان‌پذیر است.',
+                'Cancellation requires at least 24 hours notice.'
+              ));
               return;
             }
 
-            const hoursRemaining =
-              (appointmentDate.getTime() - Date.now()) / 3600000;
-
-            if (hoursRemaining < 24) {
-              alert(
-                t(
-                  'لغو نوبت در کمتر از ۲۴ ساعت مجاز نیست.',
-                  'Cancellation requires 24 hours notice.'
-                )
-              );
-              return;
-            }
-
-            if (!confirm(
-              t('نوبت لغو شود؟', 'Cancel appointment?')
-            )) {
+            if (!confirm(t(
+              'آیا از لغو این نوبت مطمئن هستید؟',
+              'Are you sure you want to cancel this appointment?'
+            ))) {
               return;
             }
 
@@ -1433,15 +1757,35 @@ function initDashboard(root, isFa) {
 
             try {
               await bookingsApi.cancel(booking.id);
+
               await loadBookings();
+
+              alert(t(
+                'نوبت شما با موفقیت لغو شد.',
+                'Your appointment was cancelled successfully.'
+              ));
+
             } catch (error) {
-              alert(error.message);
-              button.disabled = false;
+              console.error('Cancel booking error:', error);
+
+              alert(
+                error.message ||
+                t(
+                  'خطا در لغو نوبت',
+                  'Cancellation failed'
+                )
+              );
+
+              if (button.isConnected) {
+                button.disabled = false;
+              }
             }
           });
         });
 
     } catch (error) {
+      console.error('Load bookings error:', error);
+
       container.innerHTML = `
         <div class="nil-empty">
           ${escapeHtml(error.message)}
@@ -1450,9 +1794,9 @@ function initDashboard(root, isFa) {
     }
   }
 
-  // ===================================================
-  // Profile
-  // ===================================================
+  // ============================================================
+  // PROFILE
+  // ============================================================
 
   async function loadProfile() {
     const container = $('[data-nil-profile]');
@@ -1482,41 +1826,57 @@ function initDashboard(root, isFa) {
             </div>
 
             <div>
-              <h3>${escapeHtml(client.name || '-')}</h3>
-              <p>${escapeHtml(client.phone || '-')}</p>
+              <h3>
+                ${escapeHtml(client.name || '-')}
+              </h3>
+
+              <p>
+                ${escapeHtml(client.phone || '-')}
+              </p>
             </div>
           </div>
 
           <div class="nil-profile-field">
             <span>${t('نام', 'Name')}</span>
-            <strong>${escapeHtml(client.name || '-')}</strong>
+            <strong>
+              ${escapeHtml(client.name || '-')}
+            </strong>
           </div>
 
           <div class="nil-profile-field">
             <span>${t('ایمیل', 'Email')}</span>
-            <strong>${escapeHtml(client.email || '-')}</strong>
+            <strong>
+              ${escapeHtml(client.email || '-')}
+            </strong>
           </div>
 
           <div class="nil-profile-field">
             <span>${t('شماره موبایل', 'Phone')}</span>
-            <strong>${escapeHtml(client.phone || '-')}</strong>
+            <strong>
+              ${escapeHtml(client.phone || '-')}
+            </strong>
           </div>
 
           <div class="nil-profile-field">
             <span>${t('کد معرف', 'Referral code')}</span>
-            <strong>${escapeHtml(client.referral_code || '-')}</strong>
+            <strong>
+              ${escapeHtml(client.referral_code || '-')}
+            </strong>
           </div>
 
           <button
+            type="button"
             class="nil-btn nil-btn-dark"
-            data-edit-profile>
+            data-edit-profile
+          >
             ${t('ویرایش اطلاعات', 'Edit profile')}
           </button>
+
         </div>
       `;
 
       container.querySelector('[data-edit-profile]')
-        .addEventListener('click', () => {
+        ?.addEventListener('click', () => {
           renderProfileEditor(client);
         });
 
@@ -1533,8 +1893,13 @@ function initDashboard(root, isFa) {
     const container = $('[data-nil-profile]');
 
     container.innerHTML = `
-      <form class="nil-profile-card" data-profile-form>
-        <h3>${t('ویرایش پروفایل', 'Edit profile')}</h3>
+      <form
+        class="nil-profile-card"
+        data-profile-form
+      >
+        <h3>
+          ${t('ویرایش پروفایل', 'Edit profile')}
+        </h3>
 
         <label class="nil-field-label">
           ${t('نام', 'Name')}
@@ -1544,7 +1909,8 @@ function initDashboard(root, isFa) {
           class="nil-input"
           name="name"
           value="${escapeHtml(client.name || '')}"
-          required>
+          required
+        >
 
         <label class="nil-field-label">
           ${t('ایمیل', 'Email')}
@@ -1554,20 +1920,26 @@ function initDashboard(root, isFa) {
           class="nil-input"
           name="email"
           type="email"
-          value="${escapeHtml(client.email || '')}">
+          value="${escapeHtml(client.email || '')}"
+        >
 
-        <p class="nil-feedback" data-profile-error></p>
+        <p
+          class="nil-feedback"
+          data-profile-error
+        ></p>
 
         <button
           type="submit"
-          class="nil-btn nil-btn-dark">
+          class="nil-btn nil-btn-dark"
+        >
           ${t('ذخیره تغییرات', 'Save changes')}
         </button>
 
         <button
           type="button"
           class="nil-btn nil-btn-light"
-          data-profile-back>
+          data-profile-back
+        >
           ${t('بازگشت', 'Back')}
         </button>
       </form>
@@ -1604,9 +1976,9 @@ function initDashboard(root, isFa) {
       });
   }
 
-  // ===================================================
-  // Initialize
-  // ===================================================
+  // ============================================================
+  // INITIALIZE
+  // ============================================================
 
   loadServices();
 }

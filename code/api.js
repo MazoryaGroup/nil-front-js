@@ -3,15 +3,71 @@
  * ============================================================
  * NIL BEAUTY - API CLIENT
  * Laravel REST API | JWT Authentication | Vite
+ * Session timeout: 10 minutes
  * ============================================================
  */
 
-const BASE_URL = (
-  import.meta.env.VITE_API_URL || '/api'
-).replace(/\/+$/, '');
+const BASE_URL = 'https://apinil.mazoryagroup.ir/api';
+
+const TOKEN_KEY = 'auth_token';
+const USER_KEY = 'auth_user';
+const LOGIN_TIME_KEY = 'auth_login_time';
+
+const SESSION_DURATION = 10 * 60 * 1000;
 
 // ============================================================
-// Helpers
+// Session Helpers
+// ============================================================
+
+function getStoredToken() {
+  return localStorage.getItem(TOKEN_KEY);
+}
+
+function isSessionExpired() {
+  const loginTime = Number(
+    localStorage.getItem(LOGIN_TIME_KEY)
+  );
+
+  if (!Number.isFinite(loginTime) || loginTime <= 0) {
+    return true;
+  }
+
+  const elapsed = Date.now() - loginTime;
+
+  return elapsed < 0 || elapsed >= SESSION_DURATION;
+}
+
+function clearAuthSession() {
+  const hadSession =
+    !!localStorage.getItem(TOKEN_KEY) ||
+    !!localStorage.getItem(LOGIN_TIME_KEY);
+
+  localStorage.removeItem(TOKEN_KEY);
+  localStorage.removeItem(USER_KEY);
+  localStorage.removeItem(LOGIN_TIME_KEY);
+
+  if (hadSession) {
+    window.dispatchEvent(
+      new CustomEvent('auth:expired')
+    );
+  }
+}
+
+function getAuthToken() {
+  const token = getStoredToken();
+
+  if (!token) return null;
+
+  if (isSessionExpired()) {
+    clearAuthSession();
+    return null;
+  }
+
+  return token;
+}
+
+// ============================================================
+// Query Helpers
 // ============================================================
 
 function buildQuery(params = {}) {
@@ -32,6 +88,7 @@ function buildQuery(params = {}) {
           query.append(`${key}[]`, String(item));
         }
       });
+
       return;
     }
 
@@ -49,16 +106,9 @@ function withQuery(endpoint, params = {}) {
   return `${endpoint}${endpoint.includes('?') ? '&' : '?'}${query}`;
 }
 
-function getAuthToken() {
-  return localStorage.getItem('auth_token');
-}
-
-function clearAuthSession() {
-  localStorage.removeItem('auth_token');
-  localStorage.removeItem('auth_user');
-
-  window.dispatchEvent(new CustomEvent('auth:expired'));
-}
+// ============================================================
+// Error Helpers
+// ============================================================
 
 function getValidationMessage(json) {
   const errors = json?.errors;
@@ -71,25 +121,63 @@ function getValidationMessage(json) {
     .flat()
     .filter((message) => typeof message === 'string');
 
-  return messages.length ? messages.join('\n') : null;
+  return messages.length
+    ? messages.join('\n')
+    : null;
 }
 
 function createApiError(response, json) {
   const message =
     getValidationMessage(json) ||
     json?.message ||
-    (typeof json?.error === 'string' ? json.error : null) ||
+    (
+      typeof json?.error === 'string'
+        ? json.error
+        : null
+    ) ||
     `HTTP ${response.status}`;
 
   const error = new Error(message);
 
   error.name = 'ApiError';
   error.status = response.status;
-  error.statusCode = json?.statusCode || response.status;
+  error.statusCode =
+    json?.statusCode || response.status;
   error.errors = json?.errors || null;
   error.response = json;
 
   return error;
+}
+
+function createSessionError() {
+  const error = new Error(
+    'Session expired. Please login again.'
+  );
+
+  error.name = 'SessionExpiredError';
+  error.status = 401;
+  error.statusCode = 401;
+
+  return error;
+}
+
+// ============================================================
+// Public Authentication Endpoints
+// ============================================================
+
+function isPublicAuthEndpoint(endpoint) {
+  const path = String(endpoint).split('?')[0];
+
+  return [
+    '/v1/auth/register/send-code',
+    '/v1/auth/register/verify',
+    '/v1/auth/login',
+    '/v1/auth/login/phone/send-code',
+    '/v1/auth/login/phone/verify',
+    '/v1/auth/forgot-password/send-code',
+    '/v1/auth/forgot-password/verify',
+    '/v1/auth/forgot-password/reset'
+  ].includes(path);
 }
 
 // ============================================================
@@ -104,12 +192,26 @@ async function request(
 ) {
   const url = `${BASE_URL}${endpoint}`;
 
+  const publicAuth = isPublicAuthEndpoint(endpoint);
+  const hadToken = !!getStoredToken();
+
+  // Prevent expired sessions from using protected APIs.
+  if (
+    !publicAuth &&
+    hadToken &&
+    isSessionExpired()
+  ) {
+    clearAuthSession();
+    throw createSessionError();
+  }
+
   const headers = {
     Accept: 'application/json',
     ...options.headers
   };
 
-  const token = getAuthToken();
+  // Public login/OTP requests never need an old JWT.
+  const token = publicAuth ? null : getAuthToken();
 
   if (token && !headers.Authorization) {
     headers.Authorization = `Bearer ${token}`;
@@ -117,12 +219,9 @@ async function request(
 
   const config = {
     method: method.toUpperCase(),
-    headers,
-    ...options
+    ...options,
+    headers
   };
-
-  // Keep merged headers if options contain custom headers.
-  config.headers = headers;
 
   if (
     data !== null &&
@@ -132,12 +231,12 @@ async function request(
     if (data instanceof FormData) {
       config.body = data;
 
-      // Browser sets multipart boundary automatically.
       delete config.headers['Content-Type'];
       delete config.headers['content-type'];
     } else {
       config.headers['Content-Type'] =
-        config.headers['Content-Type'] || 'application/json';
+        config.headers['Content-Type'] ||
+        'application/json';
 
       config.body = JSON.stringify(data);
     }
@@ -153,17 +252,31 @@ async function request(
 
     if (response.status !== 204) {
       if (contentType.includes('application/json')) {
-        json = await response.json().catch(() => ({}));
+        json = await response
+          .json()
+          .catch(() => ({}));
       } else {
-        const text = await response.text().catch(() => '');
+        const responseText = await response
+          .text()
+          .catch(() => '');
 
-        json = text
-          ? { message: response.ok ? '' : `HTTP ${response.status}` }
+        json = responseText
+          ? {
+              message: response.ok
+                ? ''
+                : `HTTP ${response.status}`
+            }
           : {};
       }
     }
 
-    if (response.status === 401 && token) {
+    // Only invalidate the current session if the
+    // rejected request used the same stored token.
+    if (
+      response.status === 401 &&
+      token &&
+      getStoredToken() === token
+    ) {
       clearAuthSession();
     }
 
@@ -171,25 +284,27 @@ async function request(
       throw createApiError(response, json);
     }
 
-    // Support APIs that return HTTP 200 with success=false.
     if (
       json &&
       typeof json === 'object' &&
-      (json.success === false || json.is_status === false)
+      (
+        json.success === false ||
+        json.is_status === false
+      )
     ) {
       const error = new Error(
         json.message || 'API request failed.'
       );
 
       error.name = 'ApiError';
-      error.status = json.statusCode || response.status;
+      error.status =
+        json.statusCode || response.status;
       error.response = json;
 
       throw error;
     }
 
     return json;
-
   } catch (error) {
     console.error(
       `[NIL API] ${method.toUpperCase()} ${endpoint}`,
@@ -211,16 +326,31 @@ async function request(
 export const apiGet = (endpoint, options = {}) =>
   request('GET', endpoint, null, options);
 
-export const apiPost = (endpoint, data = {}, options = {}) =>
+export const apiPost = (
+  endpoint,
+  data = {},
+  options = {}
+) =>
   request('POST', endpoint, data, options);
 
-export const apiPut = (endpoint, data = {}, options = {}) =>
+export const apiPut = (
+  endpoint,
+  data = {},
+  options = {}
+) =>
   request('PUT', endpoint, data, options);
 
-export const apiPatch = (endpoint, data = {}, options = {}) =>
+export const apiPatch = (
+  endpoint,
+  data = {},
+  options = {}
+) =>
   request('PATCH', endpoint, data, options);
 
-export const apiDelete = (endpoint, options = {}) =>
+export const apiDelete = (
+  endpoint,
+  options = {}
+) =>
   request('DELETE', endpoint, null, options);
 
 // ============================================================
@@ -228,7 +358,11 @@ export const apiDelete = (endpoint, options = {}) =>
 // ============================================================
 
 export const authApi = {
-  registerSendCode: (name, phone, referral_code = null) => {
+  registerSendCode: (
+    name,
+    phone,
+    referral_code = null
+  ) => {
     const payload = {
       name,
       phone
@@ -238,7 +372,8 @@ export const authApi = {
       typeof referral_code === 'string' &&
       referral_code.trim()
     ) {
-      payload.referral_code = referral_code.trim();
+      payload.referral_code =
+        referral_code.trim();
     }
 
     return apiPost(
@@ -254,15 +389,19 @@ export const authApi = {
     }),
 
   loginPhoneSendCode: (phone) =>
-    apiPost('/v1/auth/login/phone/send-code', {
-      phone
-    }),
+    apiPost(
+      '/v1/auth/login/phone/send-code',
+      { phone }
+    ),
 
   loginPhoneVerify: (phone, code) =>
-    apiPost('/v1/auth/login/phone/verify', {
-      phone,
-      code
-    }),
+    apiPost(
+      '/v1/auth/login/phone/verify',
+      {
+        phone,
+        code
+      }
+    ),
 
   loginEmail: (email, password) =>
     apiPost('/v1/auth/login', {
@@ -271,15 +410,19 @@ export const authApi = {
     }),
 
   forgotSendCode: (phone) =>
-    apiPost('/v1/auth/forgot-password/send-code', {
-      phone
-    }),
+    apiPost(
+      '/v1/auth/forgot-password/send-code',
+      { phone }
+    ),
 
   forgotVerify: (phone, code) =>
-    apiPost('/v1/auth/forgot-password/verify', {
-      phone,
-      code
-    }),
+    apiPost(
+      '/v1/auth/forgot-password/verify',
+      {
+        phone,
+        code
+      }
+    ),
 
   forgotReset: (
     phone,
@@ -287,12 +430,15 @@ export const authApi = {
     password,
     password_confirmation
   ) =>
-    apiPost('/v1/auth/forgot-password/reset', {
-      phone,
-      reset_token,
-      password,
-      password_confirmation
-    }),
+    apiPost(
+      '/v1/auth/forgot-password/reset',
+      {
+        phone,
+        reset_token,
+        password,
+        password_confirmation
+      }
+    ),
 
   logout: () =>
     apiPost('/v1/auth/logout', {})
@@ -307,7 +453,10 @@ export const profileApi = {
     apiGet('/v1/auth/profile'),
 
   update: (data) =>
-    apiPut('/v1/auth/profile', data),
+    apiPut(
+      '/v1/auth/profile',
+      data
+    ),
 
   changePhoneSendCode: (phone) =>
     apiPost(
@@ -318,7 +467,10 @@ export const profileApi = {
   changePhoneVerify: (phone, code) =>
     apiPost(
       '/v1/auth/profile/change-phone/verify',
-      { phone, code }
+      {
+        phone,
+        code
+      }
     )
 };
 
@@ -328,13 +480,20 @@ export const profileApi = {
 
 export const bookingsApi = {
   list: (params = {}) =>
-    apiGet(withQuery('/v1/bookings', params)),
+    apiGet(
+      withQuery('/v1/bookings', params)
+    ),
 
   get: (id) =>
-    apiGet(`/v1/bookings/${encodeURIComponent(id)}`),
+    apiGet(
+      `/v1/bookings/${encodeURIComponent(id)}`
+    ),
 
   create: (data) =>
-    apiPost('/v1/bookings', data),
+    apiPost(
+      '/v1/bookings',
+      data
+    ),
 
   cancel: (id, reason = null) => {
     const payload = {};
@@ -353,6 +512,21 @@ export const bookingsApi = {
     apiPut(
       `/v1/bookings/${encodeURIComponent(id)}/reschedule`,
       data
+    ),
+
+  validateDiscount: (bookingId, code) =>
+    apiPost(
+      '/v1/discount-codes/validate',
+      {
+        booking_id: Number(bookingId),
+        code: String(code).trim()
+      }
+    ),
+
+  applyDiscount: (id, data) =>
+    apiPost(
+      `/v1/bookings/${encodeURIComponent(id)}/apply-discount`,
+      data
     )
 };
 
@@ -362,10 +536,14 @@ export const bookingsApi = {
 
 export const servicesApi = {
   list: (params = {}) =>
-    apiGet(withQuery('/v1/services', params)),
+    apiGet(
+      withQuery('/v1/services', params)
+    ),
 
   get: (id) =>
-    apiGet(`/v1/services/${encodeURIComponent(id)}`)
+    apiGet(
+      `/v1/services/${encodeURIComponent(id)}`
+    )
 };
 
 // ============================================================
@@ -374,10 +552,14 @@ export const servicesApi = {
 
 export const staffApi = {
   list: (params = {}) =>
-    apiGet(withQuery('/v1/staff', params)),
+    apiGet(
+      withQuery('/v1/staff', params)
+    ),
 
   get: (id) =>
-    apiGet(`/v1/staff/${encodeURIComponent(id)}`),
+    apiGet(
+      `/v1/staff/${encodeURIComponent(id)}`
+    ),
 
   schedule: (id) =>
     apiGet(
@@ -390,29 +572,6 @@ export const staffApi = {
 // ============================================================
 
 export const availabilityApi = {
-  /**
-   * Get available slots.
-   *
-   * staffId:
-   *   null -> automatically search all eligible staff
-   *   id   -> search one specific staff member
-   *
-   * Compatible with AvailabilityController:
-   * GET /v1/availability
-   *
-   * Response:
-   * {
-   *   success: true,
-   *   data: [
-   *     {
-   *       start_time: "09:00",
-   *       end_time: "10:00",
-   *       duration: 60,
-   *       staff_ids: [1, 2]
-   *     }
-   *   ]
-   * }
-   */
   check: (
     staffId = null,
     serviceId,
@@ -434,26 +593,29 @@ export const availabilityApi = {
     }
 
     return apiGet(
-      withQuery('/v1/availability', params)
+      withQuery(
+        '/v1/availability',
+        params
+      )
     );
   },
 
-  /**
-   * Convenience method for booking without
-   * choosing a staff member.
-   */
-  checkGeneral: (serviceId, date, interval = 30) =>
+  checkGeneral: (
+    serviceId,
+    date,
+    interval = 30
+  ) =>
     apiGet(
-      withQuery('/v1/availability', {
-        service_id: serviceId,
-        date,
-        interval
-      })
+      withQuery(
+        '/v1/availability',
+        {
+          service_id: serviceId,
+          date,
+          interval
+        }
+      )
     ),
 
-  /**
-   * Convenience method for selected staff.
-   */
   checkStaff: (
     staffId,
     serviceId,
@@ -461,12 +623,15 @@ export const availabilityApi = {
     interval = 30
   ) =>
     apiGet(
-      withQuery('/v1/availability', {
-        staff_id: staffId,
-        service_id: serviceId,
-        date,
-        interval
-      })
+      withQuery(
+        '/v1/availability',
+        {
+          staff_id: staffId,
+          service_id: serviceId,
+          date,
+          interval
+        }
+      )
     )
 };
 
@@ -475,13 +640,19 @@ export const availabilityApi = {
 // ============================================================
 
 export const paymentsApi = {
-  deposit: (bookingId, data = {}) =>
+  deposit: (
+    bookingId,
+    data = {}
+  ) =>
     apiPost(
       `/v1/payments/bookings/${encodeURIComponent(bookingId)}/deposit`,
       data
     ),
 
-  start: (bookingId, data = {}) =>
+  start: (
+    bookingId,
+    data = {}
+  ) =>
     apiPost(
       `/v1/payments/bookings/${encodeURIComponent(bookingId)}/start`,
       data
@@ -494,7 +665,10 @@ export const paymentsApi = {
 
 export const messagesApi = {
   send: (data) =>
-    apiPost('/messages', data)
+    apiPost(
+      '/messages',
+      data
+    )
 };
 
 // ============================================================
@@ -503,7 +677,10 @@ export const messagesApi = {
 
 export const waitingListApi = {
   subscribe: (email) =>
-    apiPost('/waiting-list', { email })
+    apiPost(
+      '/waiting-list',
+      { email }
+    )
 };
 
 // ============================================================
@@ -513,13 +690,18 @@ export const waitingListApi = {
 export const galleryApi = {
   list: (categoryId = null) =>
     apiGet(
-      withQuery('/v1/gallery', {
-        category_id: categoryId
-      })
+      withQuery(
+        '/v1/gallery',
+        {
+          category_id: categoryId
+        }
+      )
     ),
 
   categories: () =>
-    apiGet('/v1/gallery/categories'),
+    apiGet(
+      '/v1/gallery/categories'
+    ),
 
   get: (id) =>
     apiGet(
@@ -534,10 +716,16 @@ export const galleryApi = {
 export const blogsApi = {
   list: (params = {}) =>
     apiGet(
-      withQuery('/v1/blogs', params)
+      withQuery(
+        '/v1/blogs',
+        params
+      )
     ),
 
-  get: (id, lang = null) =>
+  get: (
+    id,
+    lang = null
+  ) =>
     apiGet(
       withQuery(
         `/v1/blogs/${encodeURIComponent(id)}`,

@@ -4748,3 +4748,427 @@ ul, ol {
 
 
 
+/* NIL - Appointment Actions */
+
+.nil-dashboard .nil-booking-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 18px;
+}
+
+.nil-dashboard .nil-booking-actions button {
+  cursor: pointer;
+  padding: 12px 18px;
+  font-size: 13px;
+  font-weight: 500;
+  transition: all .25s ease;
+}
+
+.nil-dashboard .nil-reschedule-btn {
+  background: var(--nil-green, #738267);
+  color: #fff;
+  border: 1px solid transparent;
+}
+
+.nil-dashboard .nil-reschedule-btn:hover {
+  filter: brightness(.9);
+  transform: translateY(-2px);
+}
+
+.nil-dashboard .nil-booking-actions button:disabled {
+  opacity: .5;
+  cursor: not-allowed;
+}
+
+@media (max-width: 600px) {
+  .nil-dashboard .nil-booking-actions {
+    flex-direction: column;
+  }
+
+  .nil-dashboard .nil-booking-actions button {
+    width: 100%;
+  }
+}
+
+
+/* ============================================================
+   NIL BEAUTY - CHECKOUT DISCOUNT
+   ============================================================ */
+
+.nil-checkout-discount {
+  margin: 24px 0;
+  padding: 22px 0;
+  border-top: 1px solid #e8e8e8;
+}
+
+.nil-checkout-discount label {
+  display: block;
+  margin-bottom: 12px;
+  font-size: 14px;
+  font-weight: 600;
+  color: #111;
+}
+
+.nil-discount-input-group {
+  display: flex;
+  align-items: stretch;
+  gap: 10px;
+}
+
+.nil-discount-input {
+  flex: 1;
+  min-width: 0;
+  min-height: 48px;
+  padding: 12px 15px;
+  background: #fff;
+  border: 1px solid #ddd;
+  border-radius: 0;
+  outline: none;
+  color: #111;
+  font-size: 14px;
+  transition: border-color .2s ease;
+}
+
+.nil-discount-input:focus {
+  border-color: var(--nil-green, #738267);
+}
+
+.nil-discount-input::placeholder {
+  color: #aaa;
+}
+
+.nil-discount-button {
+  min-width: 105px;
+  padding: 12px 18px;
+  border: 1px solid #111;
+  background: #111;
+  color: #fff;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all .25s ease;
+}
+
+.nil-discount-button:hover {
+  background: var(--nil-green, #738267);
+  border-color: var(--nil-green, #738267);
+}
+
+.nil-discount-button:disabled,
+.nil-discount-input:disabled {
+  opacity: .55;
+  cursor: not-allowed;
+}
+
+.nil-discount-message {
+  margin: 12px 0 0;
+  color: var(--nil-green, #738267);
+  font-size: 12px;
+  line-height: 1.9;
+}
+
+.nil-discount-message[hidden] {
+  display: none;
+}
+
+.nil-discount-message.error {
+  color: #c0392b;
+}
+
+.nil-discount-applied {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 14px;
+  padding: 12px 14px;
+  background: #eef3eb;
+  color: #527148;
+  font-size: 12px;
+  line-height: 1.8;
+}
+
+.nil-discount-applied span {
+  font-weight: 700;
+  font-size: 16px;
+}
+
+.nil-discount-row strong {
+  color: var(--nil-green, #738267);
+}
+
+@media (max-width: 480px) {
+  .nil-discount-input-group {
+    flex-direction: column;
+  }
+
+  .nil-discount-input {
+    width: 100%;
+  }
+
+  .nil-discount-button {
+    width: 100%;
+    min-height: 46px;
+  }
+
+  .nil-checkout-discount {
+    margin: 18px 0;
+    padding: 18px 0;
+  }
+}
+
+/* NIL Header Logo */
+
+.nil-brand-logo {
+  display: block;
+  width: 120px;
+  height: auto;
+  max-height: 100px;
+  object-fit: contain;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+@media (max-width: 767px) {
+  .nil-brand-logo {
+    width: 85px;
+    max-height: 48px;
+  }
+}
+
+
+/* ============================================
+   NIL BEAUTY - MINIMAL OLIVE FOOTER
+   Colors: Olive / White / Black
+============================================ */
+
+.nil-footer {
+  background: #7d8566;
+  color: #ffffff;
+  padding: 38px 24px 18px;
+  font-family: inherit;
+}
+
+.nil-footer *,
+.nil-footer *::before,
+.nil-footer *::after {
+  box-sizing: border-box;
+}
+
+.nil-footer-container {
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+/* ============================================
+   BRAND
+============================================ */
+
+.nil-footer-brand {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+.nil-footer-logo {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+}
+
+.nil-footer-logo img {
+  display: block;
+  width: 150px;
+  height: auto;
+  max-height: 100px;
+  object-fit: contain;
+}
+
+.nil-footer-description {
+  margin: 10px 0 0;
+  font-size: 12px;
+  font-weight: 400;
+  line-height: 1.7;
+  letter-spacing: 0.02em;
+  color: #ffffff;
+}
+
+/* ============================================
+   NAVIGATION
+============================================ */
+
+.nil-footer-navigation {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 12px 30px;
+  margin-top: 25px;
+}
+
+.nil-footer-navigation a {
+  position: relative;
+  color: #ffffff;
+  text-decoration: none;
+  font-size: 13px;
+  font-weight: 400;
+  transition:
+    color 0.25s ease,
+    opacity 0.25s ease;
+}
+
+.nil-footer-navigation a:hover {
+  color: #000000;
+  opacity: 1;
+}
+
+/* ============================================
+   SOCIAL ICONS
+============================================ */
+
+.nil-footer-social {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 22px;
+  margin-top: 25px;
+}
+
+.nil-footer-social a {
+  width: 44px;
+  height: 44px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  border-radius: 50%;
+  background: #ffffff;
+  opacity: 1;
+  text-decoration: none;
+  transition:
+    background 0.25s ease,
+    transform 0.25s ease;
+}
+
+.nil-footer-social img {
+  display: block;
+  width: 26px;
+  height: 26px;
+  object-fit: contain;
+  filter: brightness(0);
+  transition: filter 0.25s ease;
+}
+
+.nil-footer-social a:hover {
+  background: #000000;
+  transform: translateY(-3px);
+}
+
+.nil-footer-social a:hover img {
+  filter: brightness(0) invert(1);
+}
+
+/* ============================================
+   FOOTER BOTTOM
+============================================ */
+
+.nil-footer-bottom {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 16px;
+  margin-top: 30px;
+  padding-top: 15px;
+  border-top: 1px solid rgba(255, 255, 255, 0.35);
+  font-size: 11px;
+  line-height: 1.8;
+  color: #ffffff;
+}
+
+.nil-footer-credit {
+  color: #ffffff;
+}
+
+.nil-footer-credit a {
+  margin-inline-start: 4px;
+  color: #ffffff;
+  font-weight: 600;
+  text-decoration: none;
+  transition: color 0.25s ease;
+}
+
+.nil-footer-credit a:hover {
+  color: #000000;
+}
+
+/* ============================================
+   MOBILE
+============================================ */
+
+@media (max-width: 767px) {
+  .nil-footer {
+    padding: 30px 16px 15px;
+  }
+
+  .nil-footer-logo img {
+    width: 120px;
+    max-height: 85px;
+
+  .nil-footer-description {
+    margin-top: 8px;
+    font-size: 11px;
+  }
+
+  .nil-footer-navigation {
+    margin-top: 20px;
+    gap: 12px 20px;
+  }
+
+  .nil-footer-navigation a {
+    font-size: 12px;
+  }
+
+  .nil-footer-social {
+    margin-top: 22px;
+    gap: 18px;
+  }
+
+  .nil-footer-social a {
+    width: 44px;
+    height: 44px;
+  }
+
+  .nil-footer-social img {
+    width: 26px;
+    height: 26px;
+  }
+
+  .nil-footer-bottom {
+    flex-direction: column;
+    justify-content: center;
+    text-align: center;
+    gap: 5px;
+    margin-top: 25px;
+    padding-top: 12px;
+    font-size: 10px;
+  }
+}
+
+/* ============================================
+   ACCESSIBILITY
+============================================ */
+
+@media (prefers-reduced-motion: reduce) {
+  .nil-footer a,
+  .nil-footer img {
+    transition: none;
+  }
+}
