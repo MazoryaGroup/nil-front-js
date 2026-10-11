@@ -7,7 +7,7 @@
  * ============================================================
  */
 
-const BASE_URL = 'https://apinil.mazoryagroup.ir/api';
+const BASE_URL = 'http://127.0.0.1:8000/api';
 
 const TOKEN_KEY = 'auth_token';
 const USER_KEY = 'auth_user';

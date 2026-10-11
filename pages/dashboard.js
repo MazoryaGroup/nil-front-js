@@ -1,4 +1,3 @@
-
 import '../asset/css/custom.css';
 
 import { Layout, initLayout } from '../components/Layout.js';
@@ -14,6 +13,11 @@ import {
 
 // ============================================================
 // NIL BEAUTY — CUSTOMER DASHBOARD
+// MULTI-SERVICE BOOKING + MULTI-SERVICE RESCHEDULE
+// ============================================================
+
+// ============================================================
+// HELPERS
 // ============================================================
 
 const escapeHtml = (value) =>
@@ -107,7 +111,11 @@ function formatJalali(iso) {
   try {
     const { year, month, day } = getJalali(iso);
 
-    return `${faNumber(day)} ${persianMonths[month - 1]} ${faNumber(year)}`;
+    return (
+      `${faNumber(day)} ` +
+      `${persianMonths[month - 1]} ` +
+      `${faNumber(year)}`
+    );
   } catch {
     return String(iso);
   }
@@ -145,7 +153,6 @@ function getMonthData(offset = 0) {
   }
 
   const days = [];
-
   cursor = firstDay;
 
   while (days.length < 31) {
@@ -154,7 +161,9 @@ function getMonthData(offset = 0) {
     if (
       parts.year !== year ||
       parts.month !== month
-    ) break;
+    ) {
+      break;
+    }
 
     days.push({
       iso: cursor,
@@ -169,15 +178,69 @@ function getMonthData(offset = 0) {
 }
 
 // ============================================================
+// TIME HELPERS
+// ============================================================
+
+function clockToMinutes(time) {
+  const match = String(time || '').match(
+    /^(\d{1,2}):(\d{2})/
+  );
+
+  if (!match) return null;
+
+  const hours = Number(match[1]);
+  const minutes = Number(match[2]);
+
+  if (
+    hours < 0 ||
+    hours > 23 ||
+    minutes < 0 ||
+    minutes > 59
+  ) {
+    return null;
+  }
+
+  return hours * 60 + minutes;
+}
+
+function minutesToClock(minutes) {
+  if (
+    !Number.isFinite(minutes) ||
+    minutes < 0 ||
+    minutes >= 1440
+  ) {
+    return null;
+  }
+
+  const hours = Math.floor(minutes / 60);
+  const mins = minutes % 60;
+
+  return (
+    String(hours).padStart(2, '0') +
+    ':' +
+    String(mins).padStart(2, '0')
+  );
+}
+
+// ============================================================
 // API HELPERS
 // ============================================================
 
 function extractList(response, key) {
   if (Array.isArray(response)) return response;
   if (Array.isArray(response?.data)) return response.data;
-  if (Array.isArray(response?.data?.[key])) return response.data[key];
-  if (Array.isArray(response?.data?.data)) return response.data.data;
-  if (Array.isArray(response?.[key])) return response[key];
+
+  if (Array.isArray(response?.data?.[key])) {
+    return response.data[key];
+  }
+
+  if (Array.isArray(response?.data?.data)) {
+    return response.data.data;
+  }
+
+  if (Array.isArray(response?.[key])) {
+    return response[key];
+  }
 
   return [];
 }
@@ -202,12 +265,16 @@ function normalizeSlots(response) {
     )
     .map((slot) => ({
       ...slot,
+
       start_time: String(slot.start_time).slice(0, 5),
       end_time: String(slot.end_time).slice(0, 5),
+
       staff_ids: [...new Set(
         slot.staff_ids
           .map(Number)
-          .filter((id) => Number.isInteger(id) && id > 0)
+          .filter((id) =>
+            Number.isInteger(id) && id > 0
+          )
       )]
     }))
     .filter((slot) => slot.staff_ids.length > 0)
@@ -216,6 +283,25 @@ function normalizeSlots(response) {
       a.end_time.localeCompare(b.end_time)
     );
 }
+
+function getBookingItems(booking) {
+  const items =
+    booking?.booking_services ||
+    booking?.services ||
+    [];
+
+  if (!Array.isArray(items)) return [];
+
+  return [...items].sort((a, b) =>
+    String(a.start_time || '').localeCompare(
+      String(b.start_time || '')
+    )
+  );
+}
+
+// ============================================================
+// BOOKING RULES
+// ============================================================
 
 function canModifyBooking(booking) {
   const allowedStatuses = [
@@ -228,24 +314,34 @@ function canModifyBooking(booking) {
     return false;
   }
 
-  const date = String(booking.booking_date || '').slice(0, 10);
-  const time = String(booking.start_time || '').slice(0, 5);
+  const date = String(
+    booking.booking_date || ''
+  ).slice(0, 10);
+
+  const time = String(
+    booking.start_time || ''
+  ).slice(0, 5);
 
   if (
     !/^\d{4}-\d{2}-\d{2}$/.test(date) ||
     !/^\d{2}:\d{2}$/.test(time)
-  ) return false;
+  ) {
+    return false;
+  }
 
-  const appointment = new Date(`${date}T${time}:00+03:30`);
+  const appointment = new Date(
+    `${date}T${time}:00+03:30`
+  );
 
   return (
     Number.isFinite(appointment.getTime()) &&
-    appointment.getTime() - Date.now() >= 24 * 60 * 60 * 1000
+    appointment.getTime() - Date.now() >=
+      24 * 60 * 60 * 1000
   );
 }
 
 // ============================================================
-// MAIN PAGE
+// DASHBOARD PAGE
 // ============================================================
 
 export async function DashboardPage() {
@@ -276,10 +372,11 @@ export async function DashboardPage() {
         <!-- HEADER -->
         <header class="nil-topbar">
           <div class="nil-brand">
-            <div class="nil-brand-icon">N</div>
             <div>
               <strong>NIL BEAUTY</strong>
-              <small>${t('پنل مشتریان', 'Customer dashboard')}</small>
+              <small>
+                ${t('پنل مشتریان', 'Customer dashboard')}
+              </small>
             </div>
           </div>
 
@@ -288,7 +385,9 @@ export async function DashboardPage() {
             class="nil-icon-btn"
             data-nil-logout
             title="${t('خروج', 'Logout')}"
-          >↪</button>
+          >
+            ↪
+          </button>
         </header>
 
         <!-- WELCOME -->
@@ -300,7 +399,9 @@ export async function DashboardPage() {
 
             <h1>
               ${t('سلام', 'Hello')}،
-              ${escapeHtml(user?.name || t('عزیز', 'there'))}
+              ${escapeHtml(
+                user?.name || t('عزیز', 'there')
+              )}
               <span>✦</span>
             </h1>
 
@@ -360,8 +461,8 @@ export async function DashboardPage() {
 
               <p>
                 ${t(
-                  'خدمات دلخواهت رو انتخاب کن',
-                  'Choose your favorite services'
+                  'می‌توانی یک یا چند خدمت انتخاب کنی',
+                  'Select one or more services'
                 )}
               </p>
             </div>
@@ -372,12 +473,15 @@ export async function DashboardPage() {
             data-nil-services
           >
             <div class="nil-loading">
-              ${t('در حال دریافت خدمات...', 'Loading services...')}
+              ${t(
+                'در حال دریافت خدمات...',
+                'Loading services...'
+              )}
             </div>
           </div>
         </section>
 
-        <!-- BOOKINGS -->
+        <!-- MY BOOKINGS -->
         <section
           class="nil-panel"
           data-nil-panel="bookings"
@@ -431,7 +535,7 @@ export async function DashboardPage() {
         </section>
       </div>
 
-      <!-- SELECTED SERVICES BAR -->
+      <!-- SELECTED SERVICES -->
       <div
         class="nil-selection"
         data-nil-selection
@@ -468,6 +572,7 @@ export async function DashboardPage() {
           class="nil-dialog"
           role="dialog"
           aria-modal="true"
+          aria-label="${t('رزرو نوبت', 'Book appointment')}"
         >
           <div class="nil-dialog-header">
             <div>
@@ -484,11 +589,17 @@ export async function DashboardPage() {
               type="button"
               class="nil-icon-btn"
               data-nil-close
-            >✕</button>
+            >
+              ✕
+            </button>
           </div>
 
           <div class="nil-progress">
-            <span data-nil-progress="1" class="active"></span>
+            <span
+              data-nil-progress="1"
+              class="active"
+            ></span>
+
             <span data-nil-progress="2"></span>
             <span data-nil-progress="3"></span>
           </div>
@@ -498,7 +609,10 @@ export async function DashboardPage() {
             <!-- STEP 1 -->
             <div data-nil-step="1">
               <h3>
-                ${t('چه روزی برات مناسبه؟', 'Choose a date')}
+                ${t(
+                  'چه روزی برات مناسبه؟',
+                  'Choose a date'
+                )}
               </h3>
 
               <p class="nil-muted">
@@ -514,7 +628,10 @@ export async function DashboardPage() {
             <!-- STEP 2 -->
             <div data-nil-step="2" hidden>
               <h3>
-                ${t('انتخاب ساعت', 'Choose a time')}
+                ${t(
+                  'انتخاب ساعت خدمات',
+                  'Choose service times'
+                )}
               </h3>
 
               <p
@@ -531,16 +648,54 @@ export async function DashboardPage() {
             <!-- STEP 3 -->
             <div data-nil-step="3" hidden>
               <h3>
-                ${t('تأیید اطلاعات', 'Confirm booking')}
+                ${t(
+                  'تأیید اطلاعات',
+                  'Confirm booking'
+                )}
               </h3>
 
               <div data-nil-summary></div>
+
+              <div data-nil-discount-wrapper>
+                <label
+                  class="nil-field-label"
+                  for="nil-booking-discount-code"
+                >
+                  ${t(
+                    'کد تخفیف (اختیاری)',
+                    'Discount code (optional)'
+                  )}
+                </label>
+
+                <input
+                  id="nil-booking-discount-code"
+                  class="nil-input"
+                  data-nil-booking-discount-code
+                  type="text"
+                  maxlength="100"
+                  autocomplete="off"
+                  placeholder="${t(
+                    'کد تخفیف را وارد کنید',
+                    'Enter discount code'
+                  )}"
+                />
+
+                <p class="nil-muted">
+                  ${t(
+                    'اعتبار کد و مبلغ نهایی هنگام ثبت رزرو توسط سرور بررسی می‌شود.',
+                    'The server validates the discount when creating your booking.'
+                  )}
+                </p>
+              </div>
 
               <label
                 class="nil-field-label"
                 for="nil-notes"
               >
-                ${t('توضیحات (اختیاری)', 'Notes (optional)')}
+                ${t(
+                  'توضیحات (اختیاری)',
+                  'Notes (optional)'
+                )}
               </label>
 
               <textarea
@@ -587,7 +742,9 @@ export async function DashboardPage() {
   `);
 
   setTimeout(() => {
-    const root = document.querySelector('[data-nil-dashboard]');
+    const root = document.querySelector(
+      '[data-nil-dashboard]'
+    );
 
     if (!root) return;
 
@@ -604,11 +761,16 @@ export async function DashboardPage() {
 
 function initDashboard(root, isFa) {
   if (root.dataset.initialized === '1') return;
+
   root.dataset.initialized = '1';
 
   const $ = (selector) => root.querySelector(selector);
   const $$ = (selector) => [...root.querySelectorAll(selector)];
   const t = (fa, en) => isFa ? fa : en;
+
+  // ============================================================
+  // STATE
+  // ============================================================
 
   let services = [];
   let selectedServices = [];
@@ -616,15 +778,20 @@ function initDashboard(root, isFa) {
 
   let selectedDate = null;
   let selectedSlot = null;
+  let selectedSlots = [];
 
+  let currentServiceIndex = 0;
   let monthOffset = 0;
   let currentStep = 1;
 
   let loadingAvailability = false;
   let submitting = false;
-
-  let rescheduleBooking = null;
   let availabilityRequestId = 0;
+
+  // Reschedule state
+  let rescheduleBooking = null;
+  let rescheduleItems = [];
+  let rescheduleStaffId = null;
 
   const modal = $('[data-nil-modal]');
   const nextButton = $('[data-nil-next]');
@@ -642,6 +809,19 @@ function initDashboard(root, isFa) {
     element.classList.toggle('error', error);
   }
 
+  function resetRescheduleState() {
+    rescheduleBooking = null;
+    rescheduleItems = [];
+    rescheduleStaffId = null;
+    previousSelectedServices = null;
+  }
+
+  function resetTimeSelection() {
+    selectedSlot = null;
+    selectedSlots = [];
+    currentServiceIndex = 0;
+  }
+
   function updateNextButton() {
     let disabled = submitting;
 
@@ -650,11 +830,27 @@ function initDashboard(root, isFa) {
     }
 
     if (currentStep === 2) {
-      disabled ||= loadingAvailability || !selectedSlot;
+      disabled ||= (
+        loadingAvailability ||
+        !selectedSlot?.staff_id ||
+        !selectedSlot?.start_time
+      );
     }
 
     if (currentStep === 3) {
-      disabled ||= !selectedDate || !selectedSlot;
+      disabled ||= (
+        !selectedDate ||
+        selectedSlots.length !== selectedServices.length ||
+        selectedServices.some((service, index) => {
+          const slot = selectedSlots[index];
+
+          return (
+            String(slot?.service_id) !== String(service.id) ||
+            !slot?.staff_id ||
+            !slot?.start_time
+          );
+        })
+      );
     }
 
     nextButton.disabled = disabled;
@@ -719,7 +915,9 @@ function initDashboard(root, isFa) {
   $('[data-nil-logout]').addEventListener(
     'click',
     async () => {
-      if (!confirm(t('خارج می‌شوی؟', 'Log out?'))) return;
+      if (!confirm(t('خارج می‌شوی؟', 'Log out?'))) {
+        return;
+      }
 
       try {
         await logout();
@@ -762,7 +960,10 @@ function initDashboard(root, isFa) {
     if (!services.length) {
       container.innerHTML = `
         <div class="nil-empty">
-          ${t('خدمتی موجود نیست', 'No services available')}
+          ${t(
+            'خدمتی موجود نیست',
+            'No services available'
+          )}
         </div>
       `;
       return;
@@ -770,7 +971,8 @@ function initDashboard(root, isFa) {
 
     container.innerHTML = services.map((service, index) => {
       const active = selectedServices.some(
-        (item) => String(item.id) === String(service.id)
+        (item) =>
+          String(item.id) === String(service.id)
       );
 
       return `
@@ -793,12 +995,17 @@ function initDashboard(root, isFa) {
           <div class="nil-service-symbol">✧</div>
 
           <div class="nil-service-info">
-            <h3>${escapeHtml(service.name)}</h3>
+            <h3>
+              ${escapeHtml(service.name)}
+            </h3>
 
             <p>
               ${escapeHtml(
                 service.description ||
-                t('خدمات زیبایی نیل', 'NIL beauty service')
+                t(
+                  'خدمات زیبایی نیل',
+                  'NIL beauty service'
+                )
               )}
             </p>
 
@@ -829,12 +1036,14 @@ function initDashboard(root, isFa) {
           if (!service) return;
 
           const exists = selectedServices.some(
-            (item) => String(item.id) === String(service.id)
+            (item) =>
+              String(item.id) === String(service.id)
           );
 
           if (exists) {
             selectedServices = selectedServices.filter(
-              (item) => String(item.id) !== String(service.id)
+              (item) =>
+                String(item.id) !== String(service.id)
             );
           } else {
             selectedServices.push(service);
@@ -857,7 +1066,8 @@ function initDashboard(root, isFa) {
     );
 
     const total = selectedServices.reduce(
-      (sum, service) => sum + Number(service.price || 0),
+      (sum, service) =>
+        sum + Number(service.price || 0),
       0
     );
 
@@ -871,23 +1081,24 @@ function initDashboard(root, isFa) {
   );
 
   // ============================================================
-  // MODAL
+  // OPEN BOOKING MODAL
   // ============================================================
 
   function openModal() {
     if (!selectedServices.length) return;
 
-    rescheduleBooking = null;
-    previousSelectedServices = null;
+    resetRescheduleState();
+    resetTimeSelection();
 
     selectedDate = null;
-    selectedSlot = null;
     monthOffset = 0;
 
     availabilityRequestId++;
     loadingAvailability = false;
 
     $('[data-nil-notes]').value = '';
+    $('[data-nil-booking-discount-code]').value = '';
+    $('[data-nil-discount-wrapper]').hidden = false;
 
     const heading = modal.querySelector(
       '.nil-dialog-header h2'
@@ -907,6 +1118,10 @@ function initDashboard(root, isFa) {
     renderCalendar();
   }
 
+  // ============================================================
+  // OPEN RESCHEDULE MODAL — MULTI SERVICE
+  // ============================================================
+
   function openRescheduleModal(booking) {
     if (!canModifyBooking(booking)) {
       alert(t(
@@ -916,31 +1131,60 @@ function initDashboard(root, isFa) {
       return;
     }
 
-    const items =
-      booking.booking_services ||
-      booking.services ||
-      [];
+    const items = getBookingItems(booking);
 
-    if (items.length !== 1) {
+    if (!items.length) {
       alert(t(
-        'جابجایی نوبت چندخدمتی فعلاً پشتیبانی نمی‌شود.',
-        'Multi-service rescheduling is not supported yet.'
+        'اطلاعات خدمات این رزرو موجود نیست.',
+        'Booking services are unavailable.'
       ));
       return;
     }
 
-    const serviceId =
-      items[0].service_id ||
-      items[0].service?.id;
+    // The first service determines the new start time.
+    const firstItem = items[0];
 
-    const service = services.find(
-      (item) => String(item.id) === String(serviceId)
+    const firstServiceId =
+      firstItem.service_id ??
+      firstItem.service?.id;
+
+    const firstStaffId =
+      firstItem.staff_id ??
+      firstItem.staff?.id;
+
+    const firstService = services.find(
+      (item) =>
+        String(item.id) === String(firstServiceId)
     );
 
-    if (!service) {
+    if (!firstService || !firstStaffId) {
       alert(t(
-        'اطلاعات خدمت این نوبت پیدا نشد.',
-        'Booking service could not be found.'
+        'اطلاعات خدمت یا پرسنل این رزرو کامل نیست.',
+        'Booking service or staff information is incomplete.'
+      ));
+      return;
+    }
+
+    // Every service must have valid timing information.
+    const validItems = items.every((item) => {
+      return (
+        clockToMinutes(item.start_time) !== null &&
+        clockToMinutes(item.end_time) !== null &&
+        (
+          item.service_id ??
+          item.service?.id
+        ) != null &&
+        (
+          item.staff_id ??
+          item.staff?.id
+        ) != null
+      );
+    });
+
+    if (!validItems) {
+      alert(t(
+        'اطلاعات زمان‌بندی بعضی خدمات کامل نیست.',
+        'Some service scheduling details are missing.'
       ));
       return;
     }
@@ -948,16 +1192,24 @@ function initDashboard(root, isFa) {
     previousSelectedServices = [...selectedServices];
 
     rescheduleBooking = booking;
-    selectedServices = [service];
+    rescheduleItems = items;
+    rescheduleStaffId = Number(firstStaffId);
+
+    // Only one service is selected for the time picker.
+    // All original services remain in rescheduleItems.
+    selectedServices = [firstService];
 
     selectedDate = null;
-    selectedSlot = null;
+    resetTimeSelection();
+
     monthOffset = 0;
 
     availabilityRequestId++;
     loadingAvailability = false;
 
     $('[data-nil-notes]').value = booking.notes || '';
+    $('[data-nil-booking-discount-code]').value = '';
+    $('[data-nil-discount-wrapper]').hidden = true;
 
     const heading = modal.querySelector(
       '.nil-dialog-header h2'
@@ -965,8 +1217,13 @@ function initDashboard(root, isFa) {
 
     if (heading) {
       heading.textContent = t(
-        'جابجایی نوبت',
-        'Reschedule appointment'
+        items.length > 1
+          ? 'جابجایی رزرو چندخدمتی'
+          : 'جابجایی نوبت',
+
+        items.length > 1
+          ? 'Reschedule multiple services'
+          : 'Reschedule appointment'
       );
     }
 
@@ -976,6 +1233,10 @@ function initDashboard(root, isFa) {
     setStep(1);
     renderCalendar();
   }
+
+  // ============================================================
+  // CLOSE MODAL
+  // ============================================================
 
   function closeModal() {
     if (submitting) return;
@@ -990,11 +1251,10 @@ function initDashboard(root, isFa) {
       updateSelectionBar();
     }
 
-    rescheduleBooking = null;
-    previousSelectedServices = null;
+    resetRescheduleState();
+    resetTimeSelection();
 
     selectedDate = null;
-    selectedSlot = null;
 
     modal.hidden = true;
     document.body.style.overflow = '';
@@ -1050,7 +1310,9 @@ function initDashboard(root, isFa) {
             type="button"
             data-month-prev
             ${monthOffset === 0 ? 'disabled' : ''}
-          >→</button>
+          >
+            →
+          </button>
 
           <div>
             <strong>
@@ -1059,14 +1321,19 @@ function initDashboard(root, isFa) {
             </strong>
 
             <small>
-              ${t('انتخاب تاریخ نوبت', 'Select a date')}
+              ${t(
+                'انتخاب تاریخ نوبت',
+                'Select a date'
+              )}
             </small>
           </div>
 
           <button
             type="button"
             data-month-next
-          >←</button>
+          >
+            ←
+          </button>
         </div>
 
         <div class="nil-weekdays">
@@ -1076,7 +1343,9 @@ function initDashboard(root, isFa) {
         </div>
 
         <div class="nil-calendar-grid">
-          ${Array(emptyDays).fill('<span></span>').join('')}
+          ${Array(emptyDays)
+            .fill('<span></span>')
+            .join('')}
 
           ${month.days.map((day) => {
             const isPast = day.iso < today;
@@ -1130,7 +1399,8 @@ function initDashboard(root, isFa) {
     ).forEach((button) => {
       button.addEventListener('click', () => {
         selectedDate = button.dataset.calendarDate;
-        selectedSlot = null;
+
+        resetTimeSelection();
 
         renderCalendar();
         updateNextButton();
@@ -1140,46 +1410,110 @@ function initDashboard(root, isFa) {
 
   // ============================================================
   // AVAILABLE TIMES
+  // SUPPORTS BOOKING + RESCHEDULING
   // ============================================================
 
   async function loadAvailableTimes() {
     const container = $('[data-nil-times]');
     const requestId = ++availabilityRequestId;
 
-    selectedSlot = null;
-    loadingAvailability = true;
+    const service = selectedServices[currentServiceIndex];
 
+    selectedSlot =
+      selectedSlots[currentServiceIndex] || null;
+
+    loadingAvailability = true;
     updateNextButton();
 
+    if (!selectedDate || !service) {
+      loadingAvailability = false;
+
+      container.innerHTML = `
+        <div class="nil-empty">
+          ${t(
+            'اطلاعات انتخاب خدمت کامل نیست.',
+            'Service selection is incomplete.'
+          )}
+        </div>
+      `;
+
+      updateNextButton();
+      return;
+    }
+
+    const isRescheduling = !!rescheduleBooking;
+
+    const progress = isRescheduling
+      ? t(
+          'ساعت شروع جدید رزرو',
+          'New booking start time'
+        )
+      : (
+          selectedServices.length > 1
+            ? t(
+                `خدمت ${faNumber(currentServiceIndex + 1)} از ${faNumber(selectedServices.length)}`,
+                `Service ${currentServiceIndex + 1} of ${selectedServices.length}`
+              )
+            : t('انتخاب ساعت', 'Choose a time')
+        );
+
     $('[data-nil-date-label]').textContent =
-      formatJalali(selectedDate);
+      `${formatJalali(selectedDate)} — ${progress}: ${service.name}`;
+
+    const previous =
+      selectedSlots[currentServiceIndex - 1];
+
+    const earliestStart = isRescheduling
+      ? null
+      : previous?.end_time || null;
+
+    const selectedSoFar = isRescheduling
+      ? ''
+      : selectedSlots
+          .slice(0, currentServiceIndex)
+          .map((slot, index) => `
+            <div
+              class="nil-summary-row"
+              style="margin-bottom:6px"
+            >
+              <span>
+                ${escapeHtml(
+                  selectedServices[index]?.name || ''
+                )}
+              </span>
+
+              <strong>
+                ${escapeHtml(slot.start_time)}
+                -
+                ${escapeHtml(slot.end_time)}
+              </strong>
+            </div>
+          `).join('');
+
+    const priorHtml = selectedSoFar
+      ? `
+        <div
+          class="nil-summary"
+          style="grid-column:1/-1;margin-bottom:16px"
+        >
+          ${selectedSoFar}
+        </div>
+      `
+      : '';
 
     container.innerHTML = `
-      <div class="nil-loading">
+      ${priorHtml}
+
+      <div
+        class="nil-loading"
+        style="grid-column:1/-1"
+      >
         ${t(
           'در حال بررسی ساعت‌های آزاد...',
           'Checking available times...'
         )}
       </div>
     `;
-
-    if (selectedServices.length !== 1) {
-      loadingAvailability = false;
-      updateNextButton();
-
-      container.innerHTML = `
-        <div class="nil-empty">
-          ${t(
-            'رزرو همزمان چند خدمت نیاز به API ظرفیت ترکیبی دارد. فعلاً یک خدمت انتخاب کن.',
-            'Combined availability is required for multiple services. Please select one service.'
-          )}
-        </div>
-      `;
-
-      return;
-    }
-
-    const service = selectedServices[0];
 
     try {
       const response = await availabilityApi.check(
@@ -1191,62 +1525,161 @@ function initDashboard(root, isFa) {
 
       if (requestId !== availabilityRequestId) return;
 
-      const slots = normalizeSlots(response);
+      const slots = normalizeSlots(response).filter((slot) => {
+        const afterPrevious =
+          !earliestStart ||
+          slot.start_time >= earliestStart;
+
+        // Keep the original staff for rescheduling.
+        const sameStaff =
+          !isRescheduling ||
+          slot.staff_ids.includes(rescheduleStaffId);
+
+        return afterPrevious && sameStaff;
+      });
+
+      if (
+        selectedSlot &&
+        !slots.some((slot) =>
+          slot.start_time === selectedSlot.start_time &&
+          slot.end_time === selectedSlot.end_time &&
+          slot.staff_ids.includes(
+            Number(selectedSlot.staff_id)
+          )
+        )
+      ) {
+        selectedSlot = null;
+
+        selectedSlots = selectedSlots.slice(
+          0,
+          currentServiceIndex
+        );
+
+        updateNextButton();
+      }
 
       if (!slots.length) {
         container.innerHTML = `
-          <div class="nil-empty">
-            ${t(
-              'برای این روز ساعت آزادی پیدا نشد.',
-              'No available times for this date.'
-            )}
+          ${priorHtml}
+
+          <div
+            class="nil-empty"
+            style="grid-column:1/-1"
+          >
+            ${isRescheduling
+              ? t(
+                  'برای پرسنل فعلی در این تاریخ ساعت آزادی پیدا نشد. تاریخ دیگری انتخاب کن.',
+                  'No available times for the assigned staff on this date.'
+                )
+              : earliestStart
+                ? t(
+                    `برای ${escapeHtml(service.name)} بعد از ساعت ${escapeHtml(earliestStart)} زمان آزادی پیدا نشد.`,
+                    `No available time for ${escapeHtml(service.name)} after ${escapeHtml(earliestStart)}.`
+                  )
+                : t(
+                    'برای این روز ساعت آزادی پیدا نشد.',
+                    'No available times for this date.'
+                  )
+            }
           </div>
         `;
+
         return;
       }
 
-      container.innerHTML = slots.map((slot, index) => `
-        <button
-          type="button"
-          class="nil-time"
-          data-slot-index="${index}"
-        >
-          <span>
-            ◷ ${escapeHtml(slot.start_time)}
-          </span>
+      container.innerHTML = `
+        ${priorHtml}
 
-          <small style="
-            display:block;
-            margin-top:6px;
-            opacity:.65;
-            font-size:11px;
-          ">
-            ${t('تا', 'to')}
-            ${escapeHtml(slot.end_time)}
-          </small>
-        </button>
-      `).join('');
+        <p
+          class="nil-muted"
+          style="grid-column:1/-1;margin-bottom:12px"
+        >
+          ${isRescheduling
+            ? t(
+                'انتخاب ساعت شروع جدید تمام خدمات:',
+                'Choose the new start time for all services:'
+              )
+            : t('ساعت خدمت:', 'Time for:')
+          }
+
+          <strong>
+            ${escapeHtml(service.name)}
+          </strong>
+        </p>
+
+        ${slots.map((slot, index) => {
+          const active =
+            selectedSlot?.start_time === slot.start_time &&
+            selectedSlot?.end_time === slot.end_time;
+
+          return `
+            <button
+              type="button"
+              class="nil-time ${active ? 'active' : ''}"
+              data-slot-index="${index}"
+              aria-pressed="${active}"
+            >
+              <span>
+                ◷ ${escapeHtml(slot.start_time)}
+              </span>
+
+              <small
+                style="
+                  display:block;
+                  margin-top:6px;
+                  opacity:.65;
+                  font-size:11px;
+                "
+              >
+                ${t('تا', 'to')}
+                ${escapeHtml(slot.end_time)}
+              </small>
+            </button>
+          `;
+        }).join('')}
+      `;
 
       container.querySelectorAll('[data-slot-index]')
         .forEach((button) => {
           button.addEventListener('click', () => {
-            const slot = slots[Number(button.dataset.slotIndex)];
+            const slot = slots[
+              Number(button.dataset.slotIndex)
+            ];
 
             if (!slot?.staff_ids?.length) return;
 
             selectedSlot = {
+              service_id: service.id,
               start_time: slot.start_time,
               end_time: slot.end_time,
               duration: slot.duration,
               staff_ids: slot.staff_ids,
-              staff_id: slot.staff_ids[0]
+
+              staff_id: isRescheduling
+                ? rescheduleStaffId
+                : slot.staff_ids[0]
             };
+
+            selectedSlots = selectedSlots.slice(
+              0,
+              currentServiceIndex
+            );
+
+            selectedSlots[currentServiceIndex] =
+              selectedSlot;
 
             container.querySelectorAll('[data-slot-index]')
               .forEach((element) => {
+                const active = element === button;
+
                 element.classList.toggle(
                   'active',
-                  element === button
+                  active
+                );
+
+                element.setAttribute(
+                  'aria-pressed',
+                  String(active)
                 );
               });
 
@@ -1260,7 +1693,12 @@ function initDashboard(root, isFa) {
       console.error('Availability error:', error);
 
       container.innerHTML = `
-        <div class="nil-empty">
+        ${priorHtml}
+
+        <div
+          class="nil-empty"
+          style="grid-column:1/-1"
+        >
           ${escapeHtml(
             error.message ||
             t(
@@ -1270,7 +1708,6 @@ function initDashboard(root, isFa) {
           )}
         </div>
       `;
-
     } finally {
       if (requestId === availabilityRequestId) {
         loadingAvailability = false;
@@ -1280,10 +1717,212 @@ function initDashboard(root, isFa) {
   }
 
   // ============================================================
+  // RESCHEDULE PREVIEW
+  // ============================================================
+
+  function buildReschedulePreview() {
+    if (
+      !rescheduleBooking ||
+      !rescheduleItems.length ||
+      !selectedSlot?.start_time
+    ) {
+      return null;
+    }
+
+    const originalStart = clockToMinutes(
+      rescheduleItems[0].start_time
+    );
+
+    const newStart = clockToMinutes(
+      selectedSlot.start_time
+    );
+
+    if (
+      originalStart === null ||
+      newStart === null
+    ) {
+      return null;
+    }
+
+    const difference = newStart - originalStart;
+
+    const rows = [];
+
+    for (const item of rescheduleItems) {
+      const oldStart = clockToMinutes(
+        item.start_time
+      );
+
+      const oldEnd = clockToMinutes(
+        item.end_time
+      );
+
+      if (
+        oldStart === null ||
+        oldEnd === null ||
+        oldEnd <= oldStart
+      ) {
+        return null;
+      }
+
+      const newServiceStart = minutesToClock(
+        oldStart + difference
+      );
+
+      const newServiceEnd = minutesToClock(
+        oldEnd + difference
+      );
+
+      if (!newServiceStart || !newServiceEnd) {
+        return null;
+      }
+
+      rows.push({
+        service_id:
+          item.service_id ??
+          item.service?.id,
+
+        staff_id:
+          item.staff_id ??
+          item.staff?.id,
+
+        name:
+          item.service?.name ||
+          item.service_name ||
+          item.name ||
+          t('خدمت', 'Service'),
+
+        oldStart: String(item.start_time).slice(0, 5),
+        oldEnd: String(item.end_time).slice(0, 5),
+
+        newStart: newServiceStart,
+        newEnd: newServiceEnd
+      });
+    }
+
+    return rows;
+  }
+
+  // ============================================================
   // BOOKING SUMMARY
   // ============================================================
 
   function renderSummary() {
+    // ========================================================
+    // RESCHEDULE SUMMARY
+    // ========================================================
+
+    if (rescheduleBooking) {
+      const rows = buildReschedulePreview();
+
+      if (!rows) {
+        $('[data-nil-summary]').innerHTML = '';
+
+        showMessage(t(
+          'زمان انتخاب‌شده معتبر نیست یا باعث می‌شود یکی از خدمات از محدوده همان روز خارج شود.',
+          'The selected time is invalid or a service would extend beyond the day.'
+        ));
+
+        return false;
+      }
+
+      $('[data-nil-summary]').innerHTML = `
+        <div class="nil-summary">
+
+          <div class="nil-summary-row">
+            <span>
+              ${t('شماره رزرو', 'Booking number')}
+            </span>
+
+            <strong>
+              #${escapeHtml(rescheduleBooking.id)}
+            </strong>
+          </div>
+
+          <div class="nil-summary-row">
+            <span>
+              ${t('تاریخ قبلی', 'Previous date')}
+            </span>
+
+            <strong>
+              ${formatJalali(
+                rescheduleBooking.booking_date
+              )}
+            </strong>
+          </div>
+
+          <div class="nil-summary-row">
+            <span>
+              ${t('تاریخ جدید', 'New date')}
+            </span>
+
+            <strong>
+              ${formatJalali(selectedDate)}
+            </strong>
+          </div>
+
+          <div
+            style="
+              margin:16px 0 8px;
+              font-weight:600;
+            "
+          >
+            ${t(
+              'زمان‌بندی جدید خدمات',
+              'New service schedule'
+            )}
+          </div>
+
+          ${rows.map((row, index) => `
+            <div class="nil-summary-row">
+              <span>
+                <strong>
+                  ${faNumber(index + 1)}.
+                  ${escapeHtml(row.name)}
+                </strong>
+
+                <small
+                  style="
+                    display:block;
+                    margin-top:5px;
+                    opacity:.65;
+                  "
+                >
+                  ${t('قبلی', 'Previous')}:
+                  ${escapeHtml(row.oldStart)}
+                  -
+                  ${escapeHtml(row.oldEnd)}
+                </small>
+              </span>
+
+              <strong>
+                ${escapeHtml(row.newStart)}
+                -
+                ${escapeHtml(row.newEnd)}
+              </strong>
+            </div>
+          `).join('')}
+
+          <p
+            class="nil-muted"
+            style="margin-top:16px"
+          >
+            ${t(
+              'ترتیب، مدت و پرسنل خدمات باید حفظ شود. ظرفیت تمام خدمات هنگام ثبت نهایی توسط سرور بررسی می‌شود.',
+              'Service order, duration and staff must be preserved. The server validates availability for every service.'
+            )}
+          </p>
+
+        </div>
+      `;
+
+      return true;
+    }
+
+    // ========================================================
+    // NEW BOOKING SUMMARY
+    // ========================================================
+
     const total = selectedServices.reduce(
       (sum, service) =>
         sum + Number(service.price || 0),
@@ -1296,41 +1935,87 @@ function initDashboard(root, isFa) {
       0
     );
 
+    const first = selectedSlots[0];
+    const last = selectedSlots[
+      selectedSlots.length - 1
+    ];
+
     $('[data-nil-summary]').innerHTML = `
       <div class="nil-summary">
 
-        ${selectedServices.map((service) => `
-          <div class="nil-summary-row">
-            <span>${escapeHtml(service.name)}</span>
+        ${selectedServices.map((service, index) => {
+          const slot = selectedSlots[index];
 
-            <strong>
-              ${priceFormat(service.price)}
-              ${t('تومان', 'Toman')}
-            </strong>
-          </div>
-        `).join('')}
+          return `
+            <div class="nil-summary-row">
+              <span>
+                ${escapeHtml(service.name)}
+
+                <small
+                  style="
+                    display:block;
+                    opacity:.7;
+                  "
+                >
+                  ◷
+                  ${escapeHtml(slot?.start_time || '-')}
+                  -
+                  ${escapeHtml(slot?.end_time || '-')}
+                </small>
+              </span>
+
+              <strong>
+                ${priceFormat(service.price)}
+                ${t('تومان', 'Toman')}
+              </strong>
+            </div>
+          `;
+        }).join('')}
 
         <div class="nil-summary-row">
-          <span>${t('تاریخ', 'Date')}</span>
-          <strong>${formatJalali(selectedDate)}</strong>
-        </div>
+          <span>
+            ${t('تاریخ', 'Date')}
+          </span>
 
-        <div class="nil-summary-row">
-          <span>${t('ساعت شروع', 'Start time')}</span>
           <strong>
-            ${escapeHtml(selectedSlot?.start_time)}
+            ${formatJalali(selectedDate)}
           </strong>
         </div>
 
         <div class="nil-summary-row">
-          <span>${t('ساعت پایان', 'End time')}</span>
+          <span>
+            ${t(
+              'شروع اولین خدمت',
+              'First service starts'
+            )}
+          </span>
+
           <strong>
-            ${escapeHtml(selectedSlot?.end_time)}
+            ${escapeHtml(first?.start_time || '-')}
           </strong>
         </div>
 
         <div class="nil-summary-row">
-          <span>${t('بیعانه', 'Deposit')}</span>
+          <span>
+            ${t(
+              'پایان آخرین خدمت',
+              'Last service ends'
+            )}
+          </span>
+
+          <strong>
+            ${escapeHtml(last?.end_time || '-')}
+          </strong>
+        </div>
+
+        <div class="nil-summary-row">
+          <span>
+            ${t(
+              'بیعانه پیش از تخفیف',
+              'Deposit before discount'
+            )}
+          </span>
+
           <strong>
             ${priceFormat(deposit)}
             ${t('تومان', 'Toman')}
@@ -1338,7 +2023,13 @@ function initDashboard(root, isFa) {
         </div>
 
         <div class="nil-summary-row total">
-          <span>${t('مبلغ کل', 'Total')}</span>
+          <span>
+            ${t(
+              'جمع خدمات پیش از تخفیف',
+              'Total before discount'
+            )}
+          </span>
+
           <strong>
             ${priceFormat(total)}
             ${t('تومان', 'Toman')}
@@ -1347,6 +2038,8 @@ function initDashboard(root, isFa) {
 
       </div>
     `;
+
+    return true;
   }
 
   // ============================================================
@@ -1354,24 +2047,50 @@ function initDashboard(root, isFa) {
   // ============================================================
 
   nextButton.addEventListener('click', async () => {
-    if (submitting) return;
+    if (submitting || nextButton.disabled) return;
 
+    // STEP 1 -> STEP 2
     if (currentStep === 1) {
       if (!selectedDate) return;
 
+      currentServiceIndex = 0;
+
+      selectedSlot =
+        selectedSlots[0] || null;
+
       setStep(2);
       await loadAvailableTimes();
+
       return;
     }
 
+    // STEP 2 -> NEXT SERVICE OR SUMMARY
     if (currentStep === 2) {
-      if (!selectedSlot) return;
+      if (!selectedSlot?.staff_id) return;
 
-      renderSummary();
-      setStep(3);
+      if (
+        !rescheduleBooking &&
+        currentServiceIndex <
+          selectedServices.length - 1
+      ) {
+        currentServiceIndex++;
+
+        selectedSlot =
+          selectedSlots[currentServiceIndex] || null;
+
+        await loadAvailableTimes();
+      } else {
+        const valid = renderSummary();
+
+        if (valid) {
+          setStep(3);
+        }
+      }
+
       return;
     }
 
+    // STEP 3 -> SUBMIT
     if (currentStep === 3) {
       if (rescheduleBooking) {
         await submitReschedule();
@@ -1381,8 +2100,35 @@ function initDashboard(root, isFa) {
     }
   });
 
-  backButton.addEventListener('click', () => {
+  backButton.addEventListener('click', async () => {
     if (submitting || currentStep <= 1) return;
+
+    if (currentStep === 3) {
+      currentServiceIndex =
+        selectedServices.length - 1;
+
+      selectedSlot =
+        selectedSlots[currentServiceIndex] || null;
+
+      setStep(2);
+      await loadAvailableTimes();
+
+      return;
+    }
+
+    if (
+      currentStep === 2 &&
+      currentServiceIndex > 0
+    ) {
+      currentServiceIndex--;
+
+      selectedSlot =
+        selectedSlots[currentServiceIndex] || null;
+
+      await loadAvailableTimes();
+
+      return;
+    }
 
     if (currentStep === 2) {
       availabilityRequestId++;
@@ -1390,60 +2136,103 @@ function initDashboard(root, isFa) {
       selectedSlot = null;
     }
 
-    setStep(currentStep - 1);
+    setStep(1);
   });
 
   // ============================================================
-  // CREATE BOOKING
+  // CREATE BOOKING — MULTI SERVICE
   // ============================================================
 
   async function submitBooking() {
     if (submitting) return;
 
-    if (
-      !selectedDate ||
-      !selectedSlot?.staff_id ||
-      selectedServices.length !== 1
-    ) {
+    const validSelections =
+      selectedServices.length > 0 &&
+      selectedSlots.length === selectedServices.length &&
+      selectedServices.every((service, index) => {
+        const slot = selectedSlots[index];
+
+        return (
+          String(slot?.service_id) === String(service.id) &&
+          !!slot?.staff_id &&
+          !!slot?.start_time
+        );
+      });
+
+    if (!selectedDate || !validSelections) {
       showMessage(t(
         'اطلاعات رزرو کامل نیست.',
         'Booking details are incomplete.'
       ));
+
       return;
     }
 
     submitting = true;
     updateNextButton();
 
-    const service = selectedServices[0];
+    const discountCode = $(
+      '[data-nil-booking-discount-code]'
+    ).value.trim();
 
     const payload = {
       booking_date: selectedDate,
-      services: [
-        {
+
+      services: selectedServices.map(
+        (service, index) => ({
           service_id: service.id,
-          staff_id: selectedSlot.staff_id,
-          start_time: selectedSlot.start_time
-        }
-      ],
-      notes: $('[data-nil-notes]').value.trim() || null
+          staff_id: selectedSlots[index].staff_id,
+          start_time: selectedSlots[index].start_time
+        })
+      ),
+
+      notes:
+        $('[data-nil-notes]').value.trim() || null,
+
+      discount_code: discountCode || null,
+
+      use_referral_reward: false
     };
 
     try {
       const response = await bookingsApi.create(payload);
+
+      if (
+        response?.success === false ||
+        response?.is_status === false
+      ) {
+        throw new Error(
+          response.message || 'Booking failed'
+        );
+      }
+
       const bookingId = extractBookingId(response);
+
+      const createdBooking =
+        response?.data?.booking ||
+        response?.data ||
+        response?.booking ||
+        {};
 
       if (!bookingId) {
         showMessage(t(
-          'پاسخ سرور شناسه رزرو ندارد. قبل از تلاش مجدد، نوبت‌های من را بررسی کن.',
+          'پاسخ سرور شناسه رزرو ندارد. قبل از تلاش مجدد نوبت‌های من را بررسی کن.',
           'Booking ID is missing. Check appointments before retrying.'
         ));
+
         return;
       }
 
+      const isFreeBooking =
+        createdBooking.total_amount !== undefined &&
+        createdBooking.total_amount !== null &&
+        Number(createdBooking.total_amount) === 0 &&
+        createdBooking.status === 'confirmed';
+
       selectedServices = [];
       selectedDate = null;
-      selectedSlot = null;
+
+      resetTimeSelection();
 
       renderServices();
       updateSelectionBar();
@@ -1451,18 +2240,33 @@ function initDashboard(root, isFa) {
       modal.hidden = true;
       document.body.style.overflow = '';
 
-      window.__app?.router?.navigate(
-        `/checkout?booking=${encodeURIComponent(bookingId)}`
-      );
+      if (isFreeBooking) {
+        switchTab('bookings');
+
+        alert(t(
+          'رزرو شما با تخفیف کامل و بدون نیاز به پرداخت تأیید شد.',
+          'Your fully discounted booking was confirmed without payment.'
+        ));
+      } else {
+        window.__app?.router?.navigate(
+          `/checkout?booking=${encodeURIComponent(bookingId)}`
+        );
+      }
 
     } catch (error) {
       console.error('Booking error:', error);
+      console.error('BACKEND ERROR:', error.response?.error);
+      console.error('FULL RESPONSE:', error.response);
 
       showMessage(
+        error.response?.error ||
+        error.response?.message ||
         error.message ||
-        t('خطا در ثبت رزرو', 'Booking failed')
+        t(
+          'خطا در ثبت رزرو',
+          'Booking failed'
+        )
       );
-
     } finally {
       submitting = false;
       updateNextButton();
@@ -1470,7 +2274,7 @@ function initDashboard(root, isFa) {
   }
 
   // ============================================================
-  // RESCHEDULE BOOKING
+  // RESCHEDULE — SINGLE & MULTI SERVICE
   // ============================================================
 
   async function submitReschedule() {
@@ -1478,14 +2282,30 @@ function initDashboard(root, isFa) {
       submitting ||
       !rescheduleBooking ||
       !selectedDate ||
-      !selectedSlot?.staff_id
-    ) return;
+      !selectedSlot?.start_time ||
+      !rescheduleStaffId
+    ) {
+      return;
+    }
 
     if (!canModifyBooking(rescheduleBooking)) {
       showMessage(t(
         'مهلت جابجایی این نوبت تمام شده است.',
         'The rescheduling deadline has passed.'
       ));
+
+      return;
+    }
+
+    // Validate the entire shifted schedule before submitting.
+    const preview = buildReschedulePreview();
+
+    if (!preview || !preview.length) {
+      showMessage(t(
+        'زمان‌بندی جدید معتبر نیست.',
+        'The new schedule is invalid.'
+      ));
+
       return;
     }
 
@@ -1493,13 +2313,17 @@ function initDashboard(root, isFa) {
     updateNextButton();
 
     try {
+      // Existing API contract.
+      // Backend must move ALL booking services atomically.
+      const payload = {
+        booking_date: selectedDate,
+        start_time: selectedSlot.start_time,
+        staff_id: rescheduleStaffId
+      };
+
       const response = await bookingsApi.reschedule(
         rescheduleBooking.id,
-        {
-          booking_date: selectedDate,
-          start_time: selectedSlot.start_time,
-          staff_id: selectedSlot.staff_id
-        }
+        payload
       );
 
       if (
@@ -1511,13 +2335,13 @@ function initDashboard(root, isFa) {
         );
       }
 
-      selectedServices = previousSelectedServices || [];
+      selectedServices =
+        previousSelectedServices || [];
 
-      rescheduleBooking = null;
-      previousSelectedServices = null;
+      resetRescheduleState();
+      resetTimeSelection();
 
       selectedDate = null;
-      selectedSlot = null;
 
       availabilityRequestId++;
       loadingAvailability = false;
@@ -1542,21 +2366,25 @@ function initDashboard(root, isFa) {
       switchTab('bookings');
 
       alert(t(
-        'نوبت شما با موفقیت جابجا شد.',
-        'Your appointment was successfully rescheduled.'
+        'درخواست جابجایی رزرو با موفقیت ثبت شد.',
+        'The booking reschedule request was successful.'
       ));
 
     } catch (error) {
-      console.error('Reschedule error:', error);
-
-      showMessage(
-        error.message ||
-        t(
-          'خطا در جابجایی نوبت',
-          'Unable to reschedule appointment'
-        )
+      console.error(
+        'Multi-service reschedule error:',
+        error
       );
 
+      showMessage(
+        error.response?.error ||
+        error.response?.message ||
+        error.message ||
+        t(
+          'خطا در جابجایی رزرو',
+          'Failed to reschedule booking'
+        )
+      );
     } finally {
       submitting = false;
       updateNextButton();
@@ -1592,6 +2420,7 @@ function initDashboard(root, isFa) {
             )}
           </div>
         `;
+
         return;
       }
 
@@ -1607,10 +2436,7 @@ function initDashboard(root, isFa) {
       };
 
       container.innerHTML = bookings.map((booking) => {
-        const items =
-          booking.booking_services ||
-          booking.services ||
-          [];
+        const items = getBookingItems(booking);
 
         const serviceNames = items
           .map((item) =>
@@ -1627,16 +2453,43 @@ function initDashboard(root, isFa) {
 
         const canModify = canModifyBooking(booking);
 
+        const totalAmount =
+          booking.total_amount ??
+          booking.subtotal ??
+          0;
+
+        const discountAmount =
+          Number(booking.discount_amount || 0);
+
         return `
           <article class="nil-booking-card">
 
             <div class="nil-booking-top">
               <div>
                 <small>
-                  ${formatJalali(booking.booking_date)}
+                  ${formatJalali(
+                    booking.booking_date
+                  )}
                 </small>
 
-                <h3>${escapeHtml(title)}</h3>
+                <h3>
+                  ${escapeHtml(title)}
+                </h3>
+
+                ${items.length > 1 ? `
+                  <small
+                    style="
+                      display:block;
+                      margin-top:6px;
+                      opacity:.7;
+                    "
+                  >
+                    ${t(
+                      `${faNumber(items.length)} خدمت در یک رزرو`,
+                      `${items.length} services in one booking`
+                    )}
+                  </small>
+                ` : ''}
               </div>
 
               <span class="nil-status">
@@ -1650,20 +2503,65 @@ function initDashboard(root, isFa) {
 
             <div class="nil-booking-bottom">
               <span>
-                ◷ ${escapeHtml(
-                  String(booking.start_time || '').slice(0, 5)
+                ◷
+                ${escapeHtml(
+                  String(
+                    booking.start_time || ''
+                  ).slice(0, 5)
                 )}
               </span>
 
               <strong>
-                ${priceFormat(
-                  booking.subtotal ??
-                  booking.total_amount ??
-                  0
-                )}
+                ${priceFormat(totalAmount)}
                 ${t('تومان', 'Toman')}
               </strong>
             </div>
+
+            ${discountAmount > 0 ? `
+              <div class="nil-booking-bottom">
+                <span>
+                  ${t(
+                    'تخفیف اعمال‌شده',
+                    'Applied discount'
+                  )}
+                </span>
+
+                <strong>
+                  ${priceFormat(discountAmount)}
+                  ${t('تومان', 'Toman')}
+                </strong>
+              </div>
+            ` : ''}
+
+            ${items.length > 1 ? `
+              <div
+                class="nil-summary"
+                style="margin-top:12px"
+              >
+                ${items.map((item) => `
+                  <div class="nil-summary-row">
+                    <span>
+                      ${escapeHtml(
+                        item.service?.name ||
+                        item.service_name ||
+                        item.name ||
+                        t('خدمت', 'Service')
+                      )}
+                    </span>
+
+                    <strong>
+                      ${escapeHtml(
+                        String(item.start_time || '').slice(0, 5)
+                      )}
+                      -
+                      ${escapeHtml(
+                        String(item.end_time || '').slice(0, 5)
+                      )}
+                    </strong>
+                  </div>
+                `).join('')}
+              </div>
+            ` : ''}
 
             <div class="nil-booking-actions">
 
@@ -1672,7 +2570,10 @@ function initDashboard(root, isFa) {
                   type="button"
                   data-booking-pay="${escapeHtml(booking.id)}"
                 >
-                  ${t('ادامه پرداخت', 'Continue payment')}
+                  ${t(
+                    'ادامه پرداخت',
+                    'Continue payment'
+                  )}
                 </button>
               ` : ''}
 
@@ -1682,14 +2583,21 @@ function initDashboard(root, isFa) {
                   class="nil-reschedule-btn"
                   data-booking-reschedule="${escapeHtml(booking.id)}"
                 >
-                  ◷ ${t('تغییر تاریخ و ساعت', 'Reschedule')}
+                  ◷
+                  ${t(
+                    'تغییر تاریخ و ساعت',
+                    'Reschedule'
+                  )}
                 </button>
 
                 <button
                   type="button"
                   data-booking-cancel="${escapeHtml(booking.id)}"
                 >
-                  ${t('لغو نوبت', 'Cancel')}
+                  ${t(
+                    'لغو نوبت',
+                    'Cancel'
+                  )}
                 </button>
               ` : ''}
 
@@ -1698,90 +2606,117 @@ function initDashboard(root, isFa) {
         `;
       }).join('');
 
+      // ========================================================
       // RESCHEDULE BUTTONS
-      container.querySelectorAll('[data-booking-reschedule]')
-        .forEach((button) => {
-          button.addEventListener('click', () => {
-            const booking = bookings.find(
-              (item) =>
-                String(item.id) ===
-                button.dataset.bookingReschedule
-            );
+      // ========================================================
 
-            if (!booking) return;
+      container.querySelectorAll(
+        '[data-booking-reschedule]'
+      ).forEach((button) => {
+        button.addEventListener('click', () => {
+          const booking = bookings.find(
+            (item) =>
+              String(item.id) ===
+              button.dataset.bookingReschedule
+          );
 
-            openRescheduleModal(booking);
-          });
+          if (!booking) return;
+
+          openRescheduleModal(booking);
         });
+      });
 
+      // ========================================================
       // PAYMENT BUTTONS
-      container.querySelectorAll('[data-booking-pay]')
-        .forEach((button) => {
-          button.addEventListener('click', () => {
-            window.__app?.router?.navigate(
-              `/checkout?booking=${encodeURIComponent(
-                button.dataset.bookingPay
-              )}`
-            );
-          });
-        });
+      // ========================================================
 
+      container.querySelectorAll(
+        '[data-booking-pay]'
+      ).forEach((button) => {
+        button.addEventListener('click', () => {
+          window.__app?.router?.navigate(
+            `/checkout?booking=${encodeURIComponent(
+              button.dataset.bookingPay
+            )}`
+          );
+        });
+      });
+
+      // ========================================================
       // CANCEL BUTTONS
-      container.querySelectorAll('[data-booking-cancel]')
-        .forEach((button) => {
-          button.addEventListener('click', async () => {
-            const booking = bookings.find(
-              (item) =>
-                String(item.id) ===
-                button.dataset.bookingCancel
+      // ========================================================
+
+      container.querySelectorAll(
+        '[data-booking-cancel]'
+      ).forEach((button) => {
+        button.addEventListener('click', async () => {
+          const booking = bookings.find(
+            (item) =>
+              String(item.id) ===
+              button.dataset.bookingCancel
+          );
+
+          if (!booking) return;
+
+          if (!canModifyBooking(booking)) {
+            alert(t(
+              'لغو نوبت فقط تا ۲۴ ساعت قبل امکان‌پذیر است.',
+              'Cancellation requires at least 24 hours notice.'
+            ));
+
+            return;
+          }
+
+          if (!confirm(t(
+            'آیا از لغو این نوبت مطمئن هستید؟',
+            'Are you sure you want to cancel this appointment?'
+          ))) {
+            return;
+          }
+
+          button.disabled = true;
+
+          try {
+            const response = await bookingsApi.cancel(
+              booking.id
             );
 
-            if (!booking) return;
-
-            if (!canModifyBooking(booking)) {
-              alert(t(
-                'لغو نوبت فقط تا ۲۴ ساعت قبل امکان‌پذیر است.',
-                'Cancellation requires at least 24 hours notice.'
-              ));
-              return;
-            }
-
-            if (!confirm(t(
-              'آیا از لغو این نوبت مطمئن هستید؟',
-              'Are you sure you want to cancel this appointment?'
-            ))) {
-              return;
-            }
-
-            button.disabled = true;
-
-            try {
-              await bookingsApi.cancel(booking.id);
-
-              await loadBookings();
-
-              alert(t(
-                'نوبت شما با موفقیت لغو شد.',
-                'Your appointment was cancelled successfully.'
-              ));
-
-            } catch (error) {
-              console.error('Cancel booking error:', error);
-
-              alert(
-                error.message ||
-                t(
-                  'خطا در لغو نوبت',
-                  'Cancellation failed'
-                )
+            if (
+              response?.success === false ||
+              response?.is_status === false
+            ) {
+              throw new Error(
+                response.message || 'Cancellation failed'
               );
-
-              if (button.isConnected) {
-                button.disabled = false;
-              }
             }
-          });
+
+            await loadBookings();
+
+            alert(t(
+              'نوبت شما با موفقیت لغو شد.',
+              'Your appointment was cancelled successfully.'
+            ));
+
+          } catch (error) {
+            console.error(
+              'Cancel booking error:',
+              error
+            );
+
+            alert(
+              error.message ||
+              t(
+                'خطا در لغو نوبت',
+                'Cancellation failed'
+              )
+            );
+
+            if (button.isConnected) {
+              button.disabled = false;
+            }
+          }
         });
+      });
 
     } catch (error) {
       console.error('Load bookings error:', error);
@@ -1803,7 +2738,10 @@ function initDashboard(root, isFa) {
 
     container.innerHTML = `
       <div class="nil-loading">
-        ${t('در حال بارگذاری...', 'Loading...')}
+        ${t(
+          'در حال بارگذاری...',
+          'Loading...'
+        )}
       </div>
     `;
 
@@ -1837,30 +2775,44 @@ function initDashboard(root, isFa) {
           </div>
 
           <div class="nil-profile-field">
-            <span>${t('نام', 'Name')}</span>
+            <span>
+              ${t('نام', 'Name')}
+            </span>
+
             <strong>
               ${escapeHtml(client.name || '-')}
             </strong>
           </div>
 
           <div class="nil-profile-field">
-            <span>${t('ایمیل', 'Email')}</span>
+            <span>
+              ${t('ایمیل', 'Email')}
+            </span>
+
             <strong>
               ${escapeHtml(client.email || '-')}
             </strong>
           </div>
 
           <div class="nil-profile-field">
-            <span>${t('شماره موبایل', 'Phone')}</span>
+            <span>
+              ${t('شماره موبایل', 'Phone')}
+            </span>
+
             <strong>
               ${escapeHtml(client.phone || '-')}
             </strong>
           </div>
 
           <div class="nil-profile-field">
-            <span>${t('کد معرف', 'Referral code')}</span>
+            <span>
+              ${t('کد معرف', 'Referral code')}
+            </span>
+
             <strong>
-              ${escapeHtml(client.referral_code || '-')}
+              ${escapeHtml(
+                client.referral_code || '-'
+              )}
             </strong>
           </div>
 
@@ -1869,16 +2821,20 @@ function initDashboard(root, isFa) {
             class="nil-btn nil-btn-dark"
             data-edit-profile
           >
-            ${t('ویرایش اطلاعات', 'Edit profile')}
+            ${t(
+              'ویرایش اطلاعات',
+              'Edit profile'
+            )}
           </button>
 
         </div>
       `;
 
-      container.querySelector('[data-edit-profile]')
-        ?.addEventListener('click', () => {
-          renderProfileEditor(client);
-        });
+      container.querySelector(
+        '[data-edit-profile]'
+      )?.addEventListener('click', () => {
+        renderProfileEditor(client);
+      });
 
     } catch (error) {
       container.innerHTML = `
@@ -1889,6 +2845,10 @@ function initDashboard(root, isFa) {
     }
   }
 
+  // ============================================================
+  // EDIT PROFILE
+  // ============================================================
+
   function renderProfileEditor(client) {
     const container = $('[data-nil-profile]');
 
@@ -1898,7 +2858,10 @@ function initDashboard(root, isFa) {
         data-profile-form
       >
         <h3>
-          ${t('ویرایش پروفایل', 'Edit profile')}
+          ${t(
+            'ویرایش پروفایل',
+            'Edit profile'
+          )}
         </h3>
 
         <label class="nil-field-label">
@@ -1932,7 +2895,10 @@ function initDashboard(root, isFa) {
           type="submit"
           class="nil-btn nil-btn-dark"
         >
-          ${t('ذخیره تغییرات', 'Save changes')}
+          ${t(
+            'ذخیره تغییرات',
+            'Save changes'
+          )}
         </button>
 
         <button
@@ -1945,35 +2911,40 @@ function initDashboard(root, isFa) {
       </form>
     `;
 
-    container.querySelector('[data-profile-back]')
-      .addEventListener('click', loadProfile);
+    container.querySelector(
+      '[data-profile-back]'
+    ).addEventListener('click', loadProfile);
 
-    container.querySelector('[data-profile-form]')
-      .addEventListener('submit', async (event) => {
-        event.preventDefault();
+    container.querySelector(
+      '[data-profile-form]'
+    ).addEventListener('submit', async (event) => {
+      event.preventDefault();
 
-        const form = event.currentTarget;
-        const submitButton = form.querySelector(
-          '[type="submit"]'
-        );
+      const form = event.currentTarget;
 
-        submitButton.disabled = true;
+      const submitButton = form.querySelector(
+        '[type="submit"]'
+      );
 
-        try {
-          await profileApi.update({
-            name: form.elements.name.value.trim(),
-            email: form.elements.email.value.trim() || null
-          });
+      submitButton.disabled = true;
 
-          await loadProfile();
+      try {
+        await profileApi.update({
+          name: form.elements.name.value.trim(),
+          email:
+            form.elements.email.value.trim() || null
+        });
 
-        } catch (error) {
-          form.querySelector('[data-profile-error]')
-            .textContent = error.message;
+        await loadProfile();
 
-          submitButton.disabled = false;
-        }
-      });
+      } catch (error) {
+        form.querySelector(
+          '[data-profile-error]'
+        ).textContent = error.message;
+
+        submitButton.disabled = false;
+      }
+    });
   }
 
   // ============================================================

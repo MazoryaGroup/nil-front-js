@@ -125,7 +125,13 @@
     "loading": "Please wait...",
     "optional": "Optional",
     "referral_label": "Referral Code",
-    "referral_placeholder": "Enter referral code (optional)"
+    "referral_placeholder": "Enter referral code (optional)",
+    "forgot-password" :" ?Forgot your password ",
+    "forgot-title" :"Forgot-Password" ,
+    "title" :"Enter your account's mobile number so that a recovery code can be sent to you.",
+    "namber" :"Mobile number",
+    "recoverycode" : "Send recovery code"
+
 }, 
 "name_required": "Please enter your name",
 

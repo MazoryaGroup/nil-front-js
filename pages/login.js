@@ -53,10 +53,16 @@ export async function LoginPage() {
       <div class="auth-container">
 
         <div class="auth-mobile-brand">
-          <div class="auth-mobile-logo">N</div>
+          
+          <img
+    src="/img/logo.png"
+    alt="NIL Beauty"
+    class="nil-brand-logo"
+    width="110"
+    height="55"
+  />
           <div>
-            <strong>NIL.</strong>
-            <small>BEAUTY STUDIO</small>
+            
           </div>
         </div>
 
@@ -113,7 +119,7 @@ export async function LoginPage() {
     data-nav-link
     class="auth-link-btn"
   >
-    رمز عبورت رو فراموش کردی؟
+    ${t('auth.forgot-password')}
   </a>
 </div>
 
@@ -171,7 +177,7 @@ export async function LoginPage() {
     data-nav-link
     class="auth-link-btn"
   >
-    رمز عبورت رو فراموش کردی؟
+   ${tr('auth.password_label', 'رمز عبور')}
   </a>
 </div>
 
@@ -185,7 +191,7 @@ export async function LoginPage() {
 
             <div style="text-align:center">
               <a href="/forgot-password" data-nav-link class="auth-link-btn">
-                ${tr('auth.forgot_password', 'رمز عبورت رو فراموش کردی؟')}
+               ${t('auth.forgot-password')}
               </a>
             </div>
 

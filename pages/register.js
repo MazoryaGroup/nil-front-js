@@ -53,10 +53,16 @@ export async function RegisterPage() {
       <div class="auth-container">
 
         <div class="auth-mobile-brand">
-          <div class="auth-mobile-logo">N</div>
+          
+          <img
+    src="/img/logo.png"
+    alt="NIL Beauty"
+    class="nil-brand-logo"
+    width="110"
+    height="55"
+  />
           <div>
-            <strong>NIL.</strong>
-            <small>BEAUTY STUDIO</small>
+            
           </div>
         </div>
 

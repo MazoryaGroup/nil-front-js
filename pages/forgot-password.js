@@ -53,10 +53,16 @@ export async function ForgotPasswordPage() {
       <div class="auth-container">
 
         <div class="auth-mobile-brand">
-          <div class="auth-mobile-logo">N</div>
+         
+          <img
+    src="/img/logo.png"
+    alt="NIL Beauty"
+    class="nil-brand-logo"
+    width="110"
+    height="55"
+  />
           <div>
-            <strong>NIL.</strong>
-            <small>BEAUTY STUDIO</small>
+            
           </div>
         </div>
 
@@ -64,10 +70,9 @@ export async function ForgotPasswordPage() {
         <section data-forgot-step="phone">
 
           <div class="auth-header">
-            <h2>فراموشی رمز عبور</h2>
+            <h2> ${t('auth.forgot-title')}</h2>
             <p>
-              شماره موبایل حساب کاربری خودت رو وارد کن
-              تا کد بازیابی برات ارسال بشه.
+              ${t('auth.title')}
             </p>
           </div>
 
@@ -75,7 +80,7 @@ export async function ForgotPasswordPage() {
 
             <div class="auth-field">
               <label for="forgot-phone">
-                شماره موبایل
+               ${t('auth.namber')}
               </label>
 
               <input
@@ -96,8 +101,7 @@ export async function ForgotPasswordPage() {
               class="primary-button w-button"
               data-submit-btn
             >
-              ارسال کد بازیابی
-            </button>
+${t('auth.recoverycode')}            </button>
 
           </form>
         </section>
