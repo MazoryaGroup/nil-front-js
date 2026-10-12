@@ -49,7 +49,7 @@
     <h2 id="loginTitle">Operator sign in</h2>
     <p id="loginSubtitle" class="muted">Enter your authorized operator credentials to access NIL Beauty finance.</p>
     <form id="loginForm" autocomplete="on">
-      <div class="field"><label id="loginUsernameLabel" for="loginUsername">Username</label><input id="loginUsername" name="username" type="text" autocomplete="username" required maxlength="255"></div>
+      <div class="field"><label id="loginUsernameLabel" for="loginUsername">Email</label><input id="loginUsername" name="email" type="email" autocomplete="username" required maxlength="255"></div>
       <div class="field"><label id="loginPasswordLabel" for="loginPassword">Password</label><input id="loginPassword" name="password" type="password" autocomplete="current-password" required></div>
       <div id="loginError" class="login-error" role="alert" hidden></div>
       <button id="loginSubmit" class="btn" type="submit">Sign in</button>
@@ -81,16 +81,17 @@
 'use strict';
 // Configure this to match your existing operator login. Never put a fixed token in source.
 const CONFIG = {
-  apiBase: '/api/offline-sync',
-  loginUrl: '/api/operator/login', // Requires a real Laravel login route; not supplied by offline-sync routes
-  meUrl: '/api/operator/me',       // Requires authenticated operator profile endpoint
-  logoutUrl: '/api/operator/logout',
+  apiBase: 'https://apinil.mazoryagroup.ir/api/offline-sync',
+  loginUrl: 'https://apinil.mazoryagroup.ir/api/operator/login', // Confirmed by your Postman response
+  // No /me or /logout route is assumed. Restore a tab session locally;
+  // server-side Bearer auth still validates every financial API call.
   authMode: 'bearer',              // Change to 'cookie' only if operator guard uses session cookies
-  tokenKey: 'nil_operator_session_token'
+  tokenKey: 'nil_operator_session_token',
+  profileKey: 'nil_operator_session_profile'
 };
 const T = {
-  en: {subtitle:'Offline Financial Management',hero:'Your finance desk, even without internet.',heroSub:'Save transactions on this device and sync safely when connected.',sync:'Sync now',pending:'Pending',uncertain:'Needs verification',completed:'Completed',failed:'Failed',newOperation:'New financial operation',queue:'Local transaction queue',refresh:'Refresh',operation:'Operation',offlineId:'Offline ID',created:'Created',status:'Status',actions:'Actions',warning:'Offline entries are not confirmed payments until the server marks them completed. Keep this device secure and do not clear site data while operations are pending.',cancel:'Cancel',save:'Save locally',online:'Online',offline:'Offline',noData:'No transactions on this device.',check:'Check / retry',view:'Details',saved:'Operation saved locally.',noOperator:'Operator profile is missing. Connect this page to operator login first.',syncing:'Syncing...',syncDone:'Synchronization check finished.',noInternet:'No internet connection.',authError:'Operator authentication required. Sign in again.',notAllowed:'This action is restricted to administrators.',error:'Error',amountNote:'Use the same currency unit as your backend.',payment_pos:'POS payment',payment_cash:'Cash payment',expense_create:'Create expense',cash_in:'Cash in',cash_out:'Cash out',refund_create:'Refund',payment_id:'Payment ID',pos_terminal_id:'POS terminal ID',reference_number:'Reference number',expense_category_id:'Expense category ID',amount:'Amount',payment_method:'Payment method',description:'Description',detail:'Transaction details',retryConfirm:'Check the server status and retry this operation if possible?',role:'Operator',unknown:'Unknown',syncFailed:'Some transactions require attention.'},
-  fa: {subtitle:'مدیریت مالی آفلاین',hero:'مدیریت مالی حتی بدون اینترنت',heroSub:'تراکنش‌ها را در دستگاه ذخیره کنید و پس از اتصال همگام‌سازی کنید.',sync:'همگام‌سازی',pending:'در انتظار',uncertain:'نیازمند بررسی',completed:'تکمیل‌شده',failed:'ناموفق',newOperation:'عملیات مالی جدید',queue:'صف تراکنش‌های دستگاه',refresh:'بروزرسانی',operation:'عملیات',offlineId:'شناسه آفلاین',created:'زمان ثبت',status:'وضعیت',actions:'اقدامات',warning:'ثبت آفلاین به معنای تأیید پرداخت نیست. فقط وضعیت completed در سرور معتبر است. تا زمان همگام‌سازی داده‌های سایت را پاک نکنید.',cancel:'انصراف',save:'ذخیره در دستگاه',online:'آنلاین',offline:'آفلاین',noData:'تراکنشی در این دستگاه وجود ندارد.',check:'بررسی / تلاش مجدد',view:'جزئیات',saved:'تراکنش در دستگاه ذخیره شد.',noOperator:'اطلاعات اپراتور موجود نیست. ابتدا صفحه را به ورود اپراتور متصل کنید.',syncing:'در حال همگام‌سازی...',syncDone:'بررسی همگام‌سازی پایان یافت.',noInternet:'اتصال اینترنت وجود ندارد.',authError:'احراز هویت اپراتور لازم است؛ دوباره وارد شوید.',notAllowed:'این عملیات فقط برای مدیر مجاز است.',error:'خطا',amountNote:'واحد مبلغ باید با واحد بک‌اند یکسان باشد.',payment_pos:'پرداخت کارت‌خوان',payment_cash:'پرداخت نقدی',expense_create:'ثبت هزینه',cash_in:'ورود وجه',cash_out:'خروج وجه',refund_create:'بازپرداخت',payment_id:'شناسه پرداخت',pos_terminal_id:'شناسه پایانه',reference_number:'شماره پیگیری',expense_category_id:'شناسه دسته هزینه',amount:'مبلغ',payment_method:'روش پرداخت',description:'توضیحات',detail:'جزئیات تراکنش',retryConfirm:'وضعیت سرور بررسی شود و در صورت امکان عملیات دوباره تلاش شود؟',role:'اپراتور',unknown:'نامشخص',syncFailed:'بعضی تراکنش‌ها نیاز به بررسی دارند.'}
+  en: {subtitle:'Offline Financial Management',hero:'Your finance desk, even without internet.',heroSub:'Save transactions on this device and sync safely when connected.',sync:'Sync now',pending:'Pending',uncertain:'Needs verification',completed:'Completed',failed:'Failed',newOperation:'New financial operation',queue:'Local transaction queue',refresh:'Refresh',operation:'Operation',offlineId:'Offline ID',created:'Created',status:'Status',actions:'Actions',warning:'Offline entries are not confirmed payments until the server marks them completed. Keep this device secure and do not clear site data while operations are pending.',cancel:'Cancel',save:'Save locally',online:'Online',offline:'Offline',noData:'No transactions on this device.',check:'Check status',view:'Details',saved:'Operation saved locally.',noOperator:'Operator profile is missing. Connect this page to operator login first.',syncing:'Syncing...',syncDone:'Synchronization check finished.',noInternet:'No internet connection.',authError:'Operator authentication required. Sign in again.',notAllowed:'This action is restricted to administrators.',error:'Error',amountNote:'Use the same currency unit as your backend.',payment_pos:'POS payment',payment_cash:'Cash payment',expense_create:'Create expense',cash_in:'Cash in',cash_out:'Cash out',refund_create:'Refund',payment_id:'Payment ID',pos_terminal_id:'POS terminal ID',reference_number:'Reference number',expense_category_id:'Expense category ID',amount:'Amount',payment_method:'Payment method',description:'Description',detail:'Transaction details',retryConfirm:'Check the server status first? A retry may create a real financial entry.',role:'Operator',unknown:'Unknown',syncFailed:'Some transactions require attention.'},
+  fa: {subtitle:'مدیریت مالی آفلاین',hero:'مدیریت مالی حتی بدون اینترنت',heroSub:'تراکنش‌ها را در دستگاه ذخیره کنید و پس از اتصال همگام‌سازی کنید.',sync:'همگام‌سازی',pending:'در انتظار',uncertain:'نیازمند بررسی',completed:'تکمیل‌شده',failed:'ناموفق',newOperation:'عملیات مالی جدید',queue:'صف تراکنش‌های دستگاه',refresh:'بروزرسانی',operation:'عملیات',offlineId:'شناسه آفلاین',created:'زمان ثبت',status:'وضعیت',actions:'اقدامات',warning:'ثبت آفلاین به معنای تأیید پرداخت نیست. فقط وضعیت completed در سرور معتبر است. تا زمان همگام‌سازی داده‌های سایت را پاک نکنید.',cancel:'انصراف',save:'ذخیره در دستگاه',online:'آنلاین',offline:'آفلاین',noData:'تراکنشی در این دستگاه وجود ندارد.',check:'بررسی وضعیت',view:'جزئیات',saved:'تراکنش در دستگاه ذخیره شد.',noOperator:'اطلاعات اپراتور موجود نیست. ابتدا صفحه را به ورود اپراتور متصل کنید.',syncing:'در حال همگام‌سازی...',syncDone:'بررسی همگام‌سازی پایان یافت.',noInternet:'اتصال اینترنت وجود ندارد.',authError:'احراز هویت اپراتور لازم است؛ دوباره وارد شوید.',notAllowed:'این عملیات فقط برای مدیر مجاز است.',error:'خطا',amountNote:'واحد مبلغ باید با واحد بک‌اند یکسان باشد.',payment_pos:'پرداخت کارت‌خوان',payment_cash:'پرداخت نقدی',expense_create:'ثبت هزینه',cash_in:'ورود وجه',cash_out:'خروج وجه',refund_create:'بازپرداخت',payment_id:'شناسه پرداخت',pos_terminal_id:'شناسه پایانه',reference_number:'شماره پیگیری',expense_category_id:'شناسه دسته هزینه',amount:'مبلغ',payment_method:'روش پرداخت',description:'توضیحات',detail:'جزئیات تراکنش',retryConfirm:'ابتدا وضعیت سرور بررسی شود؟ اجرای مجدد ممکن است یک تراکنش مالی واقعی ایجاد کند.',role:'اپراتور',unknown:'نامشخص',syncFailed:'بعضی تراکنش‌ها نیاز به بررسی دارند.'}
 };
 const FIELDS = {
   payment_pos:[['payment_id','number',true],['pos_terminal_id','number',true],['reference_number','text',true]],
@@ -125,84 +126,236 @@ function createId(){if(crypto.randomUUID)return crypto.randomUUID();const bytes=
 async function saveForm(e){e.preventDefault();if(!selectedAction||!operatorId()){toast(tr('noOperator'));return}const payload={};for(const [key,type,required] of FIELDS[selectedAction]){const raw=String(new FormData(e.currentTarget).get(key)||'').trim();if(!raw){if(required){toast(`${tr(key)} is required`);return}continue}if(type==='number'){const n=Number(raw);if(!Number.isFinite(n)||n<=0||(key!=='amount'&&!Number.isSafeInteger(n))){toast(`${tr(key)}: invalid value`);return}payload[key]=n}else payload[key]=raw}
   const item={offline_id:createId(),operator_id:operatorId(),action:selectedAction,payload,status:'pending',created_at:new Date().toISOString(),error:null,result:null};await dbPut(item);closeForm();await renderQueue();toast(tr('saved'));if(navigator.onLine)syncAll().catch(e=>toast(e.message))}
 async function renderQueue(){const op=operator();$('operatorName').textContent=`${tr('role')}: ${op?.name||op?.id||'—'}`;const items=operatorId()?await myItems():[];for(const status of ['pending','uncertain','completed','failed'])$(status+'Count').textContent=items.filter(x=>x.status===status).length;const body=$('queueBody');if(!items.length){body.innerHTML=`<tr><td colspan="5" class="empty">${escapeHtml(tr('noData'))}</td></tr>`;return}
-  body.innerHTML=items.slice().reverse().map(x=>`<tr><td><strong>${escapeHtml(tr(x.action))}</strong></td><td title="${escapeHtml(x.offline_id)}">${escapeHtml(x.offline_id.slice(0,13))}…</td><td>${escapeHtml(new Date(x.created_at).toLocaleString(lang==='fa'?'fa-IR':'en-US'))}</td><td><span class="status ${escapeHtml(x.status)}">${escapeHtml(tr(x.status))}</span></td><td><button type="button" class="btn ghost small" data-detail="${escapeHtml(x.offline_id)}">${escapeHtml(tr('view'))}</button> ${x.status==='failed'?`<button type="button" class="btn secondary small" data-retry="${escapeHtml(x.offline_id)}">${escapeHtml(tr('check'))}</button>`:''}</td></tr>`).join('');body.querySelectorAll('[data-detail]').forEach(b=>b.addEventListener('click',()=>showDetails(b.dataset.detail)));body.querySelectorAll('[data-retry]').forEach(b=>b.addEventListener('click',()=>retryOne(b.dataset.retry)))}
+  body.innerHTML=items.slice().reverse().map(x=>`<tr><td><strong>${escapeHtml(tr(x.action))}</strong></td><td title="${escapeHtml(x.offline_id)}">${escapeHtml(x.offline_id.slice(0,13))}…</td><td>${escapeHtml(new Date(x.created_at).toLocaleString(lang==='fa'?'fa-IR':'en-US'))}</td><td><span class="status ${escapeHtml(x.status)}">${escapeHtml(tr(x.status))}</span></td><td><button type="button" class="btn ghost small" data-detail="${escapeHtml(x.offline_id)}">${escapeHtml(tr('view'))}</button> ${['failed','uncertain'].includes(x.status)?`<button type="button" class="btn secondary small" data-retry="${escapeHtml(x.offline_id)}">${escapeHtml(tr('check'))}</button>`:''}</td></tr>`).join('');body.querySelectorAll('[data-detail]').forEach(b=>b.addEventListener('click',()=>showDetails(b.dataset.detail)));body.querySelectorAll('[data-retry]').forEach(b=>b.addEventListener('click',()=>retryOne(b.dataset.retry)))}
 async function showDetails(id){const x=(await myItems()).find(x=>x.offline_id===id);if(x)alert(JSON.stringify({offline_id:x.offline_id,action:x.action,payload:x.payload,status:x.status,error:x.error,result:x.result},null,2))}
-async function api(path='',method='GET',body){const res=await fetch(CONFIG.apiBase+path,{method,headers:authHeaders(),credentials:'same-origin',...(body?{body:JSON.stringify(body)}:{})});let data={};try{data=await res.json()}catch{}if(res.status===401){sessionStorage.removeItem(CONFIG.tokenKey);showLogin()}if(res.status===401||res.status===403)throw Object.assign(new Error(data.message||tr('authError')),{http:res.status});if(res.status===404)return {notFound:true};if(!res.ok)throw Object.assign(new Error(data.message||`HTTP ${res.status}`),{http:res.status,data});return data}
-async function inspectServer(item){const res=await api('/'+encodeURIComponent(item.offline_id));if(res.notFound)return 'missing';const record=res.data;if(!record||record.offline_id!==item.offline_id)throw Error('Invalid sync status response');if(record.status==='completed'){item.status='completed';item.result=record.result;item.error=null}else if(record.status==='failed'){item.status='failed';item.error=record.error_message||'Server rejected operation'}else{item.status='uncertain';item.error='Server status: '+record.status}await dbPut(item);return item.status}
-async function syncAll(){if(syncing||!navigator.onLine||!operatorId())return;syncing=true;$('syncBtn').disabled=true;$('syncBtn').textContent=tr('syncing');try{
-    const items=await myItems();for(const item of items.filter(x=>x.status==='uncertain')){try{const status=await inspectServer(item);if(status==='missing'){item.status='pending';item.error=null;await dbPut(item)}}catch(e){if(e.http===401||e.http===403)throw e;toast(e.message);return}}
-    const pending=(await myItems()).filter(x=>x.status==='pending');for(let i=0;i<pending.length;i+=100){const chunk=pending.slice(i,i+100);for(const item of chunk){item.status='uncertain';await dbPut(item)}
-      let result;try{result=await api('/batch','POST',{operations:chunk.map(({offline_id,action,payload})=>({offline_id,action,payload}))})}catch(e){toast(e.message);return}
-      if(!Array.isArray(result.data)){toast('Unexpected batch response');return}
-      const byId=new Map(result.data.map(x=>[x.offline_id,x]));for(const item of chunk){const r=byId.get(item.offline_id);if(!r)continue;const serverStatus=r.data?.status; if(serverStatus==='completed'||(r.status==='completed'&&!serverStatus)){item.status='completed';item.result=r.data?.result||r.data||null;item.error=null}else if(r.status==='failed'||serverStatus==='failed'){item.status='failed';item.error=r.message||r.data?.error_message||'Sync failed'}else{item.status='uncertain';item.error='Unexpected server state'}await dbPut(item)}
+// Every financial API call uses the operator JWT. A failed request must not be
+// interpreted as a successful payment, even if the HTTP response is 200.
+async function api(path='',method='GET',body){
+  if(!token())throw Object.assign(new Error(tr('authError')),{http:401});
+  let res;
+  try{
+    res=await fetch(CONFIG.apiBase+path,{
+      method,headers:authHeaders(),cache:'no-store',
+      ...(body!==undefined?{body:JSON.stringify(body)}:{})
+    });
+  }catch(err){throw Object.assign(new Error('Network response unknown: '+err.message),{network:true})}
+  let data={};
+  try{data=await res.json()}catch{}
+  if(res.status===401){
+    // Preserve local queue. Operator must authenticate again before sync.
+    sessionStorage.removeItem(CONFIG.tokenKey);
+    sessionStorage.removeItem(CONFIG.profileKey);
+    showLogin();
+    throw Object.assign(new Error(tr('authError')),{http:401});
+  }
+  if(res.status===403)throw Object.assign(new Error(data.message||'Access denied'),{http:403,data});
+  if(res.status===404)return {notFound:true};
+  // For 409/422, keep the server record if present; it can be 'failed'.
+  if(!res.ok && !data?.data)throw Object.assign(new Error(data.message||`HTTP ${res.status}`),{http:res.status,data});
+  return {...data,_http:res.status};
+}
+function recordStatus(result){
+  const rec=result?.data;
+  return rec && typeof rec==='object' && !Array.isArray(rec) ? rec.status : null;
+}
+function applyServerRecord(item,rec){
+  if(!rec || rec.offline_id!==item.offline_id){
+    item.status='uncertain';item.error='Server response does not match offline ID';return;
+  }
+  item.result=rec.result??null;
+  if(rec.status==='completed'){
+    item.status='completed';item.error=null;
+  }else if(rec.status==='failed'){
+    item.status='failed';item.error=rec.error_message||'Server rejected operation';
+  }else{
+    item.status='uncertain';item.error='Server status: '+String(rec.status||'unknown');
+  }
+}
+async function inspectServer(item){
+  const res=await api('/'+encodeURIComponent(item.offline_id));
+  if(res.notFound)return 'missing';
+  if(!res.data || res.data.offline_id!==item.offline_id)throw Error('Invalid sync status response');
+  applyServerRecord(item,res.data);
+  await dbPut(item);
+  return item.status;
+}
+async function syncAll(){
+  if(syncing||!navigator.onLine||!operatorId()||!token())return;
+  syncing=true;$('syncBtn').disabled=true;$('syncBtn').textContent=tr('syncing');
+  try{
+    // Ambiguous requests are inspected, never automatically re-posted.
+    for(const item of (await myItems()).filter(x=>x.status==='uncertain')){
+      try{
+        const status=await inspectServer(item);
+        if(status==='missing'){
+          item.error='Not found on server. Verify before manually re-sending.';
+          await dbPut(item);
+        }
+      }catch(e){
+        if(e.http===401||e.http===403)throw e;
+        item.error='Unable to verify server state: '+e.message;
+        await dbPut(item);
+      }
     }
-    toast((await myItems()).some(x=>x.status==='failed')?tr('syncFailed'):tr('syncDone'));
-  }finally{syncing=false;$('syncBtn').disabled=false;$('syncBtn').textContent=tr('sync');await renderQueue()}}
-async function retryOne(id){if(!navigator.onLine){toast(tr('noInternet'));return}if(!confirm(tr('retryConfirm')))return;const item=(await myItems()).find(x=>x.offline_id===id);if(!item)return;try{const status=await inspectServer(item);if(status==='missing'){item.status='pending';item.error=null;await dbPut(item);await syncAll();return}if(status==='failed'){const response=await api('/'+encodeURIComponent(id)+'/retry','POST');const rec=response.data;if(rec?.status==='completed'){item.status='completed';item.result=rec.result;item.error=null}else{item.status='failed';item.error=rec?.error_message||response.message||'Retry failed'}await dbPut(item)}else if(status==='uncertain')toast('Server is still processing this operation');await renderQueue()}catch(e){toast(e.message);await renderQueue()}}
+    const pending=(await myItems()).filter(x=>x.status==='pending');
+    for(let i=0;i<pending.length;i+=100){
+      const chunk=pending.slice(i,i+100);
+      // Mark as uncertain BEFORE network send: protects against lost responses.
+      for(const item of chunk){item.status='uncertain';item.error='Awaiting server confirmation';await dbPut(item)}
+      let result;
+      try{
+        result=await api('/batch','POST',{
+          operations:chunk.map(({offline_id,action,payload})=>({offline_id,action,payload}))
+        });
+      }catch(e){
+        toast(e.message);
+        return; // Keep uncertain; next sync inspects GET status.
+      }
+      if(!Array.isArray(result.data)){
+        toast('Unexpected batch response; server status must be checked.');
+        return;
+      }
+      const byId=new Map(result.data.map(x=>[x.offline_id,x]));
+      for(const item of chunk){
+        const row=byId.get(item.offline_id);
+        if(!row){item.error='Missing from batch response';await dbPut(item);continue}
+        if(row.data && row.data.offline_id===item.offline_id){
+          applyServerRecord(item,row.data);
+        }else if(row.status==='failed'){
+          // May be authorization or validation error before any server record.
+          item.status='failed';item.error=row.message||'Operation rejected by server';
+        }else{
+          item.status='uncertain';item.error='Unconfirmed batch status';
+        }
+        await dbPut(item);
+      }
+    }
+    toast((await myItems()).some(x=>x.status==='failed'||x.status==='uncertain')?tr('syncFailed'):tr('syncDone'));
+  }finally{
+    syncing=false;$('syncBtn').disabled=false;$('syncBtn').textContent=tr('sync');
+    await renderQueue();
+  }
+}
+async function retryOne(id){
+  if(!navigator.onLine){toast(tr('noInternet'));return}
+  if(!confirm(tr('retryConfirm')))return;
+  const item=(await myItems()).find(x=>x.offline_id===id);
+  if(!item)return;
+  try{
+    const status=await inspectServer(item);
+    if(status==='completed'){
+      toast('Already completed on server. No retry performed.');
+    }else if(status==='missing'){
+      // No known server record: do NOT silently replay a financial action.
+      if(confirm('No server record was found. After verifying the payment was NOT recorded elsewhere, send this SAME offline ID now?')){
+        item.status='pending';item.error=null;await dbPut(item);await syncAll();
+      }
+    }else if(status==='failed'){
+      if(confirm('Server confirms this operation FAILED. Retry with the same offline ID?')){
+        // If the network drops during retry, leave status uncertain.
+        item.status='uncertain';item.error='Retry result not yet confirmed';await dbPut(item);
+        const response=await api('/'+encodeURIComponent(id)+'/retry','POST');
+        if(response.data?.offline_id===id){
+          applyServerRecord(item,response.data);
+        }else{
+          item.error=response.message||'Retry result is uncertain';
+        }
+        await dbPut(item);
+      }
+    }else{
+      toast('Server is still processing. No retry performed.');
+    }
+  }catch(e){
+    if(e.http===401||e.http===403)toast(e.message);
+    else{item.status='uncertain';item.error='Retry or verification result unknown: '+e.message;await dbPut(item);toast(e.message)}
+  }finally{await renderQueue()}
+}
 $('operationForm').addEventListener('submit',e=>saveForm(e).catch(err=>toast(err.message)));
 $('closeModal').addEventListener('click',closeForm);$('cancelModal').addEventListener('click',closeForm);
 $('modalBackdrop').addEventListener('click',e=>{if(e.target===$('modalBackdrop'))closeForm()});
 $('syncBtn').addEventListener('click',()=>syncAll().catch(e=>toast(e.message)));
 $('refreshBtn').addEventListener('click',()=>renderQueue().catch(e=>toast(e.message)));
 $('langBtn').addEventListener('click',()=>setLang(lang==='en'?'fa':'en'));
-window.addEventListener('online',()=>{updateConnection();syncAll().catch(e=>toast(e.message))});window.addEventListener('offline',updateConnection);
-// The offline-sync endpoints do not accept credentials. Login is performed by a separate backend endpoint.
+window.addEventListener('online',()=>{updateConnection();if(token()&&tokenExpired(token())){sessionStorage.removeItem(CONFIG.tokenKey);sessionStorage.removeItem(CONFIG.profileKey);showLogin();toast(tr('authError'));return}syncAll().catch(e=>toast(e.message))});window.addEventListener('offline',updateConnection);
+// Login API response: data.user + data.authorization.token (JWT bearer).
 function showLoginError(message){$('loginError').textContent=message;$('loginError').hidden=false}
-function showLogin(){signedInOperator=null;$('financeApp').hidden=true;$('loginScreen').hidden=false;$('loginPassword').value='';$('loginError').hidden=true}
+function showLogin(){
+  signedInOperator=null;$('financeApp').hidden=true;$('loginScreen').hidden=false;
+  $('loginPassword').value='';$('loginError').hidden=true;
+}
 async function showFinance(profile){
   signedInOperator=profile;
   $('loginScreen').hidden=true;$('financeApp').hidden=false;
   renderActions();await renderQueue();
-  if(navigator.onLine)await syncAll().catch(e=>toast(e.message));
+  if(navigator.onLine && token())await syncAll().catch(e=>toast(e.message));
 }
-function authFetchHeaders(){const h={'Accept':'application/json','Content-Type':'application/json'};if(CONFIG.authMode==='bearer'&&token())h.Authorization=`Bearer ${token()}`;return h}
+function authFetchHeaders(){return authHeaders()}
+function tokenExpired(jwt){
+  try{
+    const p=jwt.split('.')[1].replace(/-/g,'+').replace(/_/g,'/');
+    const data=JSON.parse(atob(p));
+    return typeof data.exp==='number' && Date.now()>=data.exp*1000;
+  }catch{return true}
+}
 async function loginOperator(e){
   e.preventDefault();$('loginError').hidden=true;
-  if(!navigator.onLine){showLoginError(lang==='fa'?'برای ورود اولیه اتصال اینترنت لازم است.':'An internet connection is required to sign in.');return}
+  if(!navigator.onLine){showLoginError(tr('noInternet'));return}
   const button=$('loginSubmit');button.disabled=true;
   try{
     const response=await fetch(CONFIG.loginUrl,{
-      method:'POST',headers:authFetchHeaders(),credentials:'same-origin',
-      body:JSON.stringify({username:$('loginUsername').value.trim(),password:$('loginPassword').value})
+      method:'POST',headers:{'Accept':'application/json','Content-Type':'application/json'},
+      cache:'no-store',
+      body:JSON.stringify({email:$('loginUsername').value.trim(),password:$('loginPassword').value})
     });
     const result=await response.json().catch(()=>({}));
-    if(!response.ok)throw new Error(result.message||`Sign-in failed (HTTP ${response.status})`);
-    const profile=result.operator||result.data?.operator||result.user||result.data?.user;
-    const issuedToken=result.token||result.access_token||result.data?.token||result.data?.access_token;
-    if(!profile?.id||!['admin','staff'].includes(profile.role))throw new Error('Login response must contain operator {id, name, role}.');
-    if(CONFIG.authMode==='bearer'&&!issuedToken)throw new Error('Login response did not include an operator access token.');
-    if(issuedToken)sessionStorage.setItem(CONFIG.tokenKey,issuedToken);
+    if(!response.ok || result.status===false){
+      const errors=result.errors?Object.values(result.errors).flat().join('\n'):'';
+      throw new Error(errors||result.message||`Sign-in failed (HTTP ${response.status})`);
+    }
+    const profile=result.data?.user||result.user||result.data?.operator||result.operator;
+    const issuedToken=result.data?.authorization?.token||result.authorization?.token||result.data?.access_token||result.access_token||result.token;
+    if(!profile?.id||!['admin','staff'].includes(profile.role))throw new Error('Login response must include an operator user with id and role.');
+    if(!issuedToken)throw new Error('Login response did not include data.authorization.token');
+    sessionStorage.setItem(CONFIG.tokenKey,issuedToken);
+    sessionStorage.setItem(CONFIG.profileKey,JSON.stringify(profile));
+    $('loginPassword').value='';
     await showFinance(profile);
-  }catch(err){sessionStorage.removeItem(CONFIG.tokenKey);showLoginError(err.message)}
-  finally{button.disabled=false}
+  }catch(err){
+    sessionStorage.removeItem(CONFIG.tokenKey);
+    sessionStorage.removeItem(CONFIG.profileKey);
+    showLoginError(err.message);
+  }finally{button.disabled=false}
 }
 async function restoreLogin(){
-  if(!navigator.onLine || (CONFIG.authMode==='bearer'&&!token()))return showLogin();
-  try{
-    const response=await fetch(CONFIG.meUrl,{headers:authFetchHeaders(),credentials:'same-origin',cache:'no-store'});
-    if(!response.ok)throw new Error('Session expired');
-    const result=await response.json();
-    const profile=result.operator||result.data?.operator||result.user||result.data?.user||result.data;
-    if(!profile?.id||!['admin','staff'].includes(profile.role))throw new Error('Invalid operator session');
-    await showFinance(profile);
-  }catch{sessionStorage.removeItem(CONFIG.tokenKey);showLogin()}
+  const jwt=token();
+  let profile=null;
+  try{profile=JSON.parse(sessionStorage.getItem(CONFIG.profileKey)||'null')}catch{}
+  if(!jwt||!profile?.id||!['admin','staff'].includes(profile.role))return showLogin();
+  // No /operator/me route is assumed. This only restores a browser-tab session;
+  // it is not a server-side authorization check. The backend validates JWT.
+  if(tokenExpired(jwt) && navigator.onLine){
+    sessionStorage.removeItem(CONFIG.tokenKey);
+    sessionStorage.removeItem(CONFIG.profileKey);
+    return showLogin();
+  }
+  await showFinance(profile);
 }
 async function logoutOperator(){
-  if(navigator.onLine){
-    try{await fetch(CONFIG.logoutUrl,{method:'POST',headers:authFetchHeaders(),credentials:'same-origin'})}catch{}
-  }
-  sessionStorage.removeItem(CONFIG.tokenKey);showLogin();
+  // Local logout only: a server logout route has not been confirmed.
+  sessionStorage.removeItem(CONFIG.tokenKey);
+  sessionStorage.removeItem(CONFIG.profileKey);
+  showLogin();
 }
 function translateLogin(){
   const fa=lang==='fa';
   $('loginTitle').textContent=fa?'ورود اپراتور':'Operator sign in';
   $('loginSubtitle').textContent=fa?'برای دسترسی به امور مالی نیل وارد حساب کاربری مجاز شوید.':'Enter your authorized operator credentials to access NIL Beauty finance.';
-  $('loginUsernameLabel').textContent=fa?'نام کاربری':'Username';
+  $('loginUsernameLabel').textContent=fa?'ایمیل':'Email';
   $('loginPasswordLabel').textContent=fa?'رمز عبور':'Password';
   $('loginSubmit').textContent=fa?'ورود':'Sign in';
   $('logoutBtn').textContent=fa?'خروج':'Sign out';
   $('loginLangBtn').textContent=fa?'EN':'FA';
-  $('loginHint').textContent=fa?'برای اولین ورود اینترنت لازم است. تا وقتی صفحه باز باشد، ثبت تراکنش آفلاین ممکن است.':'First sign-in requires internet. The finance page stays usable offline while this session remains open.';
+  $('loginHint').textContent=fa?'برای ورود اولیه اینترنت لازم است. ثبت آفلاین تأیید پرداخت نیست؛ برای همگام‌سازی توکن معتبر نیاز است.':'First login needs internet. Offline entries are not confirmed payments; syncing requires a valid token.';
 }
 $('loginForm').addEventListener('submit',loginOperator);
 $('logoutBtn').addEventListener('click',logoutOperator);

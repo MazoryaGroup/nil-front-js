@@ -1,5 +1,5 @@
 'use strict';
-const CACHE='nil-finance-shell-v2-login';
+const CACHE='nil-finance-shell-v3';
 const ASSETS=['./','./index.html'];
 self.addEventListener('install',event=>{
   event.waitUntil(caches.open(CACHE).then(cache=>cache.addAll(ASSETS)).then(()=>self.skipWaiting()));

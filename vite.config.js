@@ -2,6 +2,7 @@
 import { defineConfig } from 'vite';
 import { resolve, join, dirname } from 'path';
 import { fileURLToPath } from 'url';
+
 import {
   copyFileSync,
   existsSync,
@@ -9,6 +10,10 @@ import {
   readdirSync,
   statSync
 } from 'fs';
+
+// ============================================
+// Project Root
+// ============================================
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
@@ -19,10 +24,14 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 const BACKEND_URL = 'http://nil-back.test';
 
 // ============================================
-// Copy Directory
+// Copy Directory Recursively
 // ============================================
 
 function copyDir(src, dest) {
+  if (!existsSync(src)) {
+    return;
+  }
+
   if (!existsSync(dest)) {
     mkdirSync(dest, { recursive: true });
   }
@@ -46,6 +55,7 @@ function copyDir(src, dest) {
 function copyExtraAssets() {
   return {
     name: 'copy-extra-assets',
+    apply: 'build',
 
     closeBundle() {
       const distDir = resolve(__dirname, 'dist');
@@ -54,16 +64,38 @@ function copyExtraAssets() {
         mkdirSync(distDir, { recursive: true });
       }
 
+      // ========================================
       // Copy Languages
+      // ========================================
+
       const langSrc = resolve(__dirname, 'lang');
       const langDest = resolve(distDir, 'lang');
 
       if (existsSync(langSrc)) {
         copyDir(langSrc, langDest);
         console.log('✅ lang/ copied to dist/');
+      } else {
+        console.warn('⚠️ lang/ folder not found');
       }
 
+      // ========================================
+      // Copy NIL Offline Finance
+      // ========================================
+
+      const offlineSrc = resolve(__dirname, 'nil-offline');
+      const offlineDest = resolve(distDir, 'nil-offline');
+
+      if (existsSync(offlineSrc)) {
+        copyDir(offlineSrc, offlineDest);
+        console.log('✅ nil-offline/ copied to dist/');
+      } else {
+        console.warn('⚠️ nil-offline/ folder not found');
+      }
+
+      // ========================================
       // Copy Webflow Assets
+      // ========================================
+
       const webflowFolders = [
         '664f4bd2faa9dcaac5fc2dee',
         '66b9c720ca349144caf447a8'
@@ -76,10 +108,15 @@ function copyExtraAssets() {
         if (existsSync(src)) {
           copyDir(src, dest);
           console.log(`✅ ${folder} copied to dist/`);
+        } else {
+          console.warn(`⚠️ ${folder}/ not found`);
         }
       }
 
+      // ========================================
       // Copy Root Images
+      // ========================================
+
       const rootFiles = readdirSync(__dirname).filter(file =>
         /\.(svg|png|jpg|jpeg|webp|gif|ico)$/i.test(file)
       );
@@ -91,11 +128,19 @@ function copyExtraAssets() {
         );
       }
 
-      if (rootFiles.length) {
+      if (rootFiles.length > 0) {
         console.log(
           `✅ ${rootFiles.length} root images copied to dist/`
         );
       }
+
+      // ========================================
+      // Build Completed
+      // ========================================
+
+      console.log('====================================');
+      console.log('✅ NIL BEAUTY BUILD ASSETS READY');
+      console.log('====================================');
     }
   };
 }
@@ -105,13 +150,29 @@ function copyExtraAssets() {
 // ============================================
 
 export default defineConfig({
+  // ==========================================
+  // Root
+  // ==========================================
+
   root: '.',
 
+  // ==========================================
+  // Public Assets
+  // ==========================================
+
   publicDir: 'asset',
+
+  // ==========================================
+  // Plugins
+  // ==========================================
 
   plugins: [
     copyExtraAssets()
   ],
+
+  // ==========================================
+  // Development Server
+  // ==========================================
 
   server: {
     host: 'localhost',
@@ -134,6 +195,10 @@ export default defineConfig({
       }
     }
   },
+
+  // ==========================================
+  // Production Build
+  // ==========================================
 
   build: {
     outDir: 'dist',
